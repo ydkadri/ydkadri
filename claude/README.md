@@ -39,14 +39,28 @@ At the start of each project, ask: **Is this a work or personal project?**
 ### Core Workflow
 - **[workflow.md](workflow.md)** - How we work together: question-asking protocol, documentation requirements, collaboration style
 - **[git.md](git.md)** - Git workflow: branching, commits, PRs, pre-commit/pre-push hooks
+- **[security.md](security.md)** - Security patterns and practices
 
-### Language Style Guides
-- **[python.md](python.md)** - Python code style: imports, protocols, organization, quality standards
-- **[rust.md](rust.md)** - Rust code style: naming, error handling, traits, idioms, benchmarks
-- **[sql.md](sql.md)** - SQL code style: queries, naming, formatting
+### Language Style Guides (`languages/`)
+- **[python.md](languages/python.md)** - Python code style: imports, protocols, organization, quality standards
+- **[rust.md](languages/rust.md)** - Rust code style: naming, error handling, traits, idioms, benchmarks
+- **[sql.md](languages/sql.md)** - SQL code style: queries, naming, formatting
 
-### Project Organization
-- **[project-structure.md](project-structure.md)** - Project layout: justfiles, directory structure, package managers
+### Data Architecture (`data/`)
+- **[architecture.md](data/architecture.md)** - Medallion architecture, data pipeline patterns, lifecycle
+- **[modeling.md](data/modeling.md)** - Schema design, normalization, relational vs graph databases
+- **[operations.md](data/operations.md)** - Migrations, testing, transactions, query patterns
+- **[quality.md](data/quality.md)** - Data validation, contracts, quality checks
+- **[observability.md](data/observability.md)** - Lineage, metrics, monitoring, alerting
+- **[databases/postgresql.md](data/databases/postgresql.md)** - PostgreSQL-specific features and patterns
+- **[databases/neo4j.md](data/databases/neo4j.md)** - Graph database modeling and Cypher patterns
+- **[warehouses/spark-databricks.md](data/warehouses/spark-databricks.md)** - Delta Lake, partitioning, optimization
+
+### Project Organization (`project/`)
+- **[structure.md](project/structure.md)** - Project layout: justfiles, directory structure, package managers
+- **[docker.md](project/docker.md)** - Docker and containerization patterns
+- **[ci.md](project/ci.md)** - CI/CD workflows and patterns
+- **[testing.md](project/testing.md)** - Testing strategies and patterns
 
 ---
 
