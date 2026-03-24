@@ -7,8 +7,8 @@ Language-specific and project-specific examples focusing on non-obvious implemen
 - **python/** - Python project examples and patterns
 - **rust/** - Rust project examples and patterns
 - **docker/** - Docker configuration files
-- **justfile** - Task automation recipes
-- **pre_commit_hooks.md** - Pre-commit hook patterns
+- **justfile** - Task automation recipes (outcome-focused, generic)
+- **ci_workflows.md** - GitHub Actions CI/CD patterns
 
 ## Python Examples
 
@@ -27,12 +27,12 @@ Language-specific and project-specific examples focusing on non-obvious implemen
 
 ## Common Tools
 
-- **justfile** - Task automation with recipes for Python, Rust, Docker, database, and Git workflows
-- **pre_commit_hooks.md** - Generic patterns for Python, Rust, and general file checks
+- **justfile** - Task automation with outcome-focused recipes (lint, test, docker, git workflow)
+- **ci_workflows.md** - GitHub Actions patterns for PR checks and releases
 
 ## Docker
 
-- **docker-compose.yml** - Multi-service Docker Compose configuration
+- **docker-compose.yml** - Multi-service configuration using .env files
 - **Dockerfile** - Multi-stage build example
 
 ## Philosophy
@@ -42,3 +42,4 @@ These examples focus on:
 - Generic patterns that apply across projects
 - Configuration snippets rather than full files (except where helpful)
 - Real-world integration challenges (e.g., Django/dbt structured logging)
+- Consistency between local development and CI (via `just` commands)

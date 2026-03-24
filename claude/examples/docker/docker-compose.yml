@@ -1,5 +1,11 @@
 # Example docker-compose for development
 # Demonstrates common service patterns
+#
+# Create a .env file with your configuration:
+#   POSTGRES_USER=myuser
+#   POSTGRES_PASSWORD=mypassword
+#   POSTGRES_DB=mydb
+#   LOG_LEVEL=DEBUG
 
 version: '3.8'
 
@@ -12,12 +18,12 @@ services:
       target: development
     ports:
       - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://myuser:mypassword@postgres:5432/mydb
-      - REDIS_URL=redis://redis:6379/0
-      - LOG_LEVEL=DEBUG
     env_file:
       - .env
+    environment:
+      # Reference variables from .env file
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379/0
     volumes:
       # Mount source code for hot reload
       - ./src:/app/src
@@ -34,15 +40,13 @@ services:
     image: postgres:16-alpine
     ports:
       - "5432:5432"
-    environment:
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
-      - POSTGRES_DB=mydb
+    env_file:
+      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U myuser -d mydb"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -65,8 +69,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      - DATABASE_URL=postgresql://myuser:mypassword@postgres:5432/mydb
+    env_file:
+      - .env
     depends_on:
       postgres:
         condition: service_healthy

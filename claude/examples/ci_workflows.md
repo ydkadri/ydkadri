@@ -44,7 +44,6 @@ jobs:
       matrix:
         # Python: ["3.10", "3.11", "3.12"]
         # Rust: ["stable", "beta"]
-        # Node: ["18", "20", "22"]
         version: ["3.12"]
 
     steps:
@@ -57,9 +56,6 @@ jobs:
 
       - name: Install dependencies
         run: just install
-
-      - name: Run unit tests
-        run: just test-unit
 
       - name: Run tests with coverage
         run: just test-coverage
@@ -140,30 +136,6 @@ jobs:
     key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
 ```
 
-### Node with pnpm
-
-```yaml
-- name: Setup Node.js
-  uses: actions/setup-node@v4
-  with:
-    node-version: ${{ matrix.node-version }}
-
-- name: Install pnpm
-  uses: pnpm/action-setup@v2
-  with:
-    version: 8
-
-- name: Get pnpm store directory
-  id: pnpm-cache
-  run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-- name: Setup pnpm cache
-  uses: actions/cache@v4
-  with:
-    path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-    key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-```
-
 ## Release Workflows
 
 ### Version-Based Auto-Release (Merge to Main)
@@ -193,7 +165,6 @@ jobs:
         run: |
           # Python: VERSION=$(uv run python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
           # Rust: VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
-          # Node: VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=v$VERSION" >> $GITHUB_OUTPUT
 
@@ -255,7 +226,7 @@ jobs:
         run: just test
 
       - name: Build release artifact
-        run: just build
+        run: just build-release
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -264,7 +235,6 @@ jobs:
             # Include built artifacts
             # Python: dist/*.whl
             # Rust: target/release/binary-name
-            # Node: dist/*
           draft: false
           generate_release_notes: true
         env:
@@ -282,7 +252,6 @@ jobs:
         run: |
           # Python: uv publish --token ${{ secrets.PYPI_TOKEN }}
           # Rust: cargo publish --token ${{ secrets.CARGO_TOKEN }}
-          # Node: npm publish --access public
         env:
           # Set appropriate token
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
@@ -377,20 +346,6 @@ services:
       ~/.cargo/git
       target
     key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-```
-
-### Node (pnpm)
-
-```yaml
-- name: Get pnpm store directory
-  id: pnpm-cache
-  run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-- name: Setup pnpm cache
-  uses: actions/cache@v4
-  with:
-    path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-    key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
 ```
 
 ## Environment Variables

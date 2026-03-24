@@ -9,51 +9,59 @@ default:
     @just --list
 
 # Linting and formatting
-lint:  # Catch-all for quality checks. May check typing, compilation, formatting, etc.
-    @echo "Run linting commands appropriate for your project"
-    # Python: uv run ruff check . && uv run mypy .
-    # Rust: cargo clippy -- -D warnings && cargo fmt --check
+lint-format:  # Check code formatting
+    # Python: uv run ruff format --check .
+    # Rust: cargo fmt --check
+
+lint-imports:  # Check import sorting
+    # Python: uv run isort --check-only .
+
+lint-quality:  # Check code quality (linting rules)
+    # Python: uv run ruff check .
+    # Rust: cargo clippy -- -D warnings
+
+lint-types:  # Check type annotations/hints
+    # Python: uv run mypy .
+    # Rust: (typically handled by compiler)
+
+lint: lint-format lint-imports lint-quality lint-types  # Run all linting checks
 
 format:  # Auto-format code to match style guide
-    @echo "Run formatting commands"
-    # Python: uv run ruff format .
+    # Python: uv run ruff format . && uv run isort .
     # Rust: cargo fmt
 
 # Testing
 test-unit:  # Run unit tests only
-    @echo "Run unit tests"
     # Python: uv run pytest tests/unit
     # Rust: cargo test --lib
 
 test-integration:  # Run integration tests only (may require services)
-    @echo "Run integration tests"
     # Python: uv run pytest tests/integration
     # Rust: cargo test --test integration
 
-test-coverage:  # Run unit tests with coverage report
-    @echo "Run tests with coverage"
-    # Python: uv run pytest --cov --cov-report=html
+test-coverage:  # Run tests with coverage report
+    # Python: uv run pytest --cov --cov-report=html --cov-fail-under=80
     # Rust: cargo tarpaulin --out Html
 
 test: test-unit test-integration  # Run all tests
 
-# Build and check
-build:  # Build the project (compile, package, etc.)
-    @echo "Build project"
+# Build
+build:  # Build the project for development
+    # Python: uv build
+    # Rust: cargo build
+
+build-release:  # Build optimized release artifact
     # Python: uv build
     # Rust: cargo build --release
 
 check: lint test  # Run all quality checks (what CI runs)
-    @echo "All checks passed!"
 
 # Development environment
 install:  # Install dependencies
-    @echo "Install dependencies"
     # Python: uv sync
     # Rust: cargo build
 
 dev:  # Start development environment
-    @echo "Start development environment"
     # Docker: docker compose up -d
     # Django: uv run python manage.py runserver
     # Rust: cargo watch -x run
@@ -65,6 +73,15 @@ docker-up:  # Start all services
 docker-down:  # Stop all services
     docker compose down
 
+docker-restart:  # Restart services
+    docker compose down
+    docker compose up -d
+
+docker-reset:  # Full reset: remove volumes, rebuild, and restart
+    docker compose down -v
+    docker compose build
+    docker compose up -d
+
 docker-logs service="":  # View logs for service (or all if none specified)
     docker compose logs -f {{service}}
 
@@ -73,22 +90,24 @@ docker-shell service:  # Open shell in running service
 
 # Database operations
 db-migrate:  # Apply database migrations
-    @echo "Apply migrations"
     # Python: uv run alembic upgrade head
     # Rust: sqlx migrate run
     # Django: uv run python manage.py migrate
 
 db-rollback:  # Rollback last migration
-    @echo "Rollback migration"
     # Python: uv run alembic downgrade -1
     # Rust: sqlx migrate revert
 
 db-shell:  # Open database shell
     docker compose exec postgres psql -U myuser -d mydb
 
+# Git workflow
+prepare-commit: format lint  # Prepare code for commit (format and lint)
+
+prepare-push: check  # Prepare code for push (run all checks including tests)
+
 # Cleanup
 clean:  # Remove build artifacts and caches
-    @echo "Clean build artifacts"
     # Python: find . -type d -name "__pycache__" -exec rm -rf {} +
+    # Python: rm -rf .venv/ htmlcov/ .coverage .pytest_cache/ .mypy_cache/ .ruff_cache/
     # Rust: cargo clean
-    # All: rm -rf .venv/ htmlcov/ .coverage
