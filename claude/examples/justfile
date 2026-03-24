@@ -1,0 +1,138 @@
+# Example justfile for project automation
+# Run `just` to see available commands
+
+# Default recipe shows help
+default:
+    @just --list
+
+# Python recipes
+[group('python')]
+py-install:
+    uv sync
+
+[group('python')]
+py-test:
+    uv run pytest
+
+[group('python')]
+py-test-cov:
+    uv run pytest --cov --cov-report=html
+
+[group('python')]
+py-lint:
+    uv run ruff check .
+
+[group('python')]
+py-format:
+    uv run ruff format .
+
+[group('python')]
+py-type-check:
+    uv run mypy .
+
+[group('python')]
+py-check: py-lint py-type-check py-test
+    @echo "All Python checks passed!"
+
+# Rust recipes
+[group('rust')]
+rs-build:
+    cargo build
+
+[group('rust')]
+rs-test:
+    cargo test
+
+[group('rust')]
+rs-bench:
+    cargo bench
+
+[group('rust')]
+rs-lint:
+    cargo clippy -- -D warnings
+
+[group('rust')]
+rs-format:
+    cargo fmt
+
+[group('rust')]
+rs-check: rs-lint rs-test
+    @echo "All Rust checks passed!"
+
+# Docker recipes
+[group('docker')]
+docker-build:
+    docker compose build
+
+[group('docker')]
+docker-up:
+    docker compose up -d
+
+[group('docker')]
+docker-down:
+    docker compose down
+
+[group('docker')]
+docker-logs:
+    docker compose logs -f
+
+[group('docker')]
+docker-shell service:
+    docker compose exec {{service}} /bin/bash
+
+# Database recipes
+[group('database')]
+db-migrate:
+    # Python: uv run alembic upgrade head
+    # Rust: sqlx migrate run
+    @echo "Run appropriate migration command"
+
+[group('database')]
+db-rollback:
+    # Python: uv run alembic downgrade -1
+    # Rust: sqlx migrate revert
+    @echo "Run appropriate rollback command"
+
+[group('database')]
+db-shell:
+    docker compose exec postgres psql -U myuser -d mydb
+
+# Git recipes
+[group('git')]
+git-pre-commit:
+    @echo "Running pre-commit checks..."
+    just py-format
+    just py-lint
+    just py-type-check
+    just py-test
+    @echo "Pre-commit checks passed!"
+
+[group('git')]
+git-pre-push:
+    @echo "Running pre-push checks..."
+    just py-check
+    @echo "Pre-push checks passed!"
+
+# Clean recipes
+[group('clean')]
+clean-py:
+    find . -type d -name "__pycache__" -exec rm -rf {} +
+    find . -type d -name "*.egg-info" -exec rm -rf {} +
+    find . -type d -name ".pytest_cache" -exec rm -rf {} +
+    find . -type d -name ".mypy_cache" -exec rm -rf {} +
+    find . -type d -name ".ruff_cache" -exec rm -rf {} +
+    rm -rf htmlcov/
+    rm -f .coverage
+
+[group('clean')]
+clean-rs:
+    cargo clean
+
+[group('clean')]
+clean-all: clean-py clean-rs
+    rm -rf .venv/
+    @echo "Cleaned all build artifacts!"
+
+# CI simulation - run what CI runs
+ci: py-check
+    @echo "CI checks passed locally!"
