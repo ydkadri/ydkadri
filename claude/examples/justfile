@@ -1,138 +1,94 @@
 # Example justfile for project automation
 # Run `just` to see available commands
+#
+# Recipes describe outcomes, not implementation.
+# Adapt commands to your project's tools and conventions.
 
 # Default recipe shows help
 default:
     @just --list
 
-# Python recipes
-[group('python')]
-py-install:
-    uv sync
+# Linting and formatting
+lint:  # Catch-all for quality checks. May check typing, compilation, formatting, etc.
+    @echo "Run linting commands appropriate for your project"
+    # Python: uv run ruff check . && uv run mypy .
+    # Rust: cargo clippy -- -D warnings && cargo fmt --check
 
-[group('python')]
-py-test:
-    uv run pytest
+format:  # Auto-format code to match style guide
+    @echo "Run formatting commands"
+    # Python: uv run ruff format .
+    # Rust: cargo fmt
 
-[group('python')]
-py-test-cov:
-    uv run pytest --cov --cov-report=html
+# Testing
+test-unit:  # Run unit tests only
+    @echo "Run unit tests"
+    # Python: uv run pytest tests/unit
+    # Rust: cargo test --lib
 
-[group('python')]
-py-lint:
-    uv run ruff check .
+test-integration:  # Run integration tests only (may require services)
+    @echo "Run integration tests"
+    # Python: uv run pytest tests/integration
+    # Rust: cargo test --test integration
 
-[group('python')]
-py-format:
-    uv run ruff format .
+test-coverage:  # Run unit tests with coverage report
+    @echo "Run tests with coverage"
+    # Python: uv run pytest --cov --cov-report=html
+    # Rust: cargo tarpaulin --out Html
 
-[group('python')]
-py-type-check:
-    uv run mypy .
+test: test-unit test-integration  # Run all tests
 
-[group('python')]
-py-check: py-lint py-type-check py-test
-    @echo "All Python checks passed!"
+# Build and check
+build:  # Build the project (compile, package, etc.)
+    @echo "Build project"
+    # Python: uv build
+    # Rust: cargo build --release
 
-# Rust recipes
-[group('rust')]
-rs-build:
-    cargo build
+check: lint test  # Run all quality checks (what CI runs)
+    @echo "All checks passed!"
 
-[group('rust')]
-rs-test:
-    cargo test
+# Development environment
+install:  # Install dependencies
+    @echo "Install dependencies"
+    # Python: uv sync
+    # Rust: cargo build
 
-[group('rust')]
-rs-bench:
-    cargo bench
+dev:  # Start development environment
+    @echo "Start development environment"
+    # Docker: docker compose up -d
+    # Django: uv run python manage.py runserver
+    # Rust: cargo watch -x run
 
-[group('rust')]
-rs-lint:
-    cargo clippy -- -D warnings
-
-[group('rust')]
-rs-format:
-    cargo fmt
-
-[group('rust')]
-rs-check: rs-lint rs-test
-    @echo "All Rust checks passed!"
-
-# Docker recipes
-[group('docker')]
-docker-build:
-    docker compose build
-
-[group('docker')]
-docker-up:
+# Docker operations
+docker-up:  # Start all services
     docker compose up -d
 
-[group('docker')]
-docker-down:
+docker-down:  # Stop all services
     docker compose down
 
-[group('docker')]
-docker-logs:
-    docker compose logs -f
+docker-logs service="":  # View logs for service (or all if none specified)
+    docker compose logs -f {{service}}
 
-[group('docker')]
-docker-shell service:
+docker-shell service:  # Open shell in running service
     docker compose exec {{service}} /bin/bash
 
-# Database recipes
-[group('database')]
-db-migrate:
+# Database operations
+db-migrate:  # Apply database migrations
+    @echo "Apply migrations"
     # Python: uv run alembic upgrade head
     # Rust: sqlx migrate run
-    @echo "Run appropriate migration command"
+    # Django: uv run python manage.py migrate
 
-[group('database')]
-db-rollback:
+db-rollback:  # Rollback last migration
+    @echo "Rollback migration"
     # Python: uv run alembic downgrade -1
     # Rust: sqlx migrate revert
-    @echo "Run appropriate rollback command"
 
-[group('database')]
-db-shell:
+db-shell:  # Open database shell
     docker compose exec postgres psql -U myuser -d mydb
 
-# Git recipes
-[group('git')]
-git-pre-commit:
-    @echo "Running pre-commit checks..."
-    just py-format
-    just py-lint
-    just py-type-check
-    just py-test
-    @echo "Pre-commit checks passed!"
-
-[group('git')]
-git-pre-push:
-    @echo "Running pre-push checks..."
-    just py-check
-    @echo "Pre-push checks passed!"
-
-# Clean recipes
-[group('clean')]
-clean-py:
-    find . -type d -name "__pycache__" -exec rm -rf {} +
-    find . -type d -name "*.egg-info" -exec rm -rf {} +
-    find . -type d -name ".pytest_cache" -exec rm -rf {} +
-    find . -type d -name ".mypy_cache" -exec rm -rf {} +
-    find . -type d -name ".ruff_cache" -exec rm -rf {} +
-    rm -rf htmlcov/
-    rm -f .coverage
-
-[group('clean')]
-clean-rs:
-    cargo clean
-
-[group('clean')]
-clean-all: clean-py clean-rs
-    rm -rf .venv/
-    @echo "Cleaned all build artifacts!"
-
-# CI simulation - run what CI runs
-ci: py-check
-    @echo "CI checks passed locally!"
+# Cleanup
+clean:  # Remove build artifacts and caches
+    @echo "Clean build artifacts"
+    # Python: find . -type d -name "__pycache__" -exec rm -rf {} +
+    # Rust: cargo clean
+    # All: rm -rf .venv/ htmlcov/ .coverage

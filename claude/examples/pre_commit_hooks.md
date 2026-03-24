@@ -2,6 +2,8 @@
 
 Generic patterns for setting up pre-commit hooks using the `pre-commit` framework.
 
+**Recommendation**: Leverage project `just` commands for consistency between local and CI environments.
+
 ## Installation
 
 ```bash
@@ -9,11 +11,43 @@ pip install pre-commit
 pre-commit install
 ```
 
-## Python Project Hooks
+## Using Project Just Commands
+
+The most consistent approach is to delegate to your project's `justfile`:
 
 ```yaml
 repos:
-  # Python formatting and linting with ruff
+  - repo: local
+    hooks:
+      - id: lint
+        name: lint
+        entry: just lint
+        language: system
+        pass_filenames: false
+
+      - id: format
+        name: format
+        entry: just format
+        language: system
+        pass_filenames: false
+
+      - id: test-unit
+        name: test-unit
+        entry: just test-unit
+        language: system
+        pass_filenames: false
+```
+
+This ensures pre-commit, local development, and CI all use the same commands.
+
+## Language-Specific Hooks
+
+If not using `just`, configure hooks directly:
+
+### Python with Ruff
+
+```yaml
+repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.2.0
     hooks:
@@ -21,7 +55,6 @@ repos:
         args: [--fix]
       - id: ruff-format
 
-  # Type checking with mypy
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.8.0
     hooks:
@@ -29,7 +62,7 @@ repos:
         additional_dependencies: [types-all]
 ```
 
-## Rust Project Hooks
+### Rust
 
 ```yaml
 repos:
@@ -65,7 +98,6 @@ repos:
       - id: check-added-large-files
       - id: check-merge-conflict
       - id: detect-private-key
-      - id: check-case-conflict
 ```
 
 ## Secrets Detection
@@ -82,11 +114,11 @@ repos:
 ## Running Hooks
 
 ```bash
+# Run on staged files
+pre-commit run
+
 # Run on all files
 pre-commit run --all-files
-
-# Run on staged files only
-pre-commit run
 
 # Update hook versions
 pre-commit autoupdate
