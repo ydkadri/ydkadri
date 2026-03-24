@@ -47,6 +47,37 @@ When writing code, always design the API or interface first, then implement. How
 3. Wait for review and feedback
 4. Only then implement internals
 
+## PR Review Workflow
+
+### Always Include PR Link
+
+**When requesting review, always include the PR URL:**
+- Include on initial review requests
+- Include on re-review requests after addressing feedback
+- Makes it easy to jump directly to the PR
+- Example: "Ready for review: https://github.com/ydkadri/ydkadri/pull/4"
+
+### Review Work Must Meet Quality Standards
+
+**When addressing PR feedback, apply the same standards as original work:**
+
+Before considering review work complete:
+- ✅ Run linting - all checks pass
+- ✅ Run tests - all tests pass
+- ✅ Check test coverage hasn't dropped
+- ✅ Run formatting - code formatted consistently
+- ✅ Meet all quality standards
+
+**Never consider review feedback "complete" without meeting these criteria.**
+
+### Git Merge Strategy
+
+**Prefer rebase merges for linear history:**
+- Use rebase merge (not merge commits or squash merge)
+- Maintains clean, linear commit history
+- Each commit in feature branch appears in main history
+- Makes git log easy to read and bisect work correctly
+
 ## Documentation Requirements
 
 ### When to Update Documentation
@@ -92,4 +123,4 @@ Don't ask for permission to:
 
 ---
 
-**Last Updated**: 2026-03-23
+**Last Updated**: 2026-03-24
