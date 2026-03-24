@@ -49,92 +49,27 @@ Emit standardized metrics and logs that can be consumed by any observability pla
 ### Column-Level Lineage
 
 **Track transformations at column level:**
-
-```python
-from dataclasses import dataclass
-from typing import List
-
-@dataclass
-class ColumnLineage:
-    """Column lineage metadata."""
-    target_table: str
-    target_column: str
-    source_tables: List[str]
-    source_columns: List[str]
-    transformation: str
-    created_at: datetime
-
-# Example lineage
-lineage = ColumnLineage(
-    target_table="domain.analytics.user_metrics",
-    target_column="total_spent",
-    source_tables=["structured.orders"],
-    source_columns=["total_amount"],
-    transformation="sum(orders.total_amount) group by user_id",
-    created_at=datetime.now()
-)
-```
+- Target table and column
+- Source tables and columns
+- Transformation logic description
+- Timestamp of when lineage was recorded
 
 ### Table-Level Lineage
 
 **Track dependencies between tables:**
-
-```python
-@dataclass
-class TableLineage:
-    """Table lineage metadata."""
-    target_table: str
-    source_tables: List[str]
-    transformation_type: str  # "join", "aggregate", "filter", etc.
-    pipeline_name: str
-    created_at: datetime
-
-# Log lineage
-def log_table_lineage(
-    target: str,
-    sources: List[str],
-    transformation: str,
-    pipeline: str
-):
-    """Log table lineage for tracking."""
-    lineage = TableLineage(
-        target_table=target,
-        source_tables=sources,
-        transformation_type=transformation,
-        pipeline_name=pipeline,
-        created_at=datetime.now()
-    )
-
-    # Store in lineage table
-    lineage_df = spark.createDataFrame([lineage])
-    lineage_df.write.format("delta").mode("append").save("/lineage/tables")
-
-    log.info("table_lineage_recorded", **asdict(lineage))
-```
+- Target table
+- Source tables
+- Transformation type (join, aggregate, filter)
+- Pipeline name
+- Store in lineage table for querying
 
 ### Automatic Lineage Capture
 
 **Use metadata to build lineage automatically:**
-
-```python
-def capture_lineage(df, target_table: str):
-    """Automatically capture lineage from DataFrame."""
-    # Get source tables from DataFrame plan
-    plan = df._jdf.queryExecution().analyzed().toString()
-
-    # Extract table names (simplified)
-    import re
-    source_tables = re.findall(r'Relation\[([^\]]+)\]', plan)
-
-    log_table_lineage(
-        target=target_table,
-        sources=list(set(source_tables)),
-        transformation="spark_dataframe",
-        pipeline=os.getenv("PIPELINE_NAME", "unknown")
-    )
-
-    return df
-```
+- Parse query execution plans
+- Extract source table references
+- Log lineage metadata
+- Integrate with pipeline orchestration
 
 ### Lineage Visualization
 

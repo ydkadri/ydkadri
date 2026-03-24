@@ -33,24 +33,6 @@ Each layer serves a distinct purpose in the data journey from raw ingestion to b
 
 **Why permissive?** Changes in source systems shouldn't break ingestion. Better to accept malformed data and handle it at the Landing → Cleaned transition.
 
-```python
-# Landing layer ingestion - permissive, with metadata
-raw_events = (
-    spark.read.json("s3://source/events/")
-    .withColumn("_ingested_at", current_timestamp())
-    .withColumn("_source_system", lit("stripe"))
-)
-
-(
-    raw_events
-    .write
-    .format("delta")
-    .mode("append")
-    .partitionBy("date")  # Partition by ingestion date
-    .save("/landing/stripe/events")
-)
-```
-
 ### Cleaned Layer
 
 **Validated and typed events - still append-only.**
@@ -64,23 +46,6 @@ raw_events = (
 
 **Purpose:** Clean, validated events ready for business transformation. This is where failures should happen (reject bad data).
 
-```python
-# Cleaned layer: validate, type, deduplicate
-landing_df = spark.read.format("delta").load("/landing/stripe/events")
-
-cleaned_df = (
-    landing_df
-    .dropDuplicates(["event_id"])
-    .filter(col("created_at").isNotNull())
-    .withColumn("event_id", col("event_id").cast("bigint"))
-    .withColumn("created_at", col("created_at").cast("timestamp"))
-    .withColumn("event_type", lower(trim(col("event_type"))))
-)
-
-# Can be a view if transformations are simple
-cleaned_df.write.format("delta").mode("append").save("/cleaned/stripe/events")
-```
-
 ### Structured Layer
 
 **Type-2 SCD business entities - canonical truth.**
@@ -92,25 +57,6 @@ cleaned_df.write.format("delta").mode("append").save("/cleaned/stripe/events")
 - **Reusable foundation** - Used by multiple domains
 
 **Purpose:** Canonical, historical view of business entities. The authoritative version of business data.
-
-```python
-# Structured layer: build Type-2 SCD entities
-cleaned_events = spark.read.format("delta").load("/cleaned/stripe/events")
-
-# Transform events into Type-2 SCD for customers
-customers_scd = (
-    cleaned_events
-    .filter(col("event_type") == "customer_updated")
-    .withColumn("active_from", col("created_at"))
-    .withColumn("active_to", lead("created_at").over(
-        Window.partitionBy("customer_id").orderBy("created_at")
-    ))
-    .withColumn("is_current", col("active_to").isNull())
-)
-
-# Materialize - reused by many domains
-customers_scd.write.format("delta").mode("overwrite").save("/structured/customers")
-```
 
 ### Domain Layer
 
@@ -126,40 +72,6 @@ customers_scd.write.format("delta").mode("overwrite").save("/structured/customer
 - **Multiple marts for same entity** - `marketing.customers` vs `analytics.customers`
 
 **Purpose:** Consumption layer with governance boundaries. Optimized for specific business outcomes.
-
-```python
-# Domain layer: marketing mart with governance
-structured_customers = spark.read.format("delta").load("/structured/customers")
-
-# Marketing needs email/name but analytics doesn't
-marketing_customers = (
-    structured_customers
-    .filter(col("is_current") == True)
-    .select(
-        "customer_id",
-        "email",      # PII - marketing has access
-        "name",       # PII - marketing has access
-        "segment",
-        "created_at"
-    )
-)
-
-marketing_customers.write.format("delta").mode("overwrite").save("/domain/marketing/customers")
-
-# Analytics gets aggregated, anonymized view
-analytics_customers = (
-    structured_customers
-    .filter(col("is_current") == True)
-    .select(
-        "customer_id",
-        "segment",
-        "created_at"
-        # No PII
-    )
-)
-
-analytics_customers.write.format("delta").mode("overwrite").save("/domain/analytics/customers")
-```
 
 ## Architecture Principles
 
