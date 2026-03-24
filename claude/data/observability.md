@@ -21,6 +21,12 @@ Data lineage, pipeline metrics, and data integrity monitoring using OpenTelemetr
 2. **Pipeline Metrics** - Run statistics (duration, rows processed, status)
 3. **Data Integrity Metrics** - Freshness, Completeness, Correctness
 
+**Quality vs Observability:**
+- **Data Quality** (point-in-time) - Validation logic: what to check and how (`quality.md`)
+- **Data Observability** (over time) - Measuring quality trends: monitoring validation failure rates, tracking metrics, alerting on anomalies
+
+Data quality metrics measured over time make up a core part of the data observability suite.
+
 **Tool-agnostic approach:**
 Emit standardized metrics and logs that can be consumed by any observability platform (DataDog, Prometheus, Grafana, custom dashboards).
 
@@ -434,78 +440,27 @@ log.info(
 
 ### Correctness
 
-**Validate data conforms to expectations.**
+**Track data validation failures over time.**
+
+Correctness measures whether data conforms to expectations:
+- Value ranges (amounts, IDs)
+- Referential integrity (foreign keys)
+- Business logic rules
+- Schema compliance
+
+**Implementation:** Quality validation logic is defined in `quality.md`. Observability tracks validation failure rates over time.
 
 ```python
-@dataclass
-class CorrectnessCheck:
-    """Correctness validation result."""
-    check_name: str
-    table: str
-    passed: bool
-    failed_count: int
-    total_count: int
-    measured_at: datetime
-
-def check_value_ranges(table: str, column: str, min_val: float, max_val: float) -> CorrectnessCheck:
-    """Check values are within expected range."""
-    total = spark.table(table).count()
-
-    out_of_range = spark.sql(f"""
-        select count(*) as failed
-        from {table}
-        where {column} < {min_val} or {column} > {max_val}
-    """).collect()[0]["failed"]
-
-    return CorrectnessCheck(
-        check_name=f"{column}_in_range",
-        table=table,
-        passed=(out_of_range == 0),
-        failed_count=out_of_range,
-        total_count=total,
-        measured_at=datetime.now()
-    )
-
-def check_referential_integrity(
-    child_table: str,
-    parent_table: str,
-    fk_column: str,
-    pk_column: str
-) -> CorrectnessCheck:
-    """Check referential integrity."""
-    orphaned = spark.sql(f"""
-        select count(*) as failed
-        from {child_table} c
-        left join {parent_table} p
-          on c.{fk_column} = p.{pk_column}
-        where p.{pk_column} is null
-    """).collect()[0]["failed"]
-
-    total = spark.table(child_table).count()
-
-    return CorrectnessCheck(
-        check_name=f"{child_table}_{fk_column}_references_{parent_table}",
-        table=child_table,
-        passed=(orphaned == 0),
-        failed_count=orphaned,
-        total_count=total,
-        measured_at=datetime.now()
-    )
-
-# Emit correctness metrics
-checks = [
-    check_value_ranges("structured.orders", "total_amount", 0, 1000000),
-    check_referential_integrity("structured.orders", "structured.users", "user_id", "user_id")
-]
-
-for check in checks:
-    log.info(
-        "correctness_checked",
-        check_name=check.check_name,
-        table=check.table,
-        passed=check.passed,
-        failed_count=check.failed_count
-    )
+# Emit correctness metric from quality checks
+log.info(
+    "correctness_checked",
+    check_name="order_total_in_range",
+    table="structured.orders",
+    passed=True,
+    failed_count=0,
+    total_count=1000,
+    measured_at=datetime.now()
+)
 ```
 
 ### Integrity Dashboard

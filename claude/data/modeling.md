@@ -2,82 +2,16 @@
 
 Data modeling principles, schema design, and database selection.
 
-## Choosing Data Stores
-
-### OLTP (Online Transaction Processing)
-
-**For operational application databases.**
-
-- Normalized schemas (3NF)
-- Write-optimized
-- ACID transactions
-- Row-oriented storage
-- Use: Application databases, transactional systems
-- Example: PostgreSQL, MySQL
-
-**Key characteristics:**
-- Event-first with append-only facts
-- Type-2 SCDs for dimension tracking
-- Strong consistency requirements
-
-### OLAP (Online Analytical Processing)
-
-**For analytical data warehouses.**
-
-- Denormalized schemas
-- Read-optimized
-- Eventual consistency acceptable
-- Columnar storage
-- Use: Data warehouses, analytics
-- Example: Databricks, Snowflake, BigQuery
-
-**Key characteristics:**
-- Four-layer architecture (Landing/Cleaned/Structured/Domain)
-- Optimized for aggregations and complex queries
-- Historical analysis
-
-### Event Streaming
-
-**For real-time event processing.**
-
-- Append-only logs
-- Time-ordered events
-- Immutable records
-- Use: Real-time processing, audit trails, pub/sub architectures
-- Example: Kafka, Kinesis
-
-**Key characteristics:**
-- Services produce events
-- Consumers decide their own patterns
-- Events land in warehouse for historical analysis
-
-### Graph Databases
-
-**When relationships are central.**
-
-- Relationships as first-class citizens
-- Traversal-optimized
-- Pattern matching
-- Use: Social networks, knowledge graphs, recommendations
-- Example: Neo4j
-
-**Key characteristics:**
-- Variable-depth traversals
-- Path finding
-- Pattern matching across relationships
-
-See `data/databases/neo4j.md` for detailed graph modeling patterns.
-
 ## Modeling Approach
 
 ### For Operational Systems (OLTP)
 
-**Event-first with Type-2 SCDs.**
+**Event-first for auditability.**
 
 Operational databases should:
 - Store facts as events (append-only)
 - Use 3NF for transactional data
-- Track dimension changes with Type-2 SCDs
+- Maintain current state tables alongside event logs
 
 ### For Analytical Systems (OLAP)
 
@@ -132,6 +66,7 @@ create table orders (
 **Trade-offs:**
 - More joins for queries
 - Slightly slower reads
+- Risk of losing history (e.g., user changes email, old value is lost) - hence preference for Type-2 SCD or audit events table depending on use case
 
 ### When to Denormalize
 
@@ -289,7 +224,7 @@ limit 10;
 
 ### Naming Conventions
 
-**Follow SQL naming conventions (see `claude/languages/sql.md`):**
+**SQL naming conventions:**
 
 - Tables: lowercase, plural, snake_case (`users`, `order_items`)
 - Columns: lowercase, snake_case (`user_id`, `created_at`)

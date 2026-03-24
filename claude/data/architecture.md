@@ -6,7 +6,14 @@ High-level data architecture patterns and design principles.
 
 **Preferred approach for data warehouse/lakehouse systems.**
 
-This architecture organizes data into four layers, each serving a distinct purpose in the data journey from raw ingestion to business consumption.
+This architecture organizes data into four layers:
+
+1. **Landing** - Raw ingestion, maximally permissive
+2. **Cleaned** - Validated and typed events
+3. **Structured** - Type-2 SCD business entities
+4. **Domain** - Domain-specific marts optimized for consumption
+
+Each layer serves a distinct purpose in the data journey from raw ingestion to business consumption.
 
 > **Note:** Industry often refers to similar patterns as "Medallion Architecture" or "Bronze/Silver/Gold." Our four-layer approach provides more granular separation of concerns.
 
@@ -19,7 +26,7 @@ This architecture organizes data into four layers, each serving a distinct purpo
 - **Limited structure for querying**:
   - Partition by ingestion date/time (e.g., `/landing/events/date=2024-01-01/`)
   - Organize by source system (e.g., `/landing/stripe/`, `/landing/postgres/`)
-  - Add metadata: `_ingested_at` timestamp, `_source_system` identifier
+  - Add metadata: `_ingested_at` timestamp, `_source_system` identifier, `_source_file` (or ingestion job identifier) to track what produced the data for targeted issue investigation
 - **Schema evolution friendly** - Accept changes from source systems without failures
 
 **Purpose:** Historical record of truth. Accept whatever arrives from sources. Handle schema drift and quality issues downstream.
@@ -53,7 +60,7 @@ raw_events = (
 - **Data quality checks** - Validate schema, completeness, formats
 - **Deduplicated** - Remove duplicate events
 - **Standardized** - Consistent naming, formats
-- **Can be views** - No need to materialize if simple transformations
+- **Often implemented as views** - No need to materialize if transformations are simple (common pattern in dbt-style warehouses)
 
 **Purpose:** Clean, validated events ready for business transformation. This is where failures should happen (reject bad data).
 
@@ -212,31 +219,20 @@ See `data/modeling.md` for guidance on choosing database types and schema design
 
 ## Data Pipeline Patterns
 
-### ELT vs ETL
+### ELT Pattern
 
-**ELT (Extract, Load, Transform) - preferred for modern data platforms:**
+**Extract, Load, Transform - the preferred approach:**
 
 ```
 Source → Landing (load raw) → Cleaned (validate) → Structured (transform) → Domain (aggregate)
 ```
 
-**Benefits:**
+**Why ELT:**
 - Load first, transform later (flexibility)
 - Raw data preserved (can reprocess)
 - Leverages warehouse compute power
 - Schema evolution friendly
 - Event-first approach enables audit trails
-
-**ETL (Extract, Transform, Load) - traditional approach:**
-
-```
-Source → Transform → Load to warehouse
-```
-
-**When to use:**
-- Source system has compute limitations
-- Compliance requires transformation before storage
-- Network bandwidth constrained
 
 ### Batch vs Streaming
 
@@ -279,14 +275,6 @@ See `data/warehouses/spark-databricks.md` for incremental processing patterns wi
 3. **Transformation** - Build Type-2 SCD entities in structured layer
 4. **Consumption** - Create domain-specific marts with governance
 5. **Analytics** - Reports, dashboards, ML models consume from domain layer
-6. **Archival** - Move old data to cold storage
-7. **Deletion** - Comply with retention policies
-
-**Retention policies:**
-- Landing: Keep long-term (years) - raw data is cheap, enables reprocessing
-- Cleaned: Can be views - if materialized, keep medium-term
-- Structured: Keep long-term (years) - canonical business history
-- Domain: Keep as needed - can regenerate from structured layer
 
 ---
 

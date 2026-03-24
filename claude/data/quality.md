@@ -27,6 +27,7 @@ See `observability.md` for integrity metrics (freshness, completeness, correctne
 - Out of range (negative amounts, invalid IDs)
 - Invalid formats (email without @, malformed phone)
 - Unexpected duplicates
+- Enum violations (inconsistent categorical values: male/female/m/f/MALE)
 
 **3. Business Logic Violations**
 - Data relationship inconsistencies (order total ≠ sum of items)
@@ -46,7 +47,9 @@ See `observability.md` for integrity metrics (freshness, completeness, correctne
 
 ### Schema Contracts
 
-**Define expected schema explicitly:**
+**Define expected schema explicitly from cleaned layer onwards:**
+
+Schema contracts should be enforced starting at the cleaned layer. The landing layer should remain maximally permissive to accept whatever arrives from sources.
 
 ```python
 from pyspark.sql.types import StructType, StructField, StringType, TimestampType, IntegerType
@@ -106,11 +109,13 @@ class UserContract(Protocol):
 
 ### Input Validation
 
-**Validate at ingestion (bronze layer):**
+**Validate at landing → cleaned transition:**
+
+Avoid over-validating landed data. The landing layer should accept whatever arrives. Validation should happen when moving to the cleaned layer.
 
 ```python
-def validate_input_data(df):
-    """Validate raw input data."""
+def validate_cleaned_data(df):
+    """Validate data for cleaned layer."""
     # Check required columns exist
     required_cols = ["user_id", "email", "created_at"]
     missing_cols = set(required_cols) - set(df.columns)
