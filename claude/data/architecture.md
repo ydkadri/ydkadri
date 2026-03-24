@@ -50,7 +50,7 @@ Each layer serves a distinct purpose in the data journey from raw ingestion to b
 
 **Type-2 SCD business entities - canonical truth.**
 
-- **Type-2 Slowly Changing Dimensions** - Track history with effective dates
+- **Type-2 Slowly Changing Dimensions** - Track history with active dates (active_from/active_to)
 - **Business-conformed entities** - Single source of truth for business concepts (customers, orders, products)
 - **Materialized tables** - Storage is cheap, compute is expensive
 - **Complete data** - Full business entity with all attributes
@@ -175,8 +175,6 @@ Source → Landing (load raw) → Cleaned (validate) → Structured (transform) 
 - Simpler logic
 - Slower, more expensive
 - Use: Small datasets or when incremental is complex
-
-See `data/warehouses/spark-databricks.md` for incremental processing patterns with Delta Lake.
 
 ## Data Lifecycle
 
