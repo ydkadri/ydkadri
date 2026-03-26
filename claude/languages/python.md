@@ -346,6 +346,63 @@ raise ParseError(
 raise ParseError("Missing header")
 ```
 
+### Catching Specific Exceptions
+
+**Always catch specific exceptions, never use bare `except Exception`.**
+
+Catching `Exception` is too broad and hides bugs by catching everything including `KeyboardInterrupt` and `SystemExit`.
+
+```python
+# ✅ CORRECT - Catch specific exceptions
+try:
+    data = parse_file(path)
+except FileNotFoundError:
+    log.error("file_not_found", path=str(path))
+    raise
+except ParseError as e:
+    log.error("parsing_failed", path=str(path), error=str(e))
+    raise
+except PermissionError:
+    log.error("permission_denied", path=str(path))
+    raise
+
+# ✅ CORRECT - Multiple specific exceptions
+try:
+    result = process_data(data)
+except (ValidationError, ParseError) as e:
+    log.error("data_processing_failed", error=str(e))
+    raise
+
+# ❌ INCORRECT - Too broad
+try:
+    result = process_data(data)
+except Exception as e:  # Catches everything
+    log.error("something_failed", error=str(e))
+    raise
+```
+
+**When you must catch broadly** (e.g., top-level error handler), catch specific groups:
+
+```python
+# At application boundary only
+try:
+    run_application()
+except MyPackageError as e:
+    # Catch only our application errors
+    log.exception("application_error")
+    sys.exit(1)
+except KeyboardInterrupt:
+    # Handle Ctrl+C gracefully
+    log.info("interrupted_by_user")
+    sys.exit(130)
+```
+
+**Why this matters:**
+- Specific exceptions document what can go wrong
+- Forces you to think about error cases
+- Prevents hiding bugs (typos, attribute errors, etc.)
+- Makes debugging easier
+
 ## Type Hints
 
 ### Type Everything
