@@ -78,6 +78,30 @@ Before considering review work complete:
 - Each commit in feature branch appears in main history
 - Makes git log easy to read and bisect work correctly
 
+## Tracking Deferred Work
+
+**When work is deferred, create a GitHub issue immediately.**
+
+If during development or review we decide to defer something (optimizations, refactoring, additional features, tech debt), capture it in a GitHub issue:
+
+```bash
+# Create issue via gh CLI
+gh issue create --title "Optimize graph traversal performance" \
+  --body "Context: During PR #123 we identified that graph traversal could be optimized...\n\nProposed approach:..."
+```
+
+**What to include in deferred work issues:**
+- Context explaining why it was deferred
+- Link to relevant PR or code
+- Proposed approach or next steps
+- Appropriate labels (enhancement, tech-debt, performance, etc.)
+
+**Why this matters:**
+- Prevents work from being forgotten
+- Creates discoverable record of technical decisions
+- Allows prioritizing deferred work later
+- Maintains focus on current PR without losing future improvements
+
 ## Documentation Requirements
 
 ### When to Update Documentation
@@ -123,4 +147,4 @@ Don't ask for permission to:
 
 ---
 
-**Last Updated**: 2026-03-24
+**Last Updated**: 2026-03-27
