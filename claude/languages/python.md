@@ -115,6 +115,143 @@ from mypackage.queries import find_user
 __all__ = ["models", "queries", "User", "Account", "find_user"]
 ```
 
+### Binary Entrypoints
+
+For CLI applications, use a single entrypoint module:
+
+```
+src/
+└── mypackage/
+    ├── __init__.py
+    ├── cli.py          # CLI entrypoint
+    ├── commands.py     # Command implementations
+    └── models.py
+```
+
+**In `pyproject.toml`**:
+```toml
+[project.scripts]
+mytool = "mypackage.cli:main"
+```
+
+**In `cli.py`**:
+```python
+import sys
+from mypackage import commands
+
+def main() -> int:
+    """CLI entrypoint."""
+    # Parse args, dispatch to commands
+    result = commands.run(sys.argv[1:])
+    return 0 if result.success else 1
+
+if __name__ == "__main__":
+    sys.exit(main())
+```
+
+### Monorepo Structure
+
+For projects with multiple related packages, use a monorepo with separate installable packages:
+
+```
+src/
+├── mypackage/
+│   ├── __init__.py
+│   ├── core.py
+│   └── models.py
+├── mypackage_cli/
+│   ├── __init__.py
+│   ├── cli.py
+│   └── commands.py
+└── mypackage_extras/
+    ├── __init__.py
+    └── advanced.py
+
+pyproject.toml          # Main package
+pyproject_cli.toml      # CLI package
+pyproject_extras.toml   # Extras package
+```
+
+Each package can be installed independently:
+```bash
+# Install core library
+pip install ./src/mypackage
+
+# Install CLI tool
+pip install ./src/mypackage_cli
+
+# Install extras
+pip install ./src/mypackage_extras
+```
+
+**Local dependencies** in `pyproject.toml`:
+```toml
+[project]
+name = "mypackage-cli"
+dependencies = [
+    "mypackage @ file:///path/to/src/mypackage",
+]
+```
+
+### Installation and Extras
+
+Define optional dependencies for different use cases:
+
+**In `pyproject.toml`**:
+```toml
+[project]
+name = "mypackage"
+dependencies = [
+    "requests",
+    "attrs",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "ruff>=0.1",
+    "mypy>=1.0",
+]
+test = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+cli = [
+    "typer>=0.9",
+    "rich>=13.0",
+]
+all = [
+    "mypackage[dev,test,cli]",
+]
+```
+
+**Library installation** (for importing in code):
+```bash
+# Core only
+pip install mypackage
+
+# With extras
+pip install "mypackage[dev,test]"
+uv pip install "mypackage[dev]"
+```
+
+**CLI tool installation** (isolated environment):
+```bash
+# Isolated tool install (like pipx)
+uv tool install mypackage
+
+# With extras
+uv tool install "mypackage[cli]"
+
+# From local path
+uv tool install "./src/mypackage[cli]"
+```
+
+**When to use what**:
+- `pip/uv pip install`: For libraries and development dependencies
+- `uv tool install`: For CLI applications you want globally available
+- Extras: Group related optional dependencies (dev, test, cli, docs)
+
 ### Class Design
 
 Prefer public API with private methods.
