@@ -376,7 +376,38 @@ let config = ConfigBuilder::new("localhost".to_string(), 5432)
     .build()?;
 ```
 
-### Method Organization
+### Function and Method Ordering
+
+**Define functions and methods before they are called. Read top-to-bottom.**
+
+Code should be readable from top to bottom. Define functions before anything references them.
+
+#### Module Level
+
+```rust
+// ✅ CORRECT - Helper defined before use
+fn format_timestamp(ts: SystemTime) -> String {
+    // Format timestamp for display
+    format!("{:?}", ts)
+}
+
+fn process_log_entry(entry: &LogEntry) -> String {
+    let timestamp = format_timestamp(entry.timestamp);
+    format!("{}: {}", timestamp, entry.message)
+}
+
+// ❌ INCORRECT - Helper used before definition
+fn process_log_entry(entry: &LogEntry) -> String {
+    let timestamp = format_timestamp(entry.timestamp); // Not yet defined!
+    format!("{}: {}", timestamp, entry.message)
+}
+
+fn format_timestamp(ts: SystemTime) -> String {
+    format!("{:?}", ts)
+}
+```
+
+#### Method Organization
 
 Order methods: private first, then public.
 
@@ -402,6 +433,57 @@ impl DataProcessor {
     }
 }
 ```
+
+#### Struct with Helper Methods
+
+```rust
+// ✅ CORRECT - Helper before new()
+pub struct Configuration {
+    db_url: String,
+}
+
+impl Configuration {
+    // Private helper before it's used
+    fn build_database_url(host: &str, port: u16, db: &str) -> String {
+        format!("postgresql://{}:{}/{}", host, port, db)
+    }
+
+    // new() uses the helper
+    pub fn new(host: &str, port: u16, db: &str) -> Self {
+        Self {
+            db_url: Self::build_database_url(host, port, db),
+        }
+    }
+
+    pub fn connect(&self) -> Result<Connection, Error> {
+        create_connection(&self.db_url)
+    }
+}
+
+// ❌ INCORRECT - Helper after it's used
+impl Configuration {
+    pub fn new(host: &str, port: u16, db: &str) -> Self {
+        Self {
+            db_url: Self::build_database_url(host, port, db), // Not yet defined!
+        }
+    }
+
+    fn build_database_url(host: &str, port: u16, db: &str) -> String {
+        format!("postgresql://{}:{}/{}", host, port, db)
+    }
+}
+```
+
+**Ordering within an impl block:**
+1. Private helper methods
+2. `new()` / constructors
+3. Public methods
+
+**Why this matters:**
+- Read code naturally from top to bottom
+- Understand helpers before seeing them used
+- Easier to follow logic flow
+- Consistent with how most code is read
 
 ## Documentation
 
@@ -719,4 +801,4 @@ cargo doc --open       # Generate and open docs
 
 ---
 
-**Last Updated**: 2026-03-23
+**Last Updated**: 2026-03-27

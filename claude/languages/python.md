@@ -167,6 +167,84 @@ class JSONProcessor(BaseProcessor):
 
 This ensures consistent logging, error handling, and behavior across implementations while keeping the public API stable.
 
+## Function and Method Ordering
+
+**Define functions and methods before they are called. Read top-to-bottom.**
+
+Code should be readable from top to bottom. Define functions before anything references them.
+
+### Module Level
+
+```python
+# ✅ CORRECT - Helper defined before use
+def format_timestamp(ts: datetime) -> str:
+    """Format timestamp for display."""
+    return ts.strftime("%Y-%m-%d %H:%M:%S")
+
+def process_log_entry(entry: dict) -> str:
+    """Process log entry."""
+    timestamp = format_timestamp(entry["timestamp"])
+    return f"{timestamp}: {entry['message']}"
+
+# ❌ INCORRECT - Helper used before definition
+def process_log_entry(entry: dict) -> str:
+    """Process log entry."""
+    timestamp = format_timestamp(entry["timestamp"])  # Not yet defined!
+    return f"{timestamp}: {entry['message']}"
+
+def format_timestamp(ts: datetime) -> str:
+    """Format timestamp for display."""
+    return ts.strftime("%Y-%m-%d %H:%M:%S")
+```
+
+### Class Methods and Properties
+
+Private methods and property builders before `__init__` and public methods:
+
+```python
+# ✅ CORRECT - Property builder before __init__
+class Configuration:
+    """Application configuration."""
+
+    def _build_database_url(self, host: str, port: int, db: str) -> str:
+        """Build database connection URL."""
+        return f"postgresql://{host}:{port}/{db}"
+
+    def __init__(self, host: str, port: int, db: str):
+        self.db_url = self._build_database_url(host, port, db)
+
+    def connect(self) -> Connection:
+        """Connect to database."""
+        return create_connection(self.db_url)
+
+# ❌ INCORRECT - Property builder after __init__
+class Configuration:
+    """Application configuration."""
+
+    def __init__(self, host: str, port: int, db: str):
+        self.db_url = self._build_database_url(host, port, db)  # Not yet defined!
+
+    def _build_database_url(self, host: str, port: int, db: str) -> str:
+        """Build database connection URL."""
+        return f"postgresql://{host}:{port}/{db}"
+
+    def connect(self) -> Connection:
+        """Connect to database."""
+        return create_connection(self.db_url)
+```
+
+**Ordering within a class:**
+1. Private helper methods
+2. Property builders (if any)
+3. `__init__`
+4. Public methods
+
+**Why this matters:**
+- Read code naturally from top to bottom
+- Understand helpers before seeing them used
+- Easier to follow logic flow
+- Consistent with how most code is read
+
 ### Tests
 
 - Mirror source structure
@@ -192,6 +270,8 @@ tests/
 
 ## Testing Style
 
+### Test Organization
+
 Prefer test classes over flat functions:
 
 ```python
@@ -216,6 +296,79 @@ def test_analyze_options():
 ```
 
 **Benefits**: Better organization, easier setup/teardown, clearer test hierarchy
+
+### Parametrized Tests
+
+Use `@pytest.mark.parametrize` when testing the same functionality with multiple inputs for better readability:
+
+```python
+# ✅ CORRECT - Parametrized for clear test cases
+@pytest.mark.parametrize("input,expected", [
+    ("hello", "HELLO"),
+    ("world", "WORLD"),
+    ("", ""),
+    ("MiXeD", "MIXED"),
+])
+def test_uppercase_conversion(input, expected):
+    """Test string conversion to uppercase."""
+    assert convert_to_uppercase(input) == expected
+
+# ✅ CORRECT - Parametrized with descriptive IDs
+@pytest.mark.parametrize("value,is_valid", [
+    (0, False),
+    (1, True),
+    (65535, True),
+    (65536, False),
+    (-1, False),
+], ids=["zero", "min_valid", "max_valid", "too_large", "negative"])
+def test_port_validation(value, is_valid):
+    """Test port number validation."""
+    if is_valid:
+        validate_port(value)  # Should not raise
+    else:
+        with pytest.raises(ValueError):
+            validate_port(value)
+```
+
+**When to use parametrize:**
+- Testing the same function with multiple inputs/outputs
+- Edge cases and boundary conditions
+- Test logic is identical, only inputs differ
+- Makes it easy to add more test cases
+
+**When NOT to use parametrize:**
+- Test logic differs between cases
+- Setup/teardown differs between cases
+- Testing fundamentally different behaviors
+- Complex scenarios where readability suffers
+
+**Example of when to avoid:**
+```python
+# ❌ BAD - Different behaviors, should be separate tests
+@pytest.mark.parametrize("scenario,input,expected", [
+    ("empty_file", "", []),
+    ("single_line", "hello", ["hello"]),
+    ("file_not_found", "/nonexistent", FileNotFoundError),
+])
+def test_file_parsing(scenario, input, expected):
+    # Logic becomes complex with conditionals
+    if scenario == "file_not_found":
+        with pytest.raises(expected):
+            parse_file(input)
+    else:
+        assert parse_file(input) == expected
+
+# ✅ GOOD - Separate tests for different behaviors
+def test_parse_empty_file():
+    assert parse_file("") == []
+
+def test_parse_single_line():
+    assert parse_file("hello") == ["hello"]
+
+def test_parse_nonexistent_file_raises():
+    with pytest.raises(FileNotFoundError):
+        parse_file("/nonexistent")
+```
 
 ## Logging
 
@@ -975,4 +1128,4 @@ just format
 
 ---
 
-**Last Updated**: 2026-03-23
+**Last Updated**: 2026-03-27
