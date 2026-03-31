@@ -138,6 +138,211 @@ let config = ConfigBuilder::new("localhost".to_string(), 5432)
     .build()?;
 ```
 
+### Binary Entrypoints
+
+Cargo automatically discovers binaries in `src/bin/`:
+
+```
+src/
+├── lib.rs              # Library code
+├── main.rs             # Default binary (optional)
+└── bin/
+    ├── finder.rs       # cargo run --bin finder
+    ├── processor.rs    # cargo run --bin processor
+    └── analyzer.rs     # cargo run --bin analyzer
+```
+
+**Each binary can use the library**:
+```rust
+// src/bin/finder.rs
+use myproject::config::Config;
+use myproject::search::Searcher;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let config = Config::load()?;
+    let searcher = Searcher::new(config);
+    searcher.run()?;
+    Ok(())
+}
+```
+
+**In `Cargo.toml`**, binaries are auto-discovered:
+```toml
+[package]
+name = "myproject"
+
+# Optional: explicit binary configuration
+[[bin]]
+name = "finder"
+path = "src/bin/finder.rs"
+```
+
+**Running binaries**:
+```bash
+# Run specific binary
+cargo run --bin finder
+
+# Build all binaries
+cargo build --bins
+
+# Install binary globally
+cargo install --path . --bin finder
+```
+
+### Workspace Structure
+
+For projects with multiple related crates, use a workspace:
+
+```
+my_workspace/
+├── Cargo.toml          # Workspace root
+├── crates/
+│   ├── mylib/
+│   │   ├── Cargo.toml
+│   │   └── src/
+│   │       └── lib.rs
+│   ├── mylib_cli/
+│   │   ├── Cargo.toml
+│   │   └── src/
+│   │       ├── main.rs
+│   │       └── bin/
+│   │           └── mycli.rs
+│   └── mylib_extras/
+│       ├── Cargo.toml
+│       └── src/
+│           └── lib.rs
+```
+
+**Workspace `Cargo.toml`**:
+```toml
+[workspace]
+members = [
+    "crates/mylib",
+    "crates/mylib_cli",
+    "crates/mylib_extras",
+]
+resolver = "2"
+
+# Shared dependencies across workspace
+[workspace.dependencies]
+tokio = { version = "1.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+anyhow = "1.0"
+```
+
+**Member crate using workspace dependencies**:
+```toml
+# crates/mylib/Cargo.toml
+[package]
+name = "mylib"
+version = "0.1.0"
+
+[dependencies]
+tokio = { workspace = true }
+serde = { workspace = true }
+```
+
+**Workspace member relationships**:
+```toml
+# crates/mylib_cli/Cargo.toml
+[package]
+name = "mylib-cli"
+version = "0.1.0"
+
+[dependencies]
+mylib = { path = "../mylib" }          # Local dependency
+mylib_extras = { path = "../mylib_extras", optional = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+```
+
+**Building workspace members**:
+```bash
+# Build all members
+cargo build --workspace
+
+# Build specific member
+cargo build -p mylib
+
+# Run binary from member
+cargo run -p mylib-cli --bin mycli
+
+# Test all members
+cargo test --workspace
+```
+
+### Features and Optional Dependencies
+
+Use features for optional functionality:
+
+**Defining features**:
+```toml
+[package]
+name = "mylib"
+
+[dependencies]
+# Always included
+serde = "1.0"
+
+# Optional dependencies
+tokio = { version = "1.0", optional = true }
+tracing = { version = "0.1", optional = true }
+
+[features]
+default = ["std"]
+
+# Feature flags
+std = []
+async = ["tokio"]           # Enables tokio when async feature is used
+logging = ["tracing"]       # Enables tracing when logging feature is used
+full = ["async", "logging"] # Enables multiple features
+```
+
+**Using features in code**:
+```rust
+// Conditionally compile based on features
+#[cfg(feature = "async")]
+pub async fn fetch_data() -> Result<Data, Error> {
+    // Async implementation using tokio
+}
+
+#[cfg(not(feature = "async"))]
+pub fn fetch_data() -> Result<Data, Error> {
+    // Sync implementation
+}
+```
+
+**Installing and building with features**:
+```bash
+# Build with specific features
+cargo build --features async,logging
+
+# Build with all features
+cargo build --all-features
+
+# Build with no default features
+cargo build --no-default-features
+
+# Install with features
+cargo install mylib --features full
+```
+
+**Depending on crates with features**:
+```toml
+[dependencies]
+mylib = { version = "0.1", features = ["async", "logging"] }
+
+# Or from workspace
+mylib = { path = "../mylib", features = ["full"] }
+```
+
+**Feature best practices**:
+- Keep `default` minimal - only include widely-needed features
+- Use descriptive feature names: `async`, `cli`, `compression`
+- Document feature requirements in crate README
+- Avoid feature explosion - combine related functionality
+- Test with `--no-default-features` to catch missing feature gates
+
 ## Trait Design
 
 Keep traits focused and cohesive:
