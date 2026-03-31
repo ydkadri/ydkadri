@@ -117,31 +117,32 @@ __all__ = ["models", "queries", "User", "Account", "find_user"]
 
 ### Binary Entrypoints
 
-For CLI applications, use a single entrypoint module:
+For CLI applications, organize CLI code as a subpackage:
 
 ```
 src/
 └── mypackage/
     ├── __init__.py
-    ├── cli.py          # CLI entrypoint
-    ├── commands.py     # Command implementations
-    └── models.py
+    ├── core.py
+    └── cli/
+        ├── __init__.py
+        ├── main.py      # CLI entrypoint
+        └── commands.py  # Command implementations
 ```
 
 **In `pyproject.toml`**:
 ```toml
 [project.scripts]
-mytool = "mypackage.cli:main"
+mytool = "mypackage.cli.main:main"
 ```
 
-**In `cli.py`**:
+**In `cli/main.py`**:
 ```python
 import sys
-from mypackage import commands
+from mypackage.cli import commands
 
 def main() -> int:
     """CLI entrypoint."""
-    # Parse args, dispatch to commands
     result = commands.run(sys.argv[1:])
     return 0 if result.success else 1
 
@@ -149,90 +150,190 @@ if __name__ == "__main__":
     sys.exit(main())
 ```
 
-### Monorepo Structure
+### Core + Plugin Architecture
 
-For projects with multiple related packages, use a monorepo with separate installable packages:
+For extensible applications, use entry points for plugin discovery. **Example**: File I/O library with optional S3 support.
 
+**Project structure**:
 ```
 src/
-├── mypackage/
+├── my_io_core/
 │   ├── __init__.py
-│   ├── core.py
-│   └── models.py
-├── mypackage_cli/
-│   ├── __init__.py
-│   ├── cli.py
-│   └── commands.py
-└── mypackage_extras/
+│   ├── backends/
+│   │   ├── __init__.py
+│   │   ├── base.py      # Backend protocol/base class
+│   │   └── local.py     # Built-in local filesystem backend
+│   └── discovery.py     # Plugin discovery
+└── my_io_core_s3/
     ├── __init__.py
-    └── advanced.py
+    └── backend.py           # S3 backend implementation
 
-pyproject.toml          # Main package
-pyproject_cli.toml      # CLI package
-pyproject_extras.toml   # Extras package
+pyproject.toml               # Core package
+pyproject_s3.toml           # S3 plugin package
 ```
 
-Each package can be installed independently:
-```bash
-# Install core library
-pip install ./src/mypackage
+**Core package discovers plugins via entry points**:
 
-# Install CLI tool
-pip install ./src/mypackage_cli
+```python
+# src/my_io_core/discovery.py
+import importlib.metadata
+import logging
+from typing import Protocol
 
-# Install extras
-pip install ./src/mypackage_extras
+log = logging.getLogger(__name__)
+
+class Backend(Protocol):
+    """Protocol that all backends must implement."""
+    def read(self, path: str) -> bytes: ...
+    def write(self, path: str, data: bytes) -> None: ...
+
+_BACKENDS: dict[str, type[Backend]] = {}
+
+def discover_backends() -> None:
+    """Discover and register all installed backend plugins."""
+    entry_points = importlib.metadata.entry_points(group="my_io_core.backends")
+    
+    for ep in entry_points:
+        try:
+            backend_class = ep.load()
+            _BACKENDS[ep.name] = backend_class
+            log.info(f"Registered backend: {ep.name}")
+        except Exception as e:
+            # Fail loudly - don't silently ignore broken plugins
+            raise RuntimeError(
+                f"Failed to load backend plugin '{ep.name}': {e}"
+            ) from e
+
+def get_backend(name: str) -> type[Backend]:
+    """Get a registered backend by name."""
+    if name not in _BACKENDS:
+        available = ", ".join(_BACKENDS.keys())
+        raise ValueError(
+            f"Unknown backend '{name}'. Available: {available}"
+        )
+    return _BACKENDS[name]
+
+# Discover at import time
+discover_backends()
 ```
 
-**Local dependencies** in `pyproject.toml`:
+**Plugin registers itself via entry point**:
+
 ```toml
+# pyproject_s3.toml
 [project]
-name = "mypackage-cli"
+name = "my-io-core-s3"
+version = "0.1.0"
 dependencies = [
-    "mypackage @ file:///path/to/src/mypackage",
+    "my-io-core>=0.1.0,<0.2.0",  # Pin to compatible core version
+    "boto3>=1.26.0",
 ]
+
+[project.entry-points."my_io_core.backends"]
+s3 = "my_io_core_s3.backend:S3Backend"
 ```
 
-### Installation and Extras
+```python
+# src/my_io_core_s3/backend.py
+import boto3
+from my_io_core.backends.base import Backend
 
-Define optional dependencies for different use cases:
+class S3Backend(Backend):
+    """S3 backend for my-io-core."""
+    
+    def __init__(self, bucket: str):
+        self.s3 = boto3.client("s3")
+        self.bucket = bucket
+    
+    def read(self, path: str) -> bytes:
+        response = self.s3.get_object(Bucket=self.bucket, Key=path)
+        return response["Body"].read()
+    
+    def write(self, path: str, data: bytes) -> None:
+        self.s3.put_object(Bucket=self.bucket, Key=path, Body=data)
+```
 
-**In `pyproject.toml`**:
+**Core package bundles plugins via extras**:
+
 ```toml
+# pyproject.toml (core)
 [project]
-name = "mypackage"
+name = "my-io-core"
+version = "0.1.0"
 dependencies = [
-    "requests",
-    "attrs",
+    "attrs>=23.0",
 ]
 
 [project.optional-dependencies]
-dev = [
-    "pytest>=7.0",
-    "ruff>=0.1",
-    "mypy>=1.0",
-]
-test = [
-    "pytest>=7.0",
-    "pytest-cov>=4.0",
-]
-cli = [
-    "typer>=0.9",
-    "rich>=13.0",
-]
-all = [
-    "mypackage[dev,test,cli]",
-]
+s3 = ["my-io-core-s3>=0.1.0,<0.2.0"]
+all = ["my-io-core[s3]"]
+dev = ["pytest>=7.0", "ruff>=0.1", "mypy>=1.0"]
 ```
+
+**Usage - plugins "just work" after installation**:
+
+```python
+# Library usage
+from my_io_core import discovery
+
+# After: pip install my-io-core[s3]
+backend = discovery.get_backend("s3")
+io = backend(bucket="my-bucket")
+data = io.read("path/to/file")
+```
+
+```python
+# CLI usage - plugins available automatically
+# src/my_io_core/cli/main.py
+from my_io_core import discovery
+
+def main() -> int:
+    # All installed backends automatically discovered
+    backend_name = parse_args().backend
+    backend = discovery.get_backend(backend_name)
+    # ...
+```
+
+**Installation**:
+```bash
+# Core only (local backend)
+pip install my-io-core
+
+# With S3 plugin
+pip install "my-io-core[s3]"
+
+# All plugins
+pip install "my-io-core[all]"
+
+# As CLI tool
+uv tool install "my-io-core[s3]"
+```
+
+**Plugin development best practices**:
+- **Version constraints**: Pin plugin to compatible core versions (e.g., `>=0.1.0,<0.2.0`)
+- **Testing**: Test core alone, core+plugin, and plugin in isolation
+- **Fail loudly**: Plugin load errors should raise, not warn
+- **Protocol/base class**: Define clear interface in core for plugins to implement
+- **Entry point group naming**: Use `{package_name}.{extension_point}` (e.g., `my_io_core.backends`)
+
+**Trade-offs**:
+- ✅ Standard Python pattern (pytest, Flask, click use this)
+- ✅ True "just works" after installation for library and CLI
+- ✅ Can support third-party plugins
+- ❌ Version compatibility matrix (core × each plugin)
+- ❌ Must test combinations
+- ❌ Breaking changes in core API break all plugins
+
+### Installation Patterns
 
 **Library installation** (for importing in code):
 ```bash
 # Core only
 pip install mypackage
 
-# With extras
+# With extras/plugins
 pip install "mypackage[dev,test]"
-uv pip install "mypackage[dev]"
+uv pip install "mypackage[s3,postgres]"
 ```
 
 **CLI tool installation** (isolated environment):
@@ -240,17 +341,17 @@ uv pip install "mypackage[dev]"
 # Isolated tool install (like pipx)
 uv tool install mypackage
 
-# With extras
-uv tool install "mypackage[cli]"
+# With extras/plugins
+uv tool install "mypackage[s3]"
 
-# From local path
-uv tool install "./src/mypackage[cli]"
+# From local path during development
+uv tool install --editable ".[s3]"
 ```
 
 **When to use what**:
 - `pip/uv pip install`: For libraries and development dependencies
 - `uv tool install`: For CLI applications you want globally available
-- Extras: Group related optional dependencies (dev, test, cli, docs)
+- Extras: Group related optional dependencies (dev, test) or plugins (s3, postgres)
 
 ### Class Design
 
