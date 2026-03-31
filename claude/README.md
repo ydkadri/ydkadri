@@ -34,6 +34,40 @@ At the start of each project, ask: **Is this a work or personal project?**
 - **Work**: Use CircleCI, follow work-specific conventions
 - **Personal**: Use GitHub Actions, may have different release patterns
 
+### Setting Up the Roadmap
+
+**From day 1, establish the project roadmap through a Q&A session.**
+
+This helps align on project goals, scope, and priorities before writing code. Conduct this as a conversation to understand:
+
+1. **What problem are we solving?**
+   - What's the core user need?
+   - What outcomes do users want to achieve?
+   - What are we explicitly NOT solving (out of scope)?
+
+2. **What are the key features or capabilities?**
+   - What's the MVP (minimum viable product)?
+   - What comes after MVP?
+   - What's nice-to-have vs essential?
+
+3. **How should we sequence the work?**
+   - What needs to be built first (dependencies)?
+   - What provides the most value early?
+   - What can be deferred?
+
+4. **What are the milestones?**
+   - How do we break this into releases?
+   - What defines each release (v0.1, v0.2, etc.)?
+   - What's the rough timeline?
+
+**After the Q&A, create `ROADMAP.md`** in the repository root with:
+- Clear project goals and out-of-scope items
+- Grouped features by release/milestone
+- References to GitHub issues as they're created
+- Rough sequencing of work
+
+**This establishes shared understanding early and provides a reference point throughout development.** See [workflow.md](workflow.md#maintaining-roadmapmd) for ongoing maintenance guidelines.
+
 ## Files Overview
 
 ### Core Workflow
