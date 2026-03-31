@@ -102,6 +102,46 @@ gh issue create --title "Optimize graph traversal performance" \
 - Allows prioritizing deferred work later
 - Maintains focus on current PR without losing future improvements
 
+### Maintaining ROADMAP.md
+
+In addition to GitHub issues, maintain a `ROADMAP.md` file in the repository root that provides a high-level view of planned work.
+
+**Structure**:
+```markdown
+# Roadmap
+
+## In Progress
+- Feature: Advanced search (#45, #47)
+- Enhancement: Performance optimization (#52)
+
+## Planned - Next Release
+- Feature: Export functionality (#38, #41, #43)
+- Tech debt: Refactor authentication (#50)
+
+## Future
+- Feature: Plugin system (#29)
+- Enhancement: Real-time updates (#33)
+
+## Completed
+- v0.5.0: Graph storage (shipped 2026-03-26)
+- v0.4.0: Status command (shipped 2026-03-23)
+```
+
+**Guidelines**:
+- Group issues into logical features or themes
+- Reference GitHub issue numbers for traceability
+- Update as issues move between stages
+- Move shipped work to Completed with version and date
+- Keep it high-level - detailed discussions belong in issues
+- Review and update during release planning
+
+**Why this matters**:
+- Provides at-a-glance project direction
+- Groups related issues into coherent features
+- Makes it easy to see what's coming next
+- Helps with release planning and prioritization
+- Creates a historical record of project evolution
+
 ## Documentation Requirements
 
 ### When to Update Documentation
