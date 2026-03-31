@@ -869,6 +869,207 @@ updated = attrs.evolve(user, email="newemail@example.com")
 
 Use dataclasses only for data containers, not objects with behavior. If you need methods/logic, use regular classes.
 
+## Enums for Domain Modeling
+
+**Use enums instead of string literals for states, types, and formats.**
+
+Enums provide type safety, validation, and enable pattern matching.
+
+### When to Use Enums
+
+Use enums for:
+- **States and statuses**: connection states, job statuses, workflow stages
+- **Types and formats**: output formats, data types, protocol versions
+- **Fixed sets of options**: log levels, priorities, categories
+
+**Don't use for:**
+- Boolean flags (use actual booleans)
+- Arbitrary constants (use module-level constants)
+- Dynamic values that change at runtime
+
+### Basic Enum Usage
+
+```python
+import enum
+
+# ✅ CORRECT - Enum for connection states
+class ConnectionState(enum.Enum):
+    DISCONNECTED = enum.auto()
+    CONNECTING = enum.auto()
+    CONNECTED = enum.auto()
+    FAILED = enum.auto()
+
+# ✅ CORRECT - Enum for output formats
+class OutputFormat(enum.Enum):
+    JSON = "json"
+    YAML = "yaml"
+    TOML = "toml"
+
+# ❌ INCORRECT - String literals
+def process_data(format: str):  # format could be anything!
+    if format == "json":  # Typo: "jsno" would fail at runtime
+        return to_json(data)
+    elif format == "yaml":
+        return to_yaml(data)
+
+# ✅ CORRECT - Type-safe enum
+def process_data(format: OutputFormat):
+    if format == OutputFormat.JSON:
+        return to_json(data)
+    elif format == OutputFormat.YAML:
+        return to_yaml(data)
+    # OutputFormat.JSNO would be caught by IDE/mypy at parse time
+```
+
+### Pattern Matching with match/case
+
+Enums unlock Python 3.10+ pattern matching:
+
+```python
+import enum
+
+class JobStatus(enum.Enum):
+    PENDING = enum.auto()
+    RUNNING = enum.auto()
+    COMPLETED = enum.auto()
+    FAILED = enum.auto()
+
+def handle_job(status: JobStatus) -> str:
+    """Handle job based on status using pattern matching."""
+    match status:
+        case JobStatus.PENDING:
+            return "Job queued for execution"
+        case JobStatus.RUNNING:
+            return "Job currently executing"
+        case JobStatus.COMPLETED:
+            return "Job finished successfully"
+        case JobStatus.FAILED:
+            return "Job failed, check logs"
+        case _:  # Exhaustiveness check - IDE warns if cases missing
+            raise ValueError(f"Unknown status: {status}")
+```
+
+### String-Backed Enums
+
+Use `StrEnum` (Python 3.11+) or `str, Enum` for enums that need string values:
+
+```python
+import enum
+
+# Python 3.11+
+class Environment(enum.StrEnum):
+    DEVELOPMENT = "development"
+    STAGING = "staging"
+    PRODUCTION = "production"
+
+# For Python 3.10, use str mixin:
+class Environment(str, enum.Enum):
+    DEVELOPMENT = "development"
+    STAGING = "staging"
+    PRODUCTION = "production"
+
+# Benefits: works with string operations and serialization
+env = Environment.PRODUCTION
+print(f"Running in {env}")  # "Running in production"
+assert env == "production"  # True
+```
+
+### Enums with Associated Data
+
+Use attrs with enums for complex states:
+
+```python
+import enum
+import attrs
+import datetime
+
+class ConnectionState(enum.Enum):
+    DISCONNECTED = enum.auto()
+    CONNECTING = enum.auto()
+    CONNECTED = enum.auto()
+    FAILED = enum.auto()
+
+@attrs.define
+class Connection:
+    state: ConnectionState
+    connected_since: datetime.datetime | None = None
+    error: str | None = None
+
+# Usage with pattern matching
+def get_status_message(conn: Connection) -> str:
+    match conn.state:
+        case ConnectionState.DISCONNECTED:
+            return "Not connected"
+        case ConnectionState.CONNECTING:
+            return "Connecting..."
+        case ConnectionState.CONNECTED:
+            return f"Connected since {conn.connected_since}"
+        case ConnectionState.FAILED:
+            return f"Connection failed: {conn.error}"
+```
+
+### Why Enums Matter
+
+**Type Safety**: Adding a new enum member is validated by mypy:
+```python
+class Status(Enum):
+    ACTIVE = auto()
+    INACTIVE = auto()
+    # Add new member - all match statements get flagged if incomplete
+
+def handle_status(status: Status):
+    match status:
+        case Status.ACTIVE:
+            ...
+        case Status.INACTIVE:
+            ...
+        # mypy warns: missing case for new enum member
+```
+
+**IDE Support**: Autocomplete and refactoring work correctly with enums.
+
+**Self-Documenting**: Enum members show all valid values in one place.
+
+**Prevents Typos**: `Status.ACTVE` caught at parse time, `"actve"` fails at runtime.
+
+### Real-World Example
+
+```python
+import enum
+import attrs
+
+class DataQuality(enum.StrEnum):
+    RAW = "raw"
+    CLEANED = "cleaned"
+    VALIDATED = "validated"
+    ENRICHED = "enriched"
+
+class ProcessingStage(enum.StrEnum):
+    INGESTION = "ingestion"
+    TRANSFORMATION = "transformation"
+    VALIDATION = "validation"
+    LOADING = "loading"
+
+@attrs.define
+class DataPipeline:
+    stage: ProcessingStage
+    quality: DataQuality
+
+    def can_proceed(self) -> bool:
+        """Check if pipeline can proceed to next stage."""
+        match (self.stage, self.quality):
+            case (ProcessingStage.INGESTION, DataQuality.RAW):
+                return True
+            case (ProcessingStage.TRANSFORMATION, DataQuality.CLEANED):
+                return True
+            case (ProcessingStage.VALIDATION, DataQuality.VALIDATED):
+                return True
+            case (ProcessingStage.LOADING, DataQuality.ENRICHED):
+                return True
+            case _:
+                return False
+```
+
 ## String Formatting
 
 ### Always Use f-strings
@@ -1128,4 +1329,4 @@ just format
 
 ---
 
-**Last Updated**: 2026-03-27
+**Last Updated**: 2026-03-31
