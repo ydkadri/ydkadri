@@ -1,0 +1,119 @@
+# Improved Git Configuration
+# Based on current setup with recommended additions
+
+[user]
+    name = Youcef Kadri
+    email = youcef.kadri@kraken.tech
+
+[commit]
+    template = ~/.managed/git/git-commit-message.txt
+
+[core]
+    editor = vim
+
+[push]
+    default = current
+
+[pull]
+    rebase = true
+
+[rebase]
+    autosquash = true
+
+# === NEW: Better merge conflict markers ===
+# zdiff3 shows common ancestor in conflicts, making them easier to resolve
+[merge]
+    conflictstyle = zdiff3
+
+# === NEW: Remember conflict resolutions ===
+# Helpful when rebasing - git remembers how you resolved conflicts
+[rerere]
+    enabled = true
+
+[url "git@github.com:"]
+    insteadOf = https://github.com/
+
+# === Existing Aliases ===
+[alias]
+    br = branch
+    brv = branch -v
+    cl = clone
+    co = checkout
+    cob = checkout -b
+    ct = commit
+    ctm = commit -m
+    ctam = commit -am
+    dft = difftool
+    dno = diff --name-only
+    lg = log --graph --oneline --abbrev-commit --decorate --color --all
+    pl = pull
+    ps = push
+    psf = push -f
+    psh = push -u origin HEAD
+    rb = rebase
+    rbi = rebase --interactive
+    st = status
+
+    # === NEW: Safer force push ===
+    # Only forces if no one else has pushed (prevents overwriting others' work)
+    psfl = push --force-with-lease
+
+    # === NEW: Better log views ===
+    # Prettier log with colors and relative dates
+    lg1 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)' --all
+
+    # === NEW: Undo last commit (keeps changes staged) ===
+    undo = reset HEAD~1 --mixed
+
+    # === NEW: Quick amend without editing message ===
+    amend = commit --amend --no-edit
+
+    # === NEW: Show what would be pushed ===
+    outgoing = log @{u}..
+
+    # === NEW: Show files changed in last commit ===
+    last = diff --name-only HEAD^ HEAD
+
+    # === NEW: Clean up merged branches ===
+    # Deletes local branches that have been merged (keeps main/master)
+    tidy = !git branch --merged | grep -v '\\*\\|main\\|master' | xargs -n 1 git branch -d
+
+    # === NEW: Quick stash with message ===
+    save = stash push -m
+
+    # === NEW: Show recent branches ===
+    recent = branch --sort=-committerdate --format='%(committerdate:relative)%09%(refname:short)'
+
+[diff]
+    tool = difftastic
+    # === NEW: Highlight whitespace errors ===
+    wsErrorHighlight = all
+
+[difftool]
+    prompt = false
+
+[difftool "difftastic"]
+    cmd = difft "$LOCAL" "$REMOTE"
+
+[pager]
+    difftool = true
+
+[init]
+    defaultBranch = main
+
+[fetch]
+    prune = true
+    # === NEW: Also prune tags ===
+    pruneTags = true
+
+# === NEW: Better diff algorithm ===
+# Produces more intuitive diffs
+[diff]
+    algorithm = histogram
+
+# === NEW: Show submodule changes in status/diff ===
+[status]
+    submodulesummary = true
+
+[diff]
+    submodule = log
