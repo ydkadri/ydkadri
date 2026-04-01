@@ -312,7 +312,7 @@ pub fn fetch_data() -> Result<Data, Error> {
 }
 ```
 
-**Installing and building with features**:
+**Building with features**:
 ```bash
 # Build with specific features
 cargo build --features async,logging
@@ -323,9 +323,88 @@ cargo build --all-features
 # Build with no default features
 cargo build --no-default-features
 
-# Install with features
-cargo install mylib --features full
+# Run with features
+cargo run --features s3 --bin mytool
 ```
+
+**Installing binaries with features**:
+
+Features are **compile-time** - they're baked into the binary at install time.
+
+```bash
+# Install core functionality only
+cargo install my-io-tool
+
+# Install with S3 support (compiles S3 code into binary)
+cargo install my-io-tool --features s3
+
+# Install with multiple features
+cargo install my-io-tool --features s3,postgres
+
+# Install with all features
+cargo install my-io-tool --all-features
+
+# Change features (must reinstall with --force)
+cargo install my-io-tool --features s3,postgres --force
+```
+
+**Core + Plugin pattern example**:
+
+```toml
+# File I/O tool with optional backend support
+[package]
+name = "my-io-tool"
+
+[dependencies]
+# Core dependencies (always included)
+anyhow = "1.0"
+clap = "4.0"
+
+# Optional backend dependencies (plugins)
+aws-sdk-s3 = { version = "1.0", optional = true }
+sqlx = { version = "0.7", features = ["postgres"], optional = true }
+
+[features]
+default = []  # No plugins by default
+s3 = ["aws-sdk-s3"]           # S3 plugin
+postgres = ["sqlx"]           # Postgres plugin
+all = ["s3", "postgres"]      # All plugins
+```
+
+```rust
+// src/backends/s3.rs - Only compiled if 's3' feature enabled
+#[cfg(feature = "s3")]
+pub struct S3Backend {
+    client: aws_sdk_s3::Client,
+}
+
+#[cfg(feature = "s3")]
+impl S3Backend {
+    pub fn new() -> Self {
+        // S3 client setup
+    }
+}
+```
+
+**Installing the tool**:
+```bash
+# Core only (local filesystem)
+cargo install my-io-tool
+
+# With S3 support compiled in
+cargo install my-io-tool --features s3
+
+# With all plugins compiled in
+cargo install my-io-tool --all-features
+
+# From local workspace during development
+cargo install --path . --features s3
+```
+
+**Key difference from Python**:
+- **Rust**: Features compiled into binary at install time. To change features, reinstall with `--force`.
+- **Python**: Plugins discovered at runtime. Add/remove plugins anytime without reinstalling core.
+- **Both**: Support `install mytool[extras]` pattern for library and CLI usage.
 
 **Depending on crates with features**:
 ```toml
@@ -338,10 +417,12 @@ mylib = { path = "../mylib", features = ["full"] }
 
 **Feature best practices**:
 - Keep `default` minimal - only include widely-needed features
-- Use descriptive feature names: `async`, `cli`, `compression`
+- Use descriptive feature names: `async`, `s3`, `postgres`, `compression`
 - Document feature requirements in crate README
+- Document feature installation in README: "Install with S3: `cargo install mytool --features s3`"
 - Avoid feature explosion - combine related functionality
 - Test with `--no-default-features` to catch missing feature gates
+- Version optional dependencies carefully - breaking changes affect all users of that feature
 
 ## Trait Design
 
