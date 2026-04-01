@@ -266,7 +266,7 @@ Higher levels override lower levels.
 
 ## Docker Structure
 
-### Organize Docker Files
+All Docker-related files live in `docker/` directory at project root:
 
 ```
 docker/
@@ -277,12 +277,33 @@ docker/
     └── init.sql             # Database initialization
 ```
 
-### Multi-Stage Builds
+### Key Principles
 
-Always use multi-stage Docker builds:
-- `builder` stage - Install dependencies
-- `development` stage - Include dev tools and test files
-- `production` stage - Minimal runtime image
+- **Multi-stage builds** - Separate builder and runtime stages for minimal images
+- **Environment variables** - Use `.env` files, never commit them
+- **Volumes** - Persist data and enable live reload during development
+- **Minimal images** - Use slim base images appropriate for the language
+
+**See [docker.md](docker.md) for detailed Docker patterns, multi-stage build examples, and justfile integration.**
+
+## CI/CD
+
+All projects use continuous integration with required checks on every PR:
+
+- ✅ Linting and formatting
+- ✅ Type checking
+- ✅ Tests (unit + integration)
+- ✅ Coverage threshold (80% default)
+- ✅ Security scanning
+
+### Platform Selection
+
+- **Work projects**: Use CircleCI
+- **Personal projects**: Use GitHub Actions
+
+**CI should match pre-push hooks** - same checks, same requirements.
+
+**See [ci.md](ci.md) for detailed CI/CD workflows, release pipelines, and platform-specific configurations.**
 
 ## Testing Structure
 
