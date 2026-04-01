@@ -1,0 +1,17 @@
+
+" Syntax highlighting
+syntax on
+
+" Line Numbers
+set nu
+
+" 4 space tabs
+filetype plugin indent on
+set expandtab
+set tabstop=4
+set shiftwidth=4
+
+" max mem settings
+set maxmem=6753250
+set maxmemtot=6753250
+set maxmempattern=6691516

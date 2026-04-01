@@ -1,0 +1,59 @@
+[user]
+    name = Youcef Kadri
+    email = youcef.kadri@kraken.tech
+
+[commit]
+    template = ~/.managed/git/git-commit-message.txt
+
+[core]
+    editor = vim
+
+[push]
+    default = current
+
+[pull]
+    rebase = true
+
+[rebase]
+    autosquash = true
+
+[url "git@github.com:"]
+    insteadOf = https://github.com/
+
+[alias]
+    br = branch
+    brv = branch -v
+    cl = clone
+    co = checkout
+    cob = checkout -b
+    ct = commit
+    ctm = commit -m
+    ctam = commit -am
+    dft = difftool
+    dno = diff --name-only
+    lg = log --graph --oneline --abbrev-commit --decorate --color --all
+    pl = pull
+    ps = push
+    psf = push -f
+    psh = push -u origin HEAD
+    rb = rebase
+    rbi = rebase --interactive
+    st = status
+
+[diff]
+    tool = difftastic
+
+[difftool]
+    prompt = false
+
+[difftool "difftastic"]
+    cmd = difft "$LOCAL" "$REMOTE"
+
+[pager]
+    difftool = true
+
+[init]
+    defaultBranch = main
+
+[fetch]
+    prune = true
