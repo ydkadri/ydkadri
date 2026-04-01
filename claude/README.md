@@ -81,7 +81,9 @@ This helps align on project goals, scope, and priorities before writing code. Co
 
 ### Project Organization (`project/`)
 - **[structure.md](project/structure.md)** - Project layout: justfiles, directory structure, package managers
+- **[docker.md](project/docker.md)** - Docker patterns: multi-stage builds, compose, development workflows
+- **[ci.md](project/ci.md)** - CI/CD: GitHub Actions, CircleCI, release pipelines
 
 ---
 
-**Last Updated**: 2026-03-23
+**Last Updated**: 2026-04-01
