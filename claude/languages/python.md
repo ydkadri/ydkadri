@@ -668,8 +668,6 @@ Do NOT log:
 
 Use automatic scrubbing for common field names (password, token, api_key, secret).
 
-See also: [security.md](security.md) for sensitive data handling.
-
 ## Error Handling
 
 ### Fail Fast
@@ -1447,7 +1445,7 @@ host = "prod-db.example.com"
 
 ### Secrets
 
-Never store secrets in config files. Always use environment variables. See [security.md](security.md).
+Never store secrets in config files. Always use environment variables.
 
 ### Hierarchy
 
