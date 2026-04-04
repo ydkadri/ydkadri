@@ -398,6 +398,17 @@ All documentation must be checked for validity before commit. This includes:
 - Don't restate what I said, just do it
 - Include only what's necessary to understand
 
+### Language and Spelling
+
+**Use British English spelling and conventions:**
+- colour, honour, behaviour (not color, honor, behavior)
+- organise, analyse, optimise (not organize, analyze, optimize)
+- centre, metre, litre (not center, meter, liter)
+- licence (noun), license (verb)
+- practise (verb), practice (noun)
+
+This applies to all documentation, code comments, commit messages, and PR descriptions.
+
 ### When to Ask Permission
 
 Ask before:
