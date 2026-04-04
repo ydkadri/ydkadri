@@ -4,6 +4,24 @@ Git branching, commits, and quality gates.
 
 ## Branch Strategy
 
+### Default Branch
+
+**The default branch is `main`** (or `master` in older repositories).
+
+**All new branches should be based on the latest version of main** unless otherwise specified:
+
+```bash
+# Start new work - always from latest main
+git checkout main
+git pull
+git checkout -b feature/new-feature
+
+# Only branch from a feature branch if explicitly needed
+# (e.g., building on unreleased work)
+```
+
+### Branch Naming
+
 Branches should be descriptive and categorical:
 
 - **`feature/description`** - New features or enhancements
