@@ -15,46 +15,71 @@ Use descriptive names that explain what the branch does, not just ticket numbers
 
 ## Commit History
 
-### Logical Blocks
+**Goal**: Clean, logical commits that tell a story.
 
-Commits should be **logical blocks of work**:
+### During Draft PR Phase
 
+**Fixup commits are ENCOURAGED** - makes incremental review easier:
+- "Fix linting", "Address feedback", "Fix typo" commits are fine
+- Reviewer can see what changed since last review without re-reading everything
+- Allows milestone reviews during implementation
+
+**During draft phase, commits like this are acceptable:**
+```
+1. Add query infrastructure
+2. Fix linting in registry
+3. Address feedback: simplify executor
+4. Add find-dead-code query
+5. Fix typo in query
+...
+[Then rebase before marking ready]
+```
+
+### Before Marking PR Ready (Phase 5)
+
+**Rebase to squash fixups into logical feature units:**
+- Each commit = complete, cohesive piece of functionality
+- Related changes grouped together (feature + tests + docs)
+- Commits tell a clear story
+- Reviewers can understand each commit in isolation
+
+**Final commit structure should be logical blocks of work:**
 - Each commit is complete and isolated
 - Tests pass for each commit
 - Code is documented for each commit
 - Commit can be understood in isolation
 - A complex piece of work may have multiple commits
 
-**Not allowed**: "Fix linting", "Format code", "Fix typo" commits. Use `git rebase -i` to squash fixups into logical units.
-
-### Good vs Bad Commits
-
 ```
-✅ GOOD - Logical feature units:
-1. Add user authentication with JWT tokens
-2. Add password reset flow and email templates
-3. Update documentation for authentication system
-
-❌ BAD - Scattered, fixup commits:
-1. Add auth
-2. Fix linting
-3. Add tests
-4. Fix typo
-5. Format code
-6. Actually fix auth
+✅ GOOD - After rebase, logical units:
+1. Add query infrastructure (registry, executor, formatters)
+2. Add find-dead-code query with tests
+3. Add remaining queries with tests
+4. Add CLI integration
+5. Update documentation
+6. Bump version: 0.7.0 → 0.7.1
 ```
 
 ### After Code Review
 
-After receiving review feedback:
-- Rebase to incorporate changes into logical commits
-- Don't add "address feedback" commits
-- Squash fixups appropriately
-- Push includes rebase after code review
+**At milestones during draft PR:**
+- Add fixup commits addressing feedback
+- Push with context: "Addressed feedback on milestone X: [what changed]"
+- Keeps incremental changes visible for next review
 
-## Pre-Commit Hooks
+**Before marking ready (Phase 5):**
+- Rebase to incorporate all feedback into logical commits
+- Use `git rebase -i` to squash fixups
+- Verify tests pass after rebase
+- Push cleaned history
 
-Required checks before local commit:
+## Pre-Commit and Pre-Push Hooks
+
+**Quality checks are determined during project setup** (see [README.md Step 4](README.md#step-4-pre-commit-and-pre-push-hooks)). The checks below are standard patterns used across projects - customize based on project needs.
+
+### Standard Pre-Commit Checks
+
+Typical checks before local commit:
 
 1. **Format code** - Auto-format to correct style
 2. **Linting** - All linting checks pass
@@ -74,9 +99,9 @@ Required checks before local commit:
 - Data files
 - Personal information
 
-## Pre-Push Hooks
+### Standard Pre-Push Checks
 
-Required checks before pushing to remote:
+Typical checks before pushing to remote:
 
 1. **All pre-commit checks** - Everything from pre-commit must pass (implied, don't duplicate)
 2. **Build verification** - Project builds successfully
