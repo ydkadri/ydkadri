@@ -1,0 +1,25 @@
+# ============================================================================
+# User Configuration Template
+# ============================================================================
+#
+# Copy this file to user-config.nix and update with your values:
+#   cp user-config.nix.example user-config.nix
+#
+# Then edit user-config.nix with your information.
+# user-config.nix is gitignored so your personal info stays private.
+#
+# ============================================================================
+
+{
+  # Your username (run `whoami` to find this)
+  username = "youcef.kadri";
+
+  # Your home directory (run `echo $HOME` to find this)
+  homeDirectory = "/Users/youcef.kadri";
+
+  # Your git email for commits
+  gitEmail = "youcef.d.kadri@gmail.com";
+
+  # Your full name for git commits
+  gitName = "Youcef Kadri";
+}
