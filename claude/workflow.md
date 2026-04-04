@@ -47,6 +47,235 @@ When writing code, always design the API or interface first, then implement. How
 3. Wait for review and feedback
 4. Only then implement internals
 
+## Feature Implementation Workflow
+
+**Goal**: Small increments, fast feedback, fewer review rounds.
+
+Work happens in phases with explicit checkpoints for early alignment.
+
+### Phase 1: Align on Approach
+
+1. Discuss user journey with questions (one at a time)
+2. Write user journey document (`docs/user-journeys/NN-feature-name.md`)
+   - Define user goals, workflow, and outcomes
+   - Include prerequisites, steps, verification, troubleshooting
+   - Update `docs/user-journeys/README.md` index
+
+**CHECKPOINT 1**: Push draft PR with user journey doc
+- **Request review**: "User journey complete - validating we're solving the right problem"
+- User validates: Is this the right problem to solve?
+
+### Phase 2: Design Interface
+
+3. Write interface documentation (`docs/interface/feature-name.md`) if adding public APIs
+   - Document public interface (CLI commands, API endpoints, function signatures)
+   - Include usage examples showing how it will be used
+
+**CHECKPOINT 2**: Push interface docs to same PR
+- **Request review**: "Interface design complete - validating API ergonomics before implementation"
+- User validates: Is the interface clear and well-designed?
+
+### Phase 3: Plan Implementation
+
+4. Create implementation plan in ROADMAP.md:
+   ```markdown
+   ## [Feature Name] - Implementation Plan
+   
+   **PR Strategy**: Single PR | Multiple smaller PRs
+   
+   **GitHub Issues**: #XX, #YY (list all issues this work will resolve)
+   
+   **Commit Structure**:
+   1. [Self-contained unit 1] - what and why
+   2. [Self-contained unit 2] - what and why
+   ...
+   
+   **Review Milestones**:
+   - After Commit X: Why review here? (e.g., "Validate foundation")
+   - After Commit Y: Why review here? (e.g., "Before building on this")
+   - Final: Ready for merge after version bump
+   
+   **Technical Approach**:
+   - Key architectural decisions
+   - Design patterns used
+   - Integration points
+   ```
+   
+   **IMPORTANT**: Check ROADMAP.md for any existing GitHub issues related to this feature. List them in the plan so they can be referenced in the PR and closed on merge.
+
+**CHECKPOINT 3**: Push plan to ROADMAP.md
+- **Request review**: "Implementation plan complete - agreeing on commit structure and milestones"
+- User validates: Agree on granularity, PR strategy, and review points?
+
+### Phase 4: Implement Incrementally
+
+5. Implement according to plan:
+   - Write tests first for each unit
+   - Implement the functionality
+   - Keep commits matching the plan structure
+   - **Keep fixup commits during draft phase** - makes incremental review easier
+
+**Push at planned milestones**:
+- After completing each milestone from plan
+- **Always include context**: "Milestone X complete: [what] - ready for review to [why]"
+- Example: "Foundation complete: base classes and registry - ready for review to validate before building queries on top"
+
+**When to push for milestone review:**
+
+✅ Completed a planned commit/unit
+✅ Foundation work that later work builds on
+✅ Complete feature slice working end-to-end
+✅ Before a major direction change needs validation
+✅ After significant refactor affecting many files
+
+❌ Not after every single commit (too granular)
+❌ Not when stuck on implementation detail (try to solve first)
+
+**PR stays in DRAFT** - Allows fixup commits without breaking review flow
+
+### Phase 5: Finalize
+
+6. Self-validate before asking for final review:
+   - Run linting and fix all issues
+   - Run tests with coverage and verify coverage passes
+   - Check all changes against contributing style guides (if they exist)
+   
+7. Update documentation:
+   - CHANGELOG.md with user-facing changes
+   - README.md if features or commands changed
+   - Technical docs if architecture changed
+   - Review existing docs for accuracy
+
+8. Version bump:
+   - Propose version type (patch/minor/major) and get confirmation
+   - Update version according to project's version management approach
+   - Update "Current Version" in CLAUDE.md if it exists
+
+9. **Rebase to clean commit history**:
+   - Squash fixup commits into their parent commits
+   - Ensure each commit is self-contained and logical
+   - Verify all tests pass after rebase
+
+10. **Verify GitHub issue references**:
+    - Check ROADMAP.md implementation plan for listed GitHub issues
+    - Add issue references to PR description (e.g., "Closes #33, Resolves #42")
+    - Verify issue numbers are correct and still open
+
+11. **Mark PR ready for final review**
+    - **Request review**: "Ready for final review - all feedback addressed, tests passing, docs updated"
+    - Wait for CI to pass
+    - Include PR URL
+
+### Key Principles
+
+- **3 upfront checkpoints** catch issues when they're cheap to fix
+- **Milestone reviews during implementation** prevent building on wrong foundation  
+- **Draft PR + fixup commits** make incremental review easier
+- **Clean history at the end** via rebase before marking ready
+- **Explicit review requests** with context help reviewer understand what and why
+
+## Architectural Decision Records (ADRs)
+
+For significant architectural decisions, **create an ADR** to document:
+- The context and problem
+- Alternatives considered
+- Decision made and rationale
+- Consequences (both positive and negative)
+
+### When to Create an ADR
+
+Create an ADR for decisions that:
+- Affect system architecture or structure
+- Introduce new patterns or technologies
+- Have long-term implications
+- Are difficult or costly to reverse
+- Need to be communicated to the team
+
+Examples: choosing a database, defining module boundaries, selecting a framework, establishing error handling patterns.
+
+### ADR Template
+
+Store ADRs in `docs/adr/NNNN-title.md`:
+
+```markdown
+# NNNN. [Decision Title]
+
+Date: YYYY-MM-DD
+
+## Status
+
+Accepted | Proposed | Deprecated | Superseded by [ADR-XXXX](XXXX-title.md)
+
+## Context
+
+What is the issue we're seeing that is motivating this decision or change?
+
+## Decision
+
+What is the change that we're proposing and/or doing?
+
+## Consequences
+
+What becomes easier or more difficult to do because of this change?
+
+### Positive
+
+- Benefit 1
+- Benefit 2
+
+### Negative
+
+- Trade-off 1
+- Trade-off 2
+
+## Alternatives Considered
+
+What other options were considered?
+
+### Option 1: [Name]
+- Pros: ...
+- Cons: ...
+- Why rejected: ...
+```
+
+Number ADRs sequentially (0001, 0002, etc.) and maintain an index at `docs/adr/README.md`.
+
+## GitHub Issues Integration
+
+Track all work via GitHub issues and reference them throughout the workflow:
+
+### Creating Issues
+
+When work is deferred or new work is identified:
+```bash
+gh issue create --title "Feature: Export to CSV" \
+  --body "User story: As a user, I want to export analysis results to CSV...\n\nAcceptance criteria:..."
+```
+
+### Planning with Issues
+
+In Phase 3, list all GitHub issues that the implementation will resolve:
+```markdown
+## [Feature Name] - Implementation Plan
+
+**GitHub Issues**: #33, #42, #47
+```
+
+### Closing Issues
+
+In Phase 5, add issue references to PR description:
+```markdown
+## Summary
+Implements CSV export functionality
+
+## Closes
+- Closes #33
+- Resolves #42
+- Fixes #47
+```
+
+GitHub will automatically close these issues when the PR is merged.
+
 ## PR Review Workflow
 
 ### Always Include PR Link
