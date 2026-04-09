@@ -5,6 +5,18 @@
   programs.zsh = {
     enable = true;
 
+    # Use XDG config directory for zsh files (modern standard)
+    # This puts .zshrc, .zshenv, etc. in ~/.config/zsh/ instead of ~/
+    dotDir = "${config.xdg.configHome}/zsh";
+
+    # Source Nix daemon setup first (must happen before anything else)
+    initExtraFirst = ''
+      # Source nix daemon setup for multi-user installations
+      if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+        . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+      fi
+    '';
+
     # Enable completion system
     enableCompletion = true;
 
