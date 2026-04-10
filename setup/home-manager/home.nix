@@ -236,6 +236,73 @@ in
     }
   '';
 
+  # Git helper functions
+  home.file.".managed/git/functions.sh".text = ''
+    # Install git hooks to current repository
+    install_hooks() {
+        local repo_root=$(git rev-parse --show-toplevel 2>/dev/null)
+
+        if [[ -z "$repo_root" ]]; then
+            echo "Error: Not in a git repository"
+            return 1
+        fi
+
+        if [[ ! -d "$repo_root/.git" ]]; then
+            echo "Error: .git directory not found"
+            return 1
+        fi
+
+        local hook_source="$HOME/.managed/git/pre-push"
+        local hook_dest="$repo_root/.git/hooks/pre-push"
+
+        if [[ ! -f "$hook_source" ]]; then
+            echo "Error: Hook source not found at $hook_source"
+            return 1
+        fi
+
+        cp "$hook_source" "$hook_dest"
+        chmod +x "$hook_dest"
+        echo "✓ Installed pre-push hook to $repo_root"
+    }
+  '';
+
+  # Kubernetes aliases
+  home.file.".managed/kubernetes/kubectl_aliases.sh".text = ''
+    # Kubernetes context switching (requires kubectl-ctx)
+    alias ctx='kubectl-ctx'
+
+    # Add more kubectl aliases here as needed
+    # alias k='kubectl'
+    # alias kgp='kubectl get pods'
+    # etc.
+  '';
+
+  # Environment variables (work-specific, sensitive)
+  home.file.".managed/env.sh".text = ''
+    # ========================================================================
+    # Environment Variables
+    # ========================================================================
+    # This file contains work-specific and sensitive environment variables.
+    #
+    # For sensitive values like tokens:
+    # Option 1: Set placeholder here, then manually edit this file with real value
+    # Option 2: Export from pass (password manager)
+    #   Example: export GITHUB_TOKEN=$(pass show github/personal-token)
+    #
+    # ========================================================================
+
+    # Work-specific environment variables
+    export KRAKEN_CLI_ROLE="data_platform_admin"
+
+    # GitHub personal access token
+    # To set: either replace placeholder or use: export GITHUB_TOKEN=$(pass show github/personal-token)
+    export GITHUB_TOKEN="GITHUB_TOKEN_PLACEHOLDER_SET_IN_PASS_OR_HERE"
+
+    # Add other sensitive environment variables here
+    # export OTHER_TOKEN="placeholder"
+    # export AWS_PROFILE="your-profile"
+  '';
+
   # ============================================================================
   # XDG Base Directory Specification
   # ============================================================================

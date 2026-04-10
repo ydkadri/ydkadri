@@ -67,15 +67,18 @@
       # ========================================================================
       # Source managed shell scripts from ~/.managed/
       # ========================================================================
-      # All functions are organized by category for better maintainability
+      # All functions are organised by category for better maintainability
       # Aliases are managed in shell.nix shellAliases above
 
-      source ~/.managed/common/functions.sh    # field(), work(), venv()
-      source ~/.managed/common/aliases.sh      # (currently empty)
-      source ~/.managed/claude/functions.sh    # claude-list()
-      source ~/.managed/github/functions.sh    # gist-create(), gist-list(), gist-view()
-      source ~/.managed/docker/functions.sh    # docker-clean(), docker-nuke()
-      source ~/.managed/pass/functions.sh      # pass-github()
+      source ~/.managed/env.sh                        # Environment variables (GITHUB_TOKEN, KRAKEN_CLI_ROLE)
+      source ~/.managed/common/functions.sh           # field(), work(), venv()
+      source ~/.managed/common/aliases.sh             # (currently empty)
+      source ~/.managed/claude/functions.sh           # claude-list()
+      source ~/.managed/github/functions.sh           # gist-create(), gist-list(), gist-view()
+      source ~/.managed/docker/functions.sh           # docker-clean(), docker-nuke()
+      source ~/.managed/git/functions.sh              # install_hooks()
+      source ~/.managed/pass/functions.sh             # pass-github()
+      source ~/.managed/kubernetes/kubectl_aliases.sh # ctx alias
 
       # ========================================================================
       # Tool Integration Notes
