@@ -100,6 +100,7 @@
     # === Documentation Viewers ===
     man-db                      # Man pages
     man-pages                   # POSIX man pages
+    glow                        # Markdown renderer for terminal
 
     # === File Transfer ===
     rsync                       # File synchronization
