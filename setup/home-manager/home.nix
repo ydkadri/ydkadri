@@ -282,25 +282,25 @@ in
     # ========================================================================
     # Environment Variables
     # ========================================================================
-    # This file contains work-specific and sensitive environment variables.
+    # This file contains work-specific environment variables that are safe to
+    # commit to git (not sensitive/secret).
     #
-    # For sensitive values like tokens:
-    # Option 1: Set placeholder here, then manually edit this file with real value
-    # Option 2: Export from pass (password manager)
-    #   Example: export GITHUB_TOKEN=$(pass show github/personal-token)
+    # For sensitive values (tokens, passwords):
+    # - Put them in ~/.zshrc.local (not managed by home-manager, not in git)
+    # - Or export from pass: export GITHUB_TOKEN=$(pass show github/personal-token)
+    #
+    # Example ~/.zshrc.local:
+    #   export GITHUB_TOKEN="ghp_your_token_here"
+    #   export AWS_ACCESS_KEY_ID="your_key_here"
     #
     # ========================================================================
 
-    # Work-specific environment variables
+    # Work-specific environment variables (non-sensitive)
     export KRAKEN_CLI_ROLE="data_platform_admin"
 
-    # GitHub personal access token
-    # To set: either replace placeholder or use: export GITHUB_TOKEN=$(pass show github/personal-token)
-    export GITHUB_TOKEN="GITHUB_TOKEN_PLACEHOLDER_SET_IN_PASS_OR_HERE"
-
-    # Add other sensitive environment variables here
-    # export OTHER_TOKEN="placeholder"
+    # Add other non-sensitive environment variables here
     # export AWS_PROFILE="your-profile"
+    # export NODE_ENV="development"
   '';
 
   # ============================================================================
