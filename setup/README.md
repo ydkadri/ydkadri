@@ -250,6 +250,43 @@ nvim
 # Everything should be working now!
 ```
 
+#### f. Setup Local Environment Overrides (Optional)
+
+For machine-specific configuration or secrets that shouldn't be tracked in git:
+
+```bash
+# Create ~/.zshrc.local for local overrides
+cat > ~/.zshrc.local <<'EOF'
+# Machine-specific environment variables and secrets
+# This file is not managed by home-manager and not tracked in git
+
+# GitHub personal access token
+export GITHUB_TOKEN="ghp_your_token_here"
+
+# Override work-specific variables if needed
+# export KRAKEN_CLI_ROLE="custom_role_for_this_machine"
+
+# Machine-specific aliases
+# alias custom-alias="some command"
+
+# Or export from pass instead of hardcoding
+# export GITHUB_TOKEN=$(pass show github/personal-token)
+EOF
+
+# Restart shell to load
+exec zsh
+
+# Verify
+echo $GITHUB_TOKEN
+```
+
+**When to use `~/.zshrc.local`:**
+- Sensitive values (tokens, API keys, passwords)
+- Machine-specific configuration that differs per machine
+- Temporary overrides for testing
+
+**Note:** Add `~/.zshrc.local` to `.gitignore` if you track your home directory in git.
+
 ## Usage
 
 ### Making Changes

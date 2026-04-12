@@ -103,6 +103,14 @@
       # PATH: Managed via home.sessionPath in home.nix
       #   - ~/.cargo/bin (Rust)
       #   - ~/.local/bin (local binaries)
+
+      # ========================================================================
+      # Local Overrides
+      # ========================================================================
+      # Source local overrides if they exist (not managed by home-manager)
+      # Use ~/.zshrc.local for machine-specific config or secrets that shouldn't be in git
+      # Example: export GITHUB_TOKEN="ghp_your_token_here"
+      [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
     '';
   };
 
