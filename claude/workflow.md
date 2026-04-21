@@ -113,7 +113,7 @@ Work happens in phases with explicit checkpoints for early alignment.
    - Write tests first for each unit
    - Implement the functionality
    - Keep commits matching the plan structure
-   - **Keep fixup commits during draft phase** - makes incremental review easier
+   - **Use `git commit --fixup=<commit>` during draft phase** - makes incremental review easier and cleanup automatic
 
 **Push at planned milestones**:
 - After completing each milestone from plan
@@ -152,9 +152,10 @@ Work happens in phases with explicit checkpoints for early alignment.
    - Update "Current Version" in CLAUDE.md if it exists
 
 9. **Rebase to clean commit history**:
-   - Squash fixup commits into their parent commits
+   - Use `git rebase -i --autosquash main` to automatically squash fixup commits
    - Ensure each commit is self-contained and logical
    - Verify all tests pass after rebase
+   - Example: `git rebase -i --autosquash main` (or just `git rebase -i main` if `rebase.autosquash = true`)
 
 10. **Verify GitHub issue references**:
     - Check ROADMAP.md implementation plan for listed GitHub issues
@@ -170,8 +171,8 @@ Work happens in phases with explicit checkpoints for early alignment.
 
 - **3 upfront checkpoints** catch issues when they're cheap to fix
 - **Milestone reviews during implementation** prevent building on wrong foundation  
-- **Draft PR + fixup commits** make incremental review easier
-- **Clean history at the end** via rebase before marking ready
+- **Draft PR + `--fixup` commits** make incremental review easier and cleanup automatic
+- **Clean history at the end** via `git rebase -i --autosquash` before marking ready
 - **Explicit review requests** with context help reviewer understand what and why
 
 ## Architectural Decision Records (ADRs)

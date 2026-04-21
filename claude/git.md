@@ -38,19 +38,49 @@ Use descriptive names that explain what the branch does, not just ticket numbers
 ### During Draft PR Phase
 
 **Fixup commits are ENCOURAGED** - makes incremental review easier:
-- "Fix linting", "Address feedback", "Fix typo" commits are fine
+- Use `git commit --fixup=<commit>` to mark commits for automatic squashing
 - Reviewer can see what changed since last review without re-reading everything
 - Allows milestone reviews during implementation
 
-**During draft phase, commits like this are acceptable:**
+**During draft phase, use `--fixup` commits:**
+```bash
+# Initial work
+git commit -m "Add query infrastructure"
+git commit -m "Add find-dead-code query"
+
+# Later: fix linting in first commit
+git commit --fixup=HEAD~1
+# Creates: "fixup! Add query infrastructure"
+
+# Address review feedback on second commit
+git commit --fixup=HEAD
+# Creates: "fixup! Add find-dead-code query"
+```
+
+**Finding the commit to fixup:**
+```bash
+# Show recent commits
+git log --oneline -10
+
+# Fixup into specific commit
+git commit --fixup=abc123
+
+# Fixup into most recent commit
+git commit --fixup=HEAD
+
+# Fixup into previous commit
+git commit --fixup=HEAD~1
+```
+
+**During draft phase, history looks like:**
 ```
 1. Add query infrastructure
-2. Fix linting in registry
-3. Address feedback: simplify executor
-4. Add find-dead-code query
-5. Fix typo in query
+2. fixup! Add query infrastructure
+3. Add find-dead-code query
+4. fixup! Add find-dead-code query
+5. Address feedback: simplify executor
 ...
-[Then rebase before marking ready]
+[Then autosquash rebase before marking ready]
 ```
 
 ### Before Marking PR Ready (Phase 5)
@@ -81,15 +111,57 @@ Use descriptive names that explain what the branch does, not just ticket numbers
 ### After Code Review
 
 **At milestones during draft PR:**
-- Add fixup commits addressing feedback
+- Use `git commit --fixup=<commit>` to address feedback
 - Push with context: "Addressed feedback on milestone X: [what changed]"
 - Keeps incremental changes visible for next review
 
+**Example addressing review feedback:**
+```bash
+# Review feedback: "Simplify the executor logic in first commit"
+
+# Find which commit to fix
+git log --oneline -5
+# abc123 Add CLI integration
+# def456 Add find-dead-code query
+# ghi789 Add query infrastructure  <- This one needs fixing
+
+# Make changes to executor, then commit
+git add src/executor.rs
+git commit --fixup=ghi789
+# Creates: "fixup! Add query infrastructure"
+
+# Push to show reviewer what changed
+git push
+```
+
 **Before marking ready (Phase 5):**
 - Rebase to incorporate all feedback into logical commits
-- Use `git rebase -i` to squash fixups
+- Use `git rebase -i --autosquash` to automatically squash fixup commits
 - Verify tests pass after rebase
 - Push cleaned history
+
+**Autosquash example:**
+```bash
+# Before: messy history with fixups
+git log --oneline
+# abc123 fixup! Add query infrastructure
+# def456 Add find-dead-code query  
+# ghi789 fixup! Add query infrastructure
+# jkl012 Add query infrastructure
+
+# Rebase with autosquash
+git rebase -i --autosquash main
+# Automatically reorders and marks fixups for squashing
+# Just save and exit - no manual work needed
+
+# After: clean history
+git log --oneline
+# mno345 Add find-dead-code query
+# pqr678 Add query infrastructure
+```
+
+**Note:** If you have `rebase.autosquash = true` in your gitconfig (recommended), 
+you can use `git rebase -i main` and autosquash happens automatically.
 
 ## Pre-Commit and Pre-Push Hooks
 
