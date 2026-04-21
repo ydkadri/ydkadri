@@ -95,21 +95,29 @@ All projects should have a `justfile` with standard commands.
 
 ### Command Organization
 
-Use recipe groups for clarity:
+Use recipe groups for clarity. **Format**: comment/description, then group attribute, then command:
 
 ```makefile
+# Run Python tests
 [group('python')]
 py-test:
     uv run pytest
 
+# Run Rust tests
 [group('rust')]
 rs-test:
     cargo test
 
+# Start Docker services
 [group('docker')]
 docker-up:
     docker compose up -d
 ```
+
+**Required format**:
+- Line 1: Comment describing what the command does
+- Line 2: Group attribute
+- Line 3: Command definition
 
 ### Example Patterns
 
@@ -118,22 +126,27 @@ docker-up:
 default:
     @just --list
 
+# Install project dependencies
 [group('development')]
 install:
     uv sync
 
+# Run unit tests
 [group('testing')]
 test:
     uv run pytest
 
+# Run all lints
 [group('quality')]
 lint:
     uv run ruff check .
 
+# Auto-format code
 [group('quality')]
 format:
     uv run ruff format .
 
+# Run all quality checks
 [group('quality')]
 check: lint test
     @echo "All checks passed!"
@@ -144,22 +157,27 @@ check: lint test
 default:
     @just --list
 
+# Build project
 [group('development')]
 build:
     cargo build
 
+# Run unit tests
 [group('testing')]
 test:
     cargo test
 
+# Run all lints
 [group('quality')]
 lint:
     cargo clippy -- -D warnings
 
+# Auto-format code
 [group('quality')]
 format:
     cargo fmt
 
+# Run all quality checks
 [group('quality')]
 check: lint test
     @echo "All checks passed!"
