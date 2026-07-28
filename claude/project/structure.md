@@ -28,7 +28,7 @@ project-name/
 └── .env.example
 ```
 
-Prefer `src/<app_name>/` layout over flat structure.
+Prefer `src/<app_name>/` layout over flat structure. This is the *project-level* layout; for how to structure the code *inside* `src/<app_name>/` once there's real business logic and external boundaries to manage, see [architecture.md](architecture.md).
 
 ### Rust Projects
 
