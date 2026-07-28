@@ -301,6 +301,7 @@ When writing code, always design the interface first, then implement. How someth
 
 ### Project Organization (`project/`)
 - **[structure.md](project/structure.md)** - Project layout: justfiles, directory structure, package managers
+- **[architecture.md](project/architecture.md)** - Application layer structure: ports & adapters, when to use it, reference directory + import-linter template
 - **[docker.md](project/docker.md)** - Docker patterns: multi-stage builds, compose, development workflows
 - **[ci.md](project/ci.md)** - CI/CD: GitHub Actions, CircleCI, release pipelines
 
