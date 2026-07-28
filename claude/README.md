@@ -137,14 +137,15 @@ Questions to clarify:
 Ask: **What documentation does this project need?**
 
 Questions to clarify:
-- **Architecture Decision Records (ADRs)?** (Required for significant decisions?)
+- **Architecture Decision Records (ADRs)?** (Required for significant decisions? Lives in `docs/explanation/adr/`)
 - **API documentation?** (Required? Format: OpenAPI, rustdoc, Sphinx?)
 - **User guides?** (README only, or separate docs/?)
-- **User journey documentation?** (Required for features?)
-- **Interface documentation?** (Required for public APIs?)
+- **Tutorials?** (Required for features? `docs/tutorials/`)
+- **Reference documentation?** (Required for public APIs? `docs/reference/`)
+- **How-to guides?** (Worth writing for specific recurring tasks? `docs/how-to/`)
 - **Contributing guide?** (Needed if open source or team project?)
 
-**Document documentation requirements** and create initial structure (e.g., `docs/adr/`, `docs/user-journeys/`).
+**Document documentation requirements** and create initial structure (e.g., `docs/explanation/adr/`, `docs/tutorials/`).
 
 ### Step 9: Repository Settings
 
@@ -217,17 +218,17 @@ Include:
 
 **Python projects:**
 ```bash
-mkdir -p src/project_name tests/unit tests/integration docs/user-journeys docs/interface
+mkdir -p src/project_name tests/unit tests/integration docs/tutorials docs/how-to docs/reference docs/explanation
 ```
 
 **Rust projects:**
 ```bash
-mkdir -p src tests docs/user-journeys docs/interface
+mkdir -p src tests docs/tutorials docs/how-to docs/reference docs/explanation
 ```
 
 If ADRs are required:
 ```bash
-mkdir -p docs/adr
+mkdir -p docs/explanation/adr
 ```
 
 See [project/structure.md](project/structure.md) for detailed patterns.
@@ -261,7 +262,7 @@ See [project/structure.md](project/structure.md) for detailed patterns.
    Language-specific patterns, IDE files, environment files.
 
 5. **ADR template** (if ADRs required):
-   Create `docs/adr/template.md` with the ADR structure from [workflow.md](workflow.md#adr-template).
+   Create `docs/explanation/adr/template.md` with the ADR structure from [workflow.md](workflow.md#adr-template).
 
 ### Setup Complete
 
@@ -281,7 +282,7 @@ Work should be framed as "a user can do X" rather than "implement feature Y".
 
 **IMPORTANT**: If it's not framed this way, ask me to reframe it.
 
-Always start with user-journey documentation for review - that will save significant time writing code. Outcome achieved is good, we can refactor in review.
+Always start with a tutorial draft for review - that will save significant time writing code. Outcome achieved is good, we can refactor in review.
 
 ## Interface First
 
@@ -305,4 +306,4 @@ When writing code, always design the interface first, then implement. How someth
 
 ---
 
-**Last Updated**: 2026-04-01
+**Last Updated**: 2026-07-28

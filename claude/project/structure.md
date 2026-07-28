@@ -204,26 +204,30 @@ check: lint test
 **Root Level:**
 - `README.md` - Project overview, setup, usage
 - `CHANGELOG.md` - Version history and changes
+- `CONTRIBUTING.md` - Contribution conventions (if open to contributions) - sits outside the docs/ taxonomy, same as README/CHANGELOG
 - `.env.example` - Environment variable template
 
-**docs/ Directory:**
+**docs/ Directory** (organised by [Diataxis](https://diataxis.fr/)):
 ```
 docs/
-├── user-journey/       # User journey documentation (CRITICAL)
-│   ├── feature-name.md
-│   └── workflow-name.md
-├── interface/          # Interface documentation (CRITICAL)
-│   ├── api.md
-│   └── cli.md
-├── architecture/       # System design
-│   ├── overview.md
-│   └── decisions.md
-└── development/        # Developer guides
-    ├── setup.md
-    └── contributing.md
+├── tutorials/           # Learning-oriented walkthroughs (CRITICAL)
+│   └── NN-feature-name.md
+├── how-to/               # Goal-oriented recipes for specific tasks
+│   └── task-name.md
+├── reference/            # Information-oriented, exact and current (CRITICAL)
+│   └── feature-name.md
+└── explanation/          # Understanding-oriented - the "why"
+    └── adr/
+        ├── NNNN-title.md
+        └── README.md     # ADR index
 ```
 
-User-journey and interface documentation are the most important - always start here before implementing.
+- **Tutorials** teach a beginner a skill via one guided path - the outcome is understanding, not the result itself.
+- **How-to guides** are recipes for a specific real task, written for someone who already knows the basics.
+- **Reference** describes the system as it is - signatures, flags, config - no rationale, kept in sync with the code.
+- **Explanation** captures the "why" - decisions, trade-offs, alternatives considered. ADRs live here.
+
+Tutorials and reference documentation are the most important - always start here before implementing. See [workflow.md](../workflow.md#feature-implementation-workflow) for when each is drafted, refined, and validated across a feature's lifecycle.
 
 ### README Structure
 
@@ -377,4 +381,4 @@ This structure:
 
 ---
 
-**Last Updated**: 2026-03-23
+**Last Updated**: 2026-07-28

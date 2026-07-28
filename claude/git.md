@@ -220,7 +220,7 @@ Fixes #123
 
 ## PR Workflow
 
-1. Create **draft PR** for user journey or interface documentation first
+1. Create **draft PR** for the tutorial or reference documentation first
 2. After approval, implement changes
 3. Create PR with:
    - Clear title (under 70 characters)
@@ -232,4 +232,4 @@ Fixes #123
 
 ---
 
-**Last Updated**: 2026-03-23
+**Last Updated**: 2026-07-28

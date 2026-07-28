@@ -21,17 +21,19 @@ Work should be framed as **"a user can do X"** rather than "implement feature Y"
 
 If a request is not framed this way, ask me to reframe it as a user outcome.
 
-### User Journey Documentation
+### Tutorial-First Documentation
 
-Always start with user-journey documentation for my review. This saves significant time:
+Always start with a tutorial draft for my review. This saves significant time:
 
-1. Draft user journey document describing:
+1. Draft a tutorial (`docs/tutorials/NN-feature-name.md`) describing:
    - What the user wants to achieve
-   - How they'll use the feature
+   - How they'll use the feature, step by step
    - What success looks like
 2. Create a **draft PR** with this documentation
 3. Wait for my review and feedback
 4. Only then implement the code
+
+This draft doubles as validation later: once the feature is built, Phase 5 runs these exact steps against the real thing rather than just re-reading them.
 
 **Principle**: Outcome achieved is good, we can refactor in review. Getting the user outcome right is more important than perfect code.
 
@@ -40,12 +42,14 @@ Always start with user-journey documentation for my review. This saves significa
 When writing code, always design the API or interface first, then implement. How something is used is more important than how it's built.
 
 **Design workflow:**
-1. Draft interface document describing:
+1. Draft a reference doc (`docs/reference/feature-name.md`) describing:
    - The public API/interface (how it will be used)
    - Example usage code
-2. Create a **draft PR** with the interface documentation
+2. Create a **draft PR** with the reference documentation
 3. Wait for review and feedback
 4. Only then implement internals
+
+Like the tutorial, this draft is what Phase 5 diffs against the finished code — reference documentation must describe the interface exactly, with no rationale mixed in (rationale belongs in an ADR).
 
 ## Feature Implementation Workflow
 
@@ -56,22 +60,23 @@ Work happens in phases with explicit checkpoints for early alignment.
 ### Phase 1: Align on Approach
 
 1. Discuss user journey with questions (one at a time)
-2. Write user journey document (`docs/user-journeys/NN-feature-name.md`)
+2. Write a tutorial draft (`docs/tutorials/NN-feature-name.md`)
    - Define user goals, workflow, and outcomes
    - Include prerequisites, steps, verification, troubleshooting
-   - Update `docs/user-journeys/README.md` index
+   - Note any candidate how-to topics for Phase 5 (specific recurring tasks the outcome implies) - don't draft these yet
+   - Update `docs/tutorials/README.md` index
 
-**CHECKPOINT 1**: Push draft PR with user journey doc
-- **Request review**: "User journey complete - validating we're solving the right problem"
+**CHECKPOINT 1**: Push draft PR with the tutorial
+- **Request review**: "Tutorial draft complete - validating we're solving the right problem"
 - User validates: Is this the right problem to solve?
 
 ### Phase 2: Design Interface
 
-3. Write interface documentation (`docs/interface/feature-name.md`) if adding public APIs
+3. Write reference documentation (`docs/reference/feature-name.md`) if adding public APIs
    - Document public interface (CLI commands, API endpoints, function signatures)
    - Include usage examples showing how it will be used
 
-**CHECKPOINT 2**: Push interface docs to same PR
+**CHECKPOINT 2**: Push reference docs to same PR
 - **Request review**: "Interface design complete - validating API ergonomics before implementation"
 - User validates: Is the interface clear and well-designed?
 
@@ -114,6 +119,8 @@ Work happens in phases with explicit checkpoints for early alignment.
    - Implement the functionality
    - Keep commits matching the plan structure
    - **Use `git commit --fixup=<commit>` during draft phase** - makes incremental review easier and cleanup automatic
+   - Refine the tutorial and reference drafts in place (as fixups) whenever implementation reveals a gap - don't leave the rewrite for Phase 5
+   - Open an ADR (`docs/explanation/adr/NNNN-title.md`, status `Proposed`) if a real architectural decision comes up
 
 **Push at planned milestones**:
 - After completing each milestone from plan
@@ -140,10 +147,13 @@ Work happens in phases with explicit checkpoints for early alignment.
    - Run tests with coverage and verify coverage passes
    - Check all changes against contributing style guides (if they exist)
    
-7. Update documentation:
-   - CHANGELOG.md with user-facing changes
-   - README.md if features or commands changed
-   - Technical docs if architecture changed
+7. Validate and finalize documentation:
+   - **Validate the tutorial**: run `docs/tutorials/NN-feature-name.md` step by step against the finished feature, fix any drift
+   - **Validate the reference**: diff `docs/reference/feature-name.md` against the actual CLI/API, fix any drift
+   - **Write how-to guide(s)** (`docs/how-to/task-name.md`) if the feature warrants a recipe for a specific real task - informed by what building it actually revealed, not drafted upfront
+   - **Close out ADRs**: move any `Proposed` ADRs opened during Phase 4 to `Accepted`
+   - Update CHANGELOG.md with user-facing changes
+   - Update README.md if features or commands changed
    - Review existing docs for accuracy
 
 8. Version bump:
@@ -196,7 +206,7 @@ Examples: choosing a database, defining module boundaries, selecting a framework
 
 ### ADR Template
 
-Store ADRs in `docs/adr/NNNN-title.md`:
+Store ADRs in `docs/explanation/adr/NNNN-title.md`:
 
 ```markdown
 # NNNN. [Decision Title]
@@ -239,7 +249,7 @@ What other options were considered?
 - Why rejected: ...
 ```
 
-Number ADRs sequentially (0001, 0002, etc.) and maintain an index at `docs/adr/README.md`.
+Number ADRs sequentially (0001, 0002, etc.) and maintain an index at `docs/explanation/adr/README.md`.
 
 ## GitHub Issues Integration
 
@@ -377,7 +387,10 @@ In addition to GitHub issues, maintain a `ROADMAP.md` file in the repository roo
 ### When to Update Documentation
 
 - **README.md**: Significant user-facing changes, setup changes, new features
-- **Interface documentation**: All public APIs and interfaces. Must be kept up to date with code changes.
+- **Tutorials** (`docs/tutorials/`): Drafted before implementation, refined during, validated by running them in Phase 5
+- **Reference** (`docs/reference/`): All public APIs and interfaces. Must be kept up to date with code changes.
+- **How-to guides** (`docs/how-to/`): Added in Phase 5 when the feature warrants a recipe for a specific task
+- **Explanation / ADRs** (`docs/explanation/adr/`): Opened `Proposed` when a real architectural decision arises, closed `Accepted` by Phase 5
 - **CHANGELOG.md**: Every PR must update the changelog
 - **Code comments**: Complex logic, non-obvious decisions, "why" not "what"
 
@@ -388,7 +401,8 @@ All documentation must be checked for validity before commit. This includes:
 - Code examples run
 - Instructions are accurate
 - Version numbers are current
-- Interface documentation matches actual code (CLI commands, API signatures, function interfaces)
+- Tutorials work when followed step by step
+- Reference documentation matches actual code (CLI commands, API signatures, function interfaces)
 
 ## Communication Style
 
@@ -428,4 +442,4 @@ Don't ask for permission to:
 
 ---
 
-**Last Updated**: 2026-03-27
+**Last Updated**: 2026-07-28
