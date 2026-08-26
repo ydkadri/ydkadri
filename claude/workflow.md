@@ -424,6 +424,13 @@ All documentation must be checked for validity before commit. This includes:
 
 This applies to all documentation, code comments, commit messages, and PR descriptions.
 
+### Automate Repeated Work
+
+If a task looks like it will come up again, don't just do it and move on — propose the automation and wait for a yes:
+
+- **Can it be scripted?** Propose writing the script (or justfile target) so I don't have to ask again.
+- **Can't be scripted cleanly** (heavy dependencies, complex or variable inputs) but still likely to recur? Propose a Claude Code skill instead.
+
 ### When to Ask Permission
 
 Ask before:
@@ -431,6 +438,7 @@ Ask before:
 - Hard-to-reverse operations (git reset --hard, overwriting changes)
 - Actions visible to others (pushing code, creating PRs/issues, posting comments)
 - Publishing content externally
+- Creating a script or skill for a repeated task (see [Automate Repeated Work](#automate-repeated-work))
 
 ### When to Just Proceed
 
@@ -442,4 +450,4 @@ Don't ask for permission to:
 
 ---
 
-**Last Updated**: 2026-07-28
+**Last Updated**: 2026-08-27
