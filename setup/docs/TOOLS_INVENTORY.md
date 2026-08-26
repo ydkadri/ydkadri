@@ -456,6 +456,48 @@ lsd --tree          # Same functionality with lsd
 
 ---
 
+### rclone - Cloud Storage Sync
+
+**What it is**: Command-line tool for copying/syncing files to and from cloud storage (Google Drive, S3, Dropbox, etc.) — think `rsync`, but for the cloud.
+
+**Installation**: Installed via home-manager (see `packages.nix`, File Transfer section) — already applied on this machine.
+
+**Config location**: `~/.config/rclone/rclone.conf` — one entry per remote, holding an OAuth refresh token per remote. No password is ever stored; the token comes from Google's own consent screen.
+
+**One-time setup — a Google Drive remote**:
+```bash
+rclone config
+```
+Then: `n` (new remote) → name it (e.g. `gdrive-personal`) → storage type `drive` → leave client_id/client_secret blank (uses rclone's default app) → scope `1` (full access) → leave root_folder_id/service_account_file blank → advanced config `n` → auto config `y` (opens a browser).
+
+**Avoiding an existing Google session**: if you're already signed into another Google account in your default browser, the auto-opened tab may default to that account. Either click "Use another account" on Google's screen before granting access, or answer `n` to "Use auto config?" — rclone then prints a URL to open manually (e.g. in a private/incognito window), where you log in and paste the resulting code back into the terminal. Either way, nothing here creates a persistent Google *browser* session — the only thing left behind is the refresh token in `rclone.conf`.
+
+**Uploading**:
+```bash
+# One file
+rclone copy "/path/to/photo.jpg" gdrive-personal:Instagram/
+
+# A whole folder — copy only adds/updates files, never deletes anything on the Drive side
+rclone copy "/Users/youcef.kadri/Documents/photos/for-the-gram/scheduled" gdrive-personal:Instagram/scheduled
+
+# rclone sync instead of copy makes the remote mirror the local folder exactly,
+# including deleting anything on Drive that's no longer present locally — more
+# destructive, use deliberately.
+```
+
+**Path semantics — a real gotcha**: `rclone copy photos gdrive-personal:Instagram` copies the *contents* of `photos` directly into `Instagram` (so `photos/file1` → `Instagram/file1`), it does **not** nest a `photos/` folder underneath. If you want that nesting, target `gdrive-personal:Instagram/photos` explicitly.
+
+**copy vs sync — cleanup after moving/renaming local files**: `copy` is additive-only and never deletes anything on the destination. If you move `photos/file1` to `photos/subfolder/file1` and re-run `copy`, you'll end up with *both* `Instagram/file1` (stale) and `Instagram/subfolder/file1` (new). To make the destination match the source exactly — deleting anything no longer present locally — use `sync` instead:
+```bash
+rclone sync photos gdrive-personal:Instagram --dry-run -v   # preview what would change/delete first
+rclone sync photos gdrive-personal:Instagram                # then run for real
+```
+`sync` is genuinely destructive on the remote side (anything in that Drive folder not present locally gets deleted), so always dry-run it first. Unchanged files (same size/modtime, or checksum depending on the backend) are skipped by both `copy` and `sync` — nothing gets needlessly re-uploaded.
+
+**Why use it over the Drive desktop app**: no background daemon, no continuously "signed in" client — you run one command when you want to back something up, and nothing syncs in between.
+
+---
+
 ### terraform - Infrastructure as Code
 
 **Installation**: `brew install terraform` (already installed)
@@ -524,5 +566,5 @@ terraform validate  # Validate configuration
 
 ---
 
-**Last Updated**: 2026-04-01
+**Last Updated**: 2026-08-07
 **Maintained By**: Youcef Kadri
