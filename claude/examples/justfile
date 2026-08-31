@@ -1,0 +1,113 @@
+# Example justfile for project automation
+# Run `just` to see available commands
+#
+# Recipes describe outcomes, not implementation.
+# Adapt commands to your project's tools and conventions.
+
+# Default recipe shows help
+default:
+    @just --list
+
+# Linting and formatting
+lint-format:  # Check code formatting
+    # Python: uv run ruff format --check .
+    # Rust: cargo fmt --check
+
+lint-imports:  # Check import sorting
+    # Python: uv run isort --check-only .
+
+lint-quality:  # Check code quality (linting rules)
+    # Python: uv run ruff check .
+    # Rust: cargo clippy -- -D warnings
+
+lint-types:  # Check type annotations/hints
+    # Python: uv run mypy .
+    # Rust: (typically handled by compiler)
+
+lint: lint-format lint-imports lint-quality lint-types  # Run all linting checks
+
+format:  # Auto-format code to match style guide
+    # Python: uv run ruff format . && uv run isort .
+    # Rust: cargo fmt
+
+# Testing
+test-unit:  # Run unit tests only
+    # Python: uv run pytest tests/unit
+    # Rust: cargo test --lib
+
+test-integration:  # Run integration tests only (may require services)
+    # Python: uv run pytest tests/integration
+    # Rust: cargo test --test integration
+
+test-coverage:  # Run tests with coverage report
+    # Python: uv run pytest --cov --cov-report=html --cov-fail-under=80
+    # Rust: cargo tarpaulin --out Html
+
+test: test-unit test-integration  # Run all tests
+
+# Build
+build:  # Build the project for development
+    # Python: uv build
+    # Rust: cargo build
+
+build-release:  # Build optimized release artifact
+    # Python: uv build
+    # Rust: cargo build --release
+
+check: lint test  # Run all quality checks (what CI runs)
+
+# Development environment
+install:  # Install dependencies
+    # Python: uv sync
+    # Rust: cargo build
+
+dev:  # Start development environment
+    # Docker: docker compose up -d
+    # Django: uv run python manage.py runserver
+    # Rust: cargo watch -x run
+
+# Docker operations
+docker-up:  # Start all services
+    docker compose up -d
+
+docker-down:  # Stop all services
+    docker compose down
+
+docker-restart:  # Restart services
+    docker compose down
+    docker compose up -d
+
+docker-reset:  # Full reset: remove volumes, rebuild, and restart
+    docker compose down -v
+    docker compose build
+    docker compose up -d
+
+docker-logs service="":  # View logs for service (or all if none specified)
+    docker compose logs -f {{service}}
+
+docker-shell service:  # Open shell in running service
+    docker compose exec {{service}} /bin/bash
+
+# Database operations
+db-migrate:  # Apply database migrations
+    # Python: uv run alembic upgrade head
+    # Rust: sqlx migrate run
+    # Django: uv run python manage.py migrate
+
+db-rollback:  # Rollback last migration
+    # Python: uv run alembic downgrade -1
+    # Rust: sqlx migrate revert
+
+db-shell:  # Open database shell
+    docker compose exec postgres psql -U myuser -d mydb
+
+# Git workflow
+prepare-commit: format lint  # Prepare code for commit (format and lint)
+
+prepare-push: check  # Prepare code for push (run all checks including tests)
+
+# Cleanup
+clean:  # Remove build artifacts and caches
+    # Python: find . -type d -name "__pycache__" -exec rm -rf {} +
+    # Python: rm -rf .venv/ htmlcov/ .coverage .pytest_cache/ .mypy_cache/ .ruff_cache/
+    # Rust: cargo clean
