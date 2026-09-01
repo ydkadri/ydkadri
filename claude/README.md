@@ -305,6 +305,10 @@ When writing code, always design the interface first, then implement. How someth
 - **[docker.md](project/docker.md)** - Docker patterns: multi-stage builds, compose, development workflows
 - **[ci.md](project/ci.md)** - CI/CD: GitHub Actions, CircleCI, release pipelines
 
+### Tools (`tools/`)
+- **[claude-code-skills-and-evals.md](tools/claude-code-skills-and-evals.md)** - Authoring Claude Code plugins/skills, building `inspect_ai` eval suites (triggers/execution/outcomes), and the eval-driven trim-loop workflow
+- **[password-manager.md](tools/password-manager.md)** - Complete guide to `pass` (GPG-encrypted password store): setup, multi-machine sync, team access control
+
 ---
 
-**Last Updated**: 2026-07-28
+**Last Updated**: 2026-09-01
