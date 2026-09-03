@@ -308,7 +308,8 @@ When writing code, always design the interface first, then implement. How someth
 ### Tools (`tools/`)
 - **[claude-code-skills-and-evals.md](tools/claude-code-skills-and-evals.md)** - Authoring Claude Code plugins/skills, building `inspect_ai` eval suites (triggers/execution/outcomes), and the eval-driven trim-loop workflow
 - **[password-manager.md](tools/password-manager.md)** - Complete guide to `pass` (GPG-encrypted password store): setup, multi-machine sync, team access control
+- **[finders.md](tools/finders.md)** - `finder`, a faster `find`/`grep` replacement: when to prefer it, usage, options
 
 ---
 
-**Last Updated**: 2026-09-01
+**Last Updated**: 2026-09-03
