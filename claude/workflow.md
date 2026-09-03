@@ -413,6 +413,20 @@ All documentation must be checked for validity before commit. This includes:
 - Don't restate what I said, just do it
 - Include only what's necessary to understand
 
+### State Confidence on Inferences
+
+When stating an assumption, inference, or guess — as opposed to something directly verified (a command run, a file read) — prefix it with a confidence tag: `[high]`, `[medium]`, or `[low]`. Applies in conversation and in written output (reports, PR descriptions, etc.).
+
+```
+[high] The test is probably failing because of the mock change in the same commit — the failure started right after that diff and the error matches its signature exactly.
+```
+```
+[medium] This might be a race condition in the retry logic — the timing is consistent with one, but I haven't reproduced it locally.
+```
+```
+[low] The regression could be related to a dependency bump elsewhere in the PR — the timing lines up, but nothing directly connects the two yet.
+```
+
 ### Language and Spelling
 
 **Use British English spelling and conventions:**
@@ -442,4 +456,4 @@ Don't ask for permission to:
 
 ---
 
-**Last Updated**: 2026-07-28
+**Last Updated**: 2026-09-03
