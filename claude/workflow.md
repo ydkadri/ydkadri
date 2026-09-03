@@ -108,6 +108,8 @@ Work happens in phases with explicit checkpoints for early alignment.
    
    **IMPORTANT**: Check ROADMAP.md for any existing GitHub issues related to this feature. List them in the plan so they can be referenced in the PR and closed on merge.
 
+   **If "Multiple smaller PRs"**: prefer the `gh stack` extension over loose independent branches - it keeps each PR's base in sync as earlier PRs in the stack merge. See [tools/claude-code-skills-and-evals.md](tools/claude-code-skills-and-evals.md#splitting-work-into-a-reviewable-pr-stack) for the full workflow (sizing splits, version bumps per PR, cross-stack basing).
+
 **CHECKPOINT 3**: Push plan to ROADMAP.md
 - **Request review**: "Implementation plan complete - agreeing on commit structure and milestones"
 - User validates: Agree on granularity, PR strategy, and review points?

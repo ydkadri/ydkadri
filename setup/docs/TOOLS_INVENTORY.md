@@ -150,6 +150,21 @@ gh repo clone owner/repo
 - `gist-file` - Create gist from file
 - `gist-search` - Search your gists
 
+**Extensions**:
+
+- **[gh-stack](https://github.com/github/gh-stack)** - Manages a stack of dependent branches as a chain of PRs. Installed automatically by home-manager (`home.activation.ghStackExtension` in `home-manager/programs/cli-tools.nix`); on a manual install, run `gh extension install github/gh-stack`.
+
+  **Prefer this for breaking up any large change into reviewable PRs** rather than one big diff or a pile of loose branches - it keeps bases in sync as earlier PRs in the stack merge.
+
+  ```bash
+  gh stack init branch1 branch2 branch3 --base main   # adopt existing local branches into a stack
+  gh stack submit --auto --open                        # push + create/update PRs, mark ready for review
+  gh stack view                                        # see the current stack
+  gh stack merge --yes --squash                        # merge the whole stack in order, atomically
+  ```
+
+  See [claude/tools/claude-code-skills-and-evals.md](../../claude/tools/claude-code-skills-and-evals.md#splitting-work-into-a-reviewable-pr-stack) for the full workflow (sizing splits, version bumps per PR, cross-stack basing, and the `git worktree` safety rule for branch surgery).
+
 ---
 
 ### docker + docker-compose
