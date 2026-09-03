@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   # === fzf - Fuzzy finder ===
@@ -186,6 +186,18 @@
       };
     };
   };
+
+  # gh-stack isn't packaged in nixpkgs, so install/update it via gh's own
+  # extension manager once gh itself is in place.
+  home.activation.ghStackExtension = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    if $DRY_RUN_CMD command -v gh >/dev/null 2>&1; then
+      if $DRY_RUN_CMD gh extension list 2>/dev/null | grep -q 'github/gh-stack'; then
+        $DRY_RUN_CMD gh extension upgrade gh-stack >/dev/null 2>&1 || true
+      else
+        $DRY_RUN_CMD gh extension install github/gh-stack || true
+      fi
+    fi
+  '';
 
   # === Direnv - Per-directory environment variables ===
   programs.direnv = {
