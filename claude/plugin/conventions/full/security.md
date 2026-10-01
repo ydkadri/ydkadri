@@ -115,7 +115,7 @@ export GITHUB_TOKEN=$(pass show github/personal-token)
 API_KEY=$(pass show client/api-key)
 ```
 
-**See [tools/password-manager.md](tools/password-manager.md) for complete guide** covering:
+**See the `pass` password manager guide (`tools/password-manager.md` in the ydkadri repo)** covering:
 - GPG key setup and backup
 - Multi-machine sync via git
 - Team access control

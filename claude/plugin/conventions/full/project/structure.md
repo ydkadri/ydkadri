@@ -227,7 +227,7 @@ docs/
 - **Reference** describes the system as it is - signatures, flags, config - no rationale, kept in sync with the code.
 - **Explanation** captures the "why" - decisions, trade-offs, alternatives considered. ADRs live here.
 
-Tutorials and reference documentation are the most important - always start here before implementing. See [workflow.md](../workflow.md#feature-implementation-workflow) for when each is drafted, refined, and validated across a feature's lifecycle.
+Tutorials and reference documentation are the most important - always start here before implementing. The `plan-stack` and `build-stack` skills say when each is written.
 
 ### README Structure
 

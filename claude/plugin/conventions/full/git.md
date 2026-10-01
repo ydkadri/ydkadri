@@ -165,7 +165,7 @@ you can use `git rebase -i main` and autosquash happens automatically.
 
 ## Pre-Commit and Pre-Push Hooks
 
-**Quality checks are determined during project setup** (see [README.md Step 4](README.md#step-4-pre-commit-and-pre-push-hooks)). The checks below are standard patterns used across projects - customize based on project needs.
+**Quality checks are determined during project setup** (see the `project-init` skill). The checks below are standard patterns used across projects - customize based on project needs.
 
 ### Standard Pre-Commit Checks
 
