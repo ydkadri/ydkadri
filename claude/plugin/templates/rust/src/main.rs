@@ -11,7 +11,7 @@ use tracing_subscriber::{
 /// Install the global tracing subscriber, honouring `RUST_LOG`.
 fn init_tracing() -> anyhow::Result<()> {
     let filter = EnvFilter::builder()
-        .with_default_directive(LevelFilter::DEBUG.into())
+        .with_default_directive(LevelFilter::INFO.into())
         .from_env_lossy();
     let fmt_layer = tracing_subscriber::fmt::layer()
         .with_writer(std::io::stderr)

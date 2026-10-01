@@ -26,7 +26,7 @@ just install
 cargo run -p project-name-app -- "My note"
 ```
 
-Logging is controlled with `RUST_LOG` (default `debug`), see `.env.example`.
+Logging is controlled with `RUST_LOG` (default `info`), see `.env.example`.
 
 ## Development
 
