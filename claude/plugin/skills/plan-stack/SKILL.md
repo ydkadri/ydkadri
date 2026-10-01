@@ -9,7 +9,7 @@ Turn a user outcome into a stack of draft PRs the user can approve before any co
 
 ## Step 1: Outcome and ADRs in chat
 
-Ask one question at a time until the outcome is clear ("a user can do X"). Raise each real architectural decision as a short ADR discussion: context, options, recommendation. Write agreed decisions to `docs/explanation/adr/NNNN-title.md` using `${CLAUDE_PLUGIN_ROOT}/templates/python/docs/explanation/adr/template.md`.
+Ask one question at a time until the outcome is clear ("a user can do X"). Raise each real architectural decision as a short ADR discussion: context, options, recommendation. Write agreed decisions to `docs/explanation/adr/NNNN-title.md` using `${CLAUDE_PLUGIN_ROOT}/templates/common/docs/explanation/adr/template.md`.
 
 ## Step 2: Stack plan
 

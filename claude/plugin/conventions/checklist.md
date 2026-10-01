@@ -52,6 +52,24 @@ Every item has a stable ID (for example `PY-03`). Report each finding with that 
 - [ ] **PY-13** **R** Parametrize only where the logic is identical. Test names say what is tested and the expected result.
 - [ ] **PY-14** **R** New behaviour, error paths and edge cases are covered, not only the happy path.
 
+## Rust
+
+- [ ] **RS-01** **R** Traits are named with third person verbs (`Parses`, `WritesData`). Std-style traits (`Display`, `From`) are exempt.
+- [ ] **RS-02** **R** Types are imported by name, functions through their module (`fs::read_to_string`). No glob imports.
+- [ ] **RS-03** **R** `impl` order: private helpers, constructors, public methods. Items defined before use.
+- [ ] **RS-04** **R** Module names say their purpose. No `utils`, `helpers` or `_internal`. Private by default, `pub(crate)` before `pub`.
+- [ ] **RS-05** **R** Enums, not strings, for states, formats and kinds.
+- [ ] **RS-06** **R** Library and core code return typed `thiserror` errors. `anyhow` is only in binaries. Errors carry context.
+- [ ] **RS-07** **R** Logging uses `tracing` with key-value fields, once per event. `#[instrument]` uses `skip_all` and names its fields. Log levels match the convention.
+- [ ] **RS-08** **R** Rustdoc has `# Errors`, `# Panics` and `# Safety` sections where they apply. Doc examples compile.
+- [ ] **RS-09** **R** Every `unsafe` block has a `// SAFETY:` reason, and the crate's `unsafe_code` relaxation has a reason.
+- [ ] **RS-10** **M** `unwrap`, `expect`, `panic!` and `println!` are absent outside tests and the output module. Each suppression carries a reason.
+- [ ] **RS-11** **R** Workspace layering holds: `scripts/check-deps.sh` passes and its allow-list changes are justified.
+- [ ] **RS-12** **R** Unit tests are inline in `#[cfg(test)] mod tests`. Integration tests are in `tests/integration/`. Test data is inline. Fakes implement the real trait, with no mocking crate.
+- [ ] **RS-13** **R** Table-driven tests only where the logic is identical. Test names say what is tested, with no `test_` prefix.
+- [ ] **RS-14** **R** New behaviour, error paths and edge cases are covered, not only the happy path.
+- [ ] **RS-15** **R** Benchmarks exist for performance-critical paths.
+
 ## Growing this list
 
 The `retro` skill adds items from the user's PR feedback. Promote an item from R to M when a tool can check it. Add a new language section only when that language has a template.
