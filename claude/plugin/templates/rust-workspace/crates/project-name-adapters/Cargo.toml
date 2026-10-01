@@ -1,0 +1,12 @@
+[package]
+name = "project-name-adapters"
+description = "Implementations of the core driven ports."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+project-name-core.workspace = true
+
+[lints]
+workspace = true
