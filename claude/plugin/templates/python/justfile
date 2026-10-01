@@ -1,0 +1,68 @@
+default:
+    @just --list
+
+# Install project dependencies
+[group('development')]
+install:
+    uv sync
+
+# Build the package
+[group('development')]
+build:
+    uv build
+
+# Remove build artefacts
+[group('development')]
+clean:
+    rm -rf dist build .pytest_cache .mypy_cache .ruff_cache .coverage
+
+# Run unit tests
+[group('testing')]
+test:
+    uv run pytest tests/unit
+
+# Run integration tests
+[group('testing')]
+test-integration:
+    uv run pytest tests/integration
+
+# Run tests with coverage, failing under the threshold
+[group('testing')]
+test-coverage:
+    uv run pytest --cov --cov-report=term-missing
+
+# Run lint and import contracts
+[group('quality')]
+lint:
+    uv run ruff check .
+    uv run ruff format --check .
+    uv run lint-imports
+
+# Auto-format code
+[group('quality')]
+format:
+    uv run ruff format .
+    uv run ruff check --fix .
+
+# Run strict type checking
+[group('quality')]
+typecheck:
+    uv run mypy --strict src tests
+
+# Scan for known vulnerabilities in dependencies
+[group('security')]
+vulnerability:
+    uv run pip-audit
+
+# Run all quality checks
+[group('quality')]
+check: lint typecheck test-coverage
+    @echo "All checks passed!"
+
+# Run format, lint, typecheck and unit tests
+[group('git')]
+git-pre-commit: format lint typecheck test
+
+# Run every check including integration tests and coverage
+[group('git')]
+git-pre-push: check test-integration vulnerability
