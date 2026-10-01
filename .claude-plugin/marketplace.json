@@ -1,0 +1,13 @@
+{
+  "name": "ydkadri",
+  "owner": {
+    "name": "Youcef Kadri"
+  },
+  "plugins": [
+    {
+      "name": "mine",
+      "source": "./claude/plugin",
+      "description": "Build workflow: Q&A project setup, stacked PRs, adversarial review, retro loop."
+    }
+  ]
+}
