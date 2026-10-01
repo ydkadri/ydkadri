@@ -35,16 +35,23 @@ Prefer `src/<app_name>/` layout over flat structure. This is the *project-level*
 ```
 project-name/
 ├── src/
-│   ├── main.rs or lib.rs
-│   └── module/
+│   ├── lib.rs           # library code, unit tests inline
+│   ├── main.rs          # thin binary
+│   └── module.rs
 ├── tests/
+│   └── integration/
+│       └── main.rs
 ├── docker/
 ├── Cargo.toml
+├── rust-toolchain.toml
+├── Cargo.lock           # committed
 ├── justfile
 ├── README.md
 ├── CHANGELOG.md
 └── .env.example
 ```
+
+Use a workspace (`crates/<project>-core`, `-adapters`, `-app`) when the application has real boundaries. See [architecture.md](architecture.md).
 
 ## Package Managers
 
@@ -56,8 +63,8 @@ project-name/
 
 ### Rust
 
-- Use `cargo` (standard)
-- Keep dependencies updated
+- Use `cargo`, with the toolchain pinned in `rust-toolchain.toml`
+- Commit `Cargo.lock` and build with `--locked`
 
 ## Task Runner: justfile
 
@@ -106,7 +113,7 @@ py-test:
 # Run Rust tests
 [group('rust')]
 rs-test:
-    cargo test
+    cargo test --workspace --lib --bins
 
 # Start Docker services
 [group('docker')]
@@ -160,28 +167,54 @@ default:
 # Build project
 [group('development')]
 build:
-    cargo build
+    cargo build --workspace --locked
 
-# Run unit tests
+# Run unit and doc tests
 [group('testing')]
 test:
-    cargo test
+    cargo test --workspace --lib --bins
+    cargo test --workspace --doc
 
-# Run all lints
+# Run integration tests
+[group('testing')]
+test-integration:
+    cargo test --workspace --test '*'
+
+# Run tests with coverage, failing under 80%
+[group('testing')]
+test-coverage:
+    cargo llvm-cov --workspace --fail-under-lines 80
+
+# Run format check, clippy, rustdoc and layering checks
 [group('quality')]
 lint:
-    cargo clippy -- -D warnings
+    cargo fmt --all -- --check
+    cargo clippy --workspace --all-targets --locked -- -D warnings
+    RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps
+    scripts/check-deps.sh
 
 # Auto-format code
 [group('quality')]
 format:
-    cargo fmt
+    cargo fmt --all
+
+# Run compile checks on all targets
+[group('quality')]
+typecheck:
+    cargo check --workspace --all-targets --locked
+
+# Scan dependencies for known vulnerabilities
+[group('security')]
+vulnerability:
+    cargo audit --deny warnings
 
 # Run all quality checks
 [group('quality')]
-check: lint test
+check: lint typecheck test-coverage
     @echo "All checks passed!"
 ```
+
+The complete Rust justfile is in the Rust template. `scripts/check-deps.sh` exists only in the workspace template.
 
 ## Configuration Files
 
@@ -279,8 +312,8 @@ API_KEY=your_api_key_here
 ### Configuration Hierarchy
 
 1. **Defaults** - In code
-2. **Global config** - `/etc/app/config.toml`
-3. **Local config** - `~/.config/app/config.toml`
+2. **Global config** - `~/.config/<app>/config.toml`
+3. **Local config** - `./config.toml`
 4. **Environment variables** - `.env` file
 5. **CLI arguments** - Command line flags
 
@@ -352,24 +385,18 @@ tests/
 
 ### Rust
 
-```
-tests/
-├── common/
-│   └── mod.rs                       # Shared test utilities
-├── unit/
-│   ├── parser/
-│   │   ├── mod.rs
-│   │   └── test_parse.rs
-│   └── analyzer/
-│       ├── mod.rs
-│       └── test_analyze.rs
-└── integration/
-    ├── parser/
-    │   └── test_workflows.rs
-    └── analyzer/
-        └── test_workflows.rs
+Unit tests are inline (`#[cfg(test)] mod tests`). Integration tests are one test binary. Cargo only discovers top-level files in `tests/`, so nested unit test files would never run.
 
-benches/
+```
+src/
+└── parser.rs                        # unit tests at the bottom
+tests/
+└── integration/
+    ├── main.rs                      # mod parser; mod analyzer;
+    ├── parser.rs
+    └── analyzer.rs
+
+benches/                             # only for performance-critical paths
 └── performance_benchmarks.rs
 ```
 
@@ -381,4 +408,4 @@ This structure:
 
 ---
 
-**Last Updated**: 2026-07-28
+**Last Updated**: 2026-10-01

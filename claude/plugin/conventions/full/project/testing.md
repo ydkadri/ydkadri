@@ -98,8 +98,9 @@ class TestDatabaseIntegration:
 ### File Structure
 
 - Mirror source structure
-- Tests in `tests/` directory
 - Separate unit and integration tests
+- **Python**: `tests/unit/` and `tests/integration/`, mirroring `src/`
+- **Rust**: unit tests inline in `#[cfg(test)] mod tests`; integration tests in one binary at `tests/integration/main.rs`. Cargo only discovers top-level files in `tests/`, so nested unit test directories never run.
 
 ### Test Classes vs Functions
 
@@ -118,13 +119,13 @@ class TestFeature:
 ```
 
 ```rust
-// Rust
+// Rust: unit tests are inline; name tests for what they check, with no `test_` prefix
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_basic_case() {
+    fn basic_case_returns_expected_value() {
         ...
     }
 }
@@ -155,23 +156,20 @@ def mock_api_client(mocker):
     return client
 ```
 
-**Rust - Use test helpers:**
+**Rust - helpers are for resources only:**
 
 ```rust
-// tests/common/mod.rs
+// tests/integration/support.rs
+#![expect(clippy::unwrap_used, reason = "test support code")]
+
 use tempfile::TempDir;
 
 pub fn create_test_dir() -> TempDir {
     TempDir::new().unwrap()
 }
-
-pub fn sample_config() -> Config {
-    Config {
-        host: "localhost".to_string(),
-        port: 5432,
-    }
-}
 ```
+
+Sample values (a config, a user) are built inline in the test. Helper files under `tests/` are not covered by the clippy test exemption, so they carry their own reasoned `#![expect(...)]`.
 
 **Inline test data for simple cases:**
 
@@ -217,9 +215,9 @@ def test_api_call(mocker):
     )
 ```
 
-### Rust Mocking
+### Rust Fakes
 
-**Use traits for dependency injection:**
+**Depend on a trait and write a hand-made fake. No mocking crate:**
 
 ```rust
 // Production code
@@ -238,19 +236,18 @@ impl FetchesData for ApiClient {
 // Test code
 #[cfg(test)]
 mod tests {
-    struct MockClient;
+    struct FakeClient;
 
-    impl FetchesData for MockClient {
-        fn fetch(&self, url: &str) -> Result<String, Error> {
-            Ok("mocked response".to_string())
+    impl FetchesData for FakeClient {
+        fn fetch(&self, _url: &str) -> Result<String, Error> {
+            Ok("canned response".to_owned())
         }
     }
 
     #[test]
-    fn test_with_mock() {
-        let client = MockClient;
-        let result = process_data(&client);
-        assert!(result.is_ok());
+    fn process_data_succeeds_with_canned_response() {
+        let client = FakeClient;
+        assert!(process_data(&client).is_ok(), "processing should succeed");
     }
 }
 ```
@@ -430,12 +427,14 @@ def test_parse_performance(benchmark):
     assert result is not None
 ```
 
-### Rust - criterion (always required)
+### Rust - criterion (performance-critical paths only)
 
-See rust.md for detailed benchmark patterns. All Rust projects should include benchmarks.
+See rust.md for benchmark patterns. Benchmarks are not a template default and do not run on every PR.
 
 ```rust
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use std::hint::black_box;
+
+use criterion::{criterion_group, criterion_main, Criterion};
 
 fn bench_parse(c: &mut Criterion) {
     let input = "test data".repeat(1000);
@@ -512,11 +511,16 @@ pytest -x
 
 **Rust:**
 ```bash
-# All tests
-cargo test
+# Unit and doc tests, then integration tests
+cargo test --workspace --lib --bins
+cargo test --workspace --doc
+cargo test --workspace --test '*'
+
+# Coverage with the 80% gate
+cargo llvm-cov --workspace --fail-under-lines 80
 
 # Specific test
-cargo test test_parse
+cargo test parse_valid_input
 
 # Show output
 cargo test -- --nocapture
@@ -527,4 +531,4 @@ cargo bench
 
 ---
 
-**Last Updated**: 2026-03-23
+**Last Updated**: 2026-10-01
