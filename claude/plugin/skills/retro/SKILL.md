@@ -10,9 +10,11 @@ Close each feature by improving the workflow. The output is edits to the plugin,
 ## Gather
 
 - The review log, `.claude/review-log.md`. Tally findings by checklist ID. An ID flagged in two or more PRs belongs in the executor digest, and in a lint rule if a tool can check it. An ID that is mostly `false-positive`, or never flagged, is a candidate to reword or drop.
-- The user's PR comments (`gh pr view --comments`, `gh api` for review threads).
+- `dissent` lines in the log: where the builder and reviewer disagreed. Decide who was right and change the checklist or the behaviour.
+- Round counts and reviewer timings per PR: which PRs needed more than two rounds, and why.
+- The user's PR comments (`gh pr view --comments`, `gh api` for review threads). These are read, not replied to.
 - Anything the user corrected in chat.
-- Friction: what was slow, unclear or repeated.
+- Friction: what was slow, unclear or repeated. Note where the build waited on the user, on a decision, or on a sub-agent.
 
 ## Discuss
 
@@ -31,4 +33,4 @@ Edit the plugin source in this repo, never the installed copy:
 - Bump `version` in `.claude-plugin/plugin.json` (patch for fixes, minor for new rules or skills).
 - Then `claude plugin update mine@ydkadri` on each machine.
 
-Open a PR for the change through the normal workflow.
+Open a PR for the change through the normal workflow. Prefer a quick fix now, or a GitHub issue for later, over holding the retro open until everything is settled.
