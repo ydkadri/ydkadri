@@ -16,7 +16,7 @@ The default shape for anything with real external boundaries (storage, external 
 
 - **Core** - your data (value objects) plus pure decision functions. No I/O, no third-party types.
 - **Ports** - interfaces the core defines, named with verbs (`ExtractsData`, not `Extractor`), in the core's own language, describing either what it needs from outside (**driven ports** - the core calls *out* through these) or how something else invokes it (**driving ports** - something calls *in* through these). Ports live in core, not next to whichever adapter happens to implement them.
-- **Adapters** - concrete implementations of ports. One per real external system (`S3Extractor`, `DeltaTableLoader`), plus a trivial fake per port for tests - no mocking library required.
+- **Adapters** - concrete implementations of ports. One per real external system (`S3Extractor`, `DeltaTableLoader`; the adapter names its system, the port names its behaviour), plus a trivial fake per port for tests - no mocking library required.
 - **Composition root** - the only place allowed to import both core and adapters. Wires concrete adapters into orchestrators. This is also where an "API request -> which job" mapping belongs, if you have one.
 - **Orchestrator** - sequences port calls and core calls. Contains no decisions itself: *fetch, decide, fetch, decide, act.*
 
@@ -160,10 +160,25 @@ layers =
 
 Run it as part of `lint` (see [structure.md](structure.md#task-runner-justfile)) - a violation here (e.g. `core` importing `adapters`) is a structural regression, not a style nit, and should block the same way a failing type check does.
 
-### Rust: workspace boundaries
+### Rust: workspace crates plus a dependency check
 
-Achieve the same discipline without a separate linter: put `core` in its own crate with zero dependencies on `adapters`/`composition` crates (see [rust.md](../languages/rust.md#workspace-structure)). Cargo simply refuses to compile if `core` depended back on something that depends on it - the compiler is the enforcement, not a config file.
+Use a Cargo workspace of three crates, each prefixed with the project name (an unprefixed crate called `domain` once collided with a real advisory in `cargo audit`):
+
+```
+crates/
+├── <project>-core        # domain, ports, pure functions. No workspace dependencies.
+├── <project>-adapters    # implements ports. Depends on core only.
+└── <project>-app         # composition root and binaries. The only crate that depends on both.
+```
+
+Cargo on its own rejects only dependency cycles. A backward dependency that forms no cycle, or a third-party crate in core, builds without complaint. `scripts/check-deps.sh` closes the gap by reading `cargo metadata` and failing when:
+
+- core depends on another workspace crate, or on a third-party crate missing from `scripts/core-allowed-deps.txt`
+- adapters depend on a workspace crate other than core
+- any crate other than app depends on both core and adapters, or anything depends on app
+
+The script runs as part of `lint`. Changes to the allow-list need a reason in review. The workspace template implements it.
 
 ---
 
-**Last Updated**: 2026-07-28
+**Last Updated**: 2026-10-01

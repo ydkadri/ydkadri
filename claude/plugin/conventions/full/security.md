@@ -258,15 +258,15 @@ token = random.randint(0, 1000000)
 
 ### Rust
 
-**unsafe code must be justified:**
+**`unsafe` is forbidden by default** (`unsafe_code = "forbid"` in the template). A crate that needs it relaxes the lint with a reason, and every block carries a `// SAFETY:` comment:
 
 ```rust
 /// # Safety
 /// Caller must ensure pointer is valid and properly aligned.
 /// Buffer must be at least `len` bytes.
 pub unsafe fn read_buffer(ptr: *const u8, len: usize) -> Vec<u8> {
-    // SAFETY: We trust the caller to provide valid pointer and length
-    std::slice::from_raw_parts(ptr, len).to_vec()
+    // SAFETY: the caller guarantees `ptr` is valid for `len` bytes.
+    unsafe { std::slice::from_raw_parts(ptr, len).to_vec() }
 }
 ```
 

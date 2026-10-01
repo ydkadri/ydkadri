@@ -43,7 +43,7 @@ Use multi-stage builds to create minimal final images:
 
 ```dockerfile
 # Build stage - includes all build tools
-FROM rust:latest AS builder
+FROM rust:1.98 AS builder
 WORKDIR /app
 COPY . .
 RUN cargo build --release
@@ -66,7 +66,7 @@ Use sensible defaults for the language/use case:
 - Avoid alpine for Python (compilation issues with C extensions)
 
 **Rust:**
-- Build: `rust:1.75` or `rust:latest`
+- Build: a pinned current `rust:<version>` tag that matches `rust-toolchain.toml` (edition 2024 needs a recent toolchain)
 - Runtime: `debian:bookworm-slim` or `alpine:latest`
 - Use static linking for true portability
 

@@ -14,7 +14,7 @@ Continuous integration and deployment guidelines.
 Required checks for all pull requests:
 
 1. **Linting** - Code style checks pass
-2. **Type checking** - No type errors (Python: mypy/pyright, Rust: compile checks)
+2. **Type checking** - No type errors (Python: `mypy --strict`, Rust: `cargo check` on all targets)
 3. **Compilation** - Code builds successfully (compiled languages)
 4. **Tests** - All tests pass (unit + integration)
 5. **Coverage** - Meet coverage threshold (80% default)
@@ -22,7 +22,7 @@ Required checks for all pull requests:
 7. **Security checks** - No secrets, insecure patterns
 8. **Build verification** - Artifacts build correctly
 
-**CI should match pre-push hooks** - same checks, same requirements. CI is the enforcement mechanism.
+**CI runs `just git-pre-push`**, the same recipe as the pre-push hook, so the two cannot drift. CI is the enforcement mechanism.
 
 ## Continuous Deployment
 
@@ -48,7 +48,7 @@ Automated release on merge to main:
 
 **Rust CLI tools:**
 - Build for multiple targets (Linux, macOS, Windows)
-- Publish to cargo with `cargo publish`
+- Publish with `cargo publish` (libraries) or attach binaries to the release
 - Attach binaries to GitHub release
 
 **Python packages:**
@@ -85,49 +85,29 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Python example
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
-
-      - name: Install dependencies
-        run: uv sync
-
-      - name: Lint
-        run: uv run ruff check .
-
-      - name: Type check
-        run: uv run mypy .
-
-      - name: Test
-        run: uv run pytest --cov --cov-report=xml
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
+      - uses: extractions/setup-just@v4
+      - uses: astral-sh/setup-uv@v10
+      - run: just install
+      - run: just git-pre-push
 
   # Rust example
   rust-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
-
-      - name: Format check
-        run: cargo fmt -- --check
-
-      - name: Lint
-        run: cargo clippy -- -D warnings
-
-      - name: Test
-        run: cargo test
-
-      - name: Build
-        run: cargo build --release
+        with:
+          components: clippy, rustfmt, llvm-tools-preview
+      - uses: Swatinem/rust-cache@v2
+      - uses: extractions/setup-just@v4
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov,cargo-audit
+      - run: just git-pre-push
+      - run: just build
 ```
 
 ### Release Workflow
@@ -145,7 +125,7 @@ jobs:
     if: contains(github.event.head_commit.message, 'bump version')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Extract version
         id: version
@@ -164,7 +144,7 @@ jobs:
           uv publish --token ${{ secrets.PYPI_TOKEN }}
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ steps.version.outputs.version }}
           generate_release_notes: true
@@ -185,40 +165,33 @@ orbs:
 jobs:
   test-python:
     docker:
-      - image: cimg/python:3.11
+      - image: cimg/python:3.13
     steps:
       - checkout
       - run:
           name: Install dependencies
           command: |
             curl -LsSf https://astral.sh/uv/install.sh | sh
-            uv sync
+            curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/bin
+            export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
+            just install
       - run:
-          name: Lint
-          command: uv run ruff check .
-      - run:
-          name: Type check
-          command: uv run mypy .
-      - run:
-          name: Test
-          command: uv run pytest --cov --junitxml=test-results/junit.xml
-      - store_test_results:
-          path: test-results
+          name: Pre-push checks
+          command: just git-pre-push
 
   test-rust:
     docker:
-      - image: cimg/rust:1.75
+      - image: cimg/rust:1.98
     steps:
       - checkout
       - run:
-          name: Format check
-          command: cargo fmt -- --check
+          name: Install tools
+          command: |
+            cargo install --locked just cargo-llvm-cov cargo-audit
+            rustup component add llvm-tools-preview
       - run:
-          name: Lint
-          command: cargo clippy -- -D warnings
-      - run:
-          name: Test
-          command: cargo test
+          name: Pre-push checks
+          command: just git-pre-push
 
 workflows:
   version: 2
@@ -278,8 +251,8 @@ Actions after merge:
 ### Dependency Scanning
 
 Run on every PR and weekly:
-- Python: `pip-audit` or `safety`
-- Rust: `cargo audit`
+- Python: `pip-audit`
+- Rust: `cargo audit --deny warnings`
 - Docker: `trivy` or `grype`
 
 ```yaml
@@ -300,16 +273,15 @@ Run on every PR and weekly:
 - Fail if regression > 10%
 
 **Rust:**
-- Run with `cargo bench`
-- Store results as artifacts
-- Compare across commits
+- Only for performance-critical paths, and not on every PR
+- Run `cargo bench` on demand or on a schedule, and store results as artifacts
 
 ```yaml
 - name: Benchmark
   run: cargo bench --no-fail-fast
 
 - name: Archive benchmark results
-  uses: actions/upload-artifact@v3
+  uses: actions/upload-artifact@v7
   with:
     name: benchmark-results
     path: target/criterion/
@@ -320,7 +292,7 @@ Run on every PR and weekly:
 Cache dependencies for faster builds:
 
 ```yaml
-- uses: actions/cache@v3
+- uses: actions/cache@v6
   with:
     path: |
       ~/.cargo/bin/
@@ -333,4 +305,4 @@ Cache dependencies for faster builds:
 
 ---
 
-**Last Updated**: 2026-03-23
+**Last Updated**: 2026-10-01
