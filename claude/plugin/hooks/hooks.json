@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cat \"${CLAUDE_PLUGIN_ROOT}/rules.md\""
+            "command": "cat \"${CLAUDE_PLUGIN_ROOT}/rules.md\"; printf '\\nTools: %s/tools/README.md lists the command line tools to prefer (finder for searching files). Read a tool page before first using it.\\n' \"${CLAUDE_PLUGIN_ROOT}\""
           }
         ]
       }

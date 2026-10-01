@@ -1,6 +1,6 @@
 {
   "name": "mine",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "description": "Build workflow: Q&A project setup, stacked PRs, adversarial review, retro loop.",
   "author": {
     "name": "Youcef Kadri"
