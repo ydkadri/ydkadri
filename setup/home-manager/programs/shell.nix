@@ -73,7 +73,7 @@
       source ~/.managed/env.sh                        # Environment variables (GITHUB_TOKEN, KRAKEN_CLI_ROLE)
       source ~/.managed/common/functions.sh           # field(), work(), venv()
       source ~/.managed/common/aliases.sh             # (currently empty)
-      source ~/.managed/claude/functions.sh           # claude-list()
+      source ~/.managed/claude/functions.sh           # claude-list(), claude-plugin-update()
       source ~/.managed/github/functions.sh           # gist-create(), gist-list(), gist-view()
       source ~/.managed/docker/functions.sh           # docker-clean(), docker-nuke()
       source ~/.managed/git/functions.sh              # install_hooks()
