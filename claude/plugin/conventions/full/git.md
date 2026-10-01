@@ -80,10 +80,10 @@ git commit --fixup=HEAD~1
 4. fixup! Add find-dead-code query
 5. Address feedback: simplify executor
 ...
-[Then autosquash rebase before marking ready]
+[Then autosquash once every PR is approved]
 ```
 
-### Before Marking PR Ready (Phase 5)
+### Before Merging
 
 **Rebase to squash fixups into logical feature units:**
 - Each commit = complete, cohesive piece of functionality
@@ -134,7 +134,7 @@ git commit --fixup=ghi789
 git push
 ```
 
-**Before marking ready (Phase 5):**
+**Before merging (once every PR is approved):**
 - Rebase to incorporate all feedback into logical commits
 - Use `git rebase -i --autosquash` to automatically squash fixup commits
 - Verify tests pass after rebase
@@ -150,7 +150,7 @@ git log --oneline
 # jkl012 Add query infrastructure
 
 # Rebase with autosquash
-git rebase -i --autosquash main
+git rebase -i --autosquash main   # for a stacked branch, use the branch below it as the base
 # Automatically reorders and marks fixups for squashing
 # Just save and exit - no manual work needed
 
@@ -220,12 +220,12 @@ Fixes #123
 
 ## PR Workflow
 
-1. Agree ADRs in chat, then open a stack of draft PRs: the ADRs plus the stack plan
-2. After approval, build the stack to ready-for-review
-3. Run the adversarial reviewer on each PR before submitting it
-4. Each PR has a clear title (under 70 characters), a terse summary and a test plan
-5. Address review feedback with `--fixup` commits and summarise what changed
-6. Once accepted, autosquash (`gh stack rebase`, then `git rebase -i --autosquash` per branch) and mark ready
+1. Agree ADRs in chat, then open the stack as draft PRs, each holding only the ADRs it describes. The user approves the plan.
+2. Build PR 1 as a draft. The adversarial reviewer reviews it until CLEAR, then it is marked ready.
+3. Build PR 2 while the user reviews PR 1 and the reviewer reviews PR 2. Repeat up the stack.
+4. Each PR has a clear title (under 70 characters), a terse summary and a test plan.
+5. Review comments are discussed in the dialogue, never replied to on GitHub. Agreed changes are pushed as `--fixup` commits.
+6. Once every PR is approved and the user says to merge, autosquash from the bottom up (`git rebase -i --autosquash --no-keep-empty --keep-base <base>`, then `gh stack rebase --no-trunk`, then the next branch), check each squash changed no content, and merge the stack with `gh stack merge --rebase`.
 
 ---
 
