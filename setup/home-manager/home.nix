@@ -138,6 +138,12 @@ in
 
   # Claude Code helper functions
   home.file.".managed/claude/functions.sh".text = ''
+    # Update the mine@ydkadri plugin (restart Claude Code afterwards to apply)
+    claude-plugin-update() {
+        claude plugin marketplace update ydkadri && claude plugin update mine@ydkadri \
+            && echo "Restart Claude Code to apply the update"
+    }
+
     # List recent Claude conversations (named conversations only)
     claude-list() {
         local limit="''${1:-10}"

@@ -29,6 +29,7 @@ This setup uses **home-manager** for declarative, idempotent configuration manag
 ### Language Toolchains
 - **Python**: uv (replaces pip, virtualenv, pyenv)
 - **Rust**: rustup (manages Rust toolchain versions)
+- **Claude Code**: CLI plus the personal `mine` plugin
 
 ### CLI Tools
 - **fzf** - Fuzzy finder (Ctrl+R history, Ctrl+T files)
@@ -141,7 +142,7 @@ This will:
 Install tools not managed by home-manager:
 
 ```bash
-# Install all manual tools (rustup, sesh, fonts)
+# Install all manual tools (rustup, sesh, fonts, Claude Code CLI and plugin)
 bash ~/Documents/ydkadri/setup/manual/install.sh --all
 
 # Or install specific tools only
@@ -149,12 +150,16 @@ bash ~/Documents/ydkadri/setup/manual/install.sh --rustup    # Rust toolchain
 bash ~/Documents/ydkadri/setup/manual/install.sh --sesh      # Tmux session manager
 bash ~/Documents/ydkadri/setup/manual/install.sh --fonts     # Nerd Fonts for terminal icons
 bash ~/Documents/ydkadri/setup/manual/install.sh --docker    # Check Docker Desktop (macOS)
+bash ~/Documents/ydkadri/setup/manual/install.sh --claude    # Check for the Claude Code CLI
+bash ~/Documents/ydkadri/setup/manual/install.sh --claude-plugin  # Claude Code plugin (mine@ydkadri)
 
 # Or run individual scripts
 bash ~/Documents/ydkadri/setup/manual/install-rustup.sh
 bash ~/Documents/ydkadri/setup/manual/install-sesh.sh
 bash ~/Documents/ydkadri/setup/manual/install-fonts.sh
 bash ~/Documents/ydkadri/setup/manual/install-docker.sh
+bash ~/Documents/ydkadri/setup/manual/install-claude.sh
+bash ~/Documents/ydkadri/setup/manual/install-claude-plugin.sh
 ```
 
 **Why these are separate:**
@@ -162,6 +167,37 @@ bash ~/Documents/ydkadri/setup/manual/install-docker.sh
 - **Sesh** - Not in nixpkgs, installed from GitHub releases
 - **Fonts** - System-level installation required for terminal icons
 - **Docker** - Docker Desktop required on macOS (provides daemon)
+- **Claude Code** - Native build that updates itself, so Nix would only pin it to a stale version
+- **Claude Code plugin** - Installed through Claude's own plugin manager, not Nix
+
+#### Claude Code CLI and plugin
+
+Prerequisites: `jq` (from home-manager), network access, and GitHub access for `ydkadri/ydkadri`. The CLI script only checks for `claude` on PATH; if it is missing it prints the manual install step rather than downloading anything. `claude` must be installed before the plugin step, and you may need to sign in once (`claude`) first.
+
+Automated path:
+
+```bash
+bash ~/Documents/ydkadri/setup/manual/install.sh --claude --claude-plugin   # or --all
+```
+
+The plugin script adds the `ydkadri` marketplace only if it is missing, installs `mine@ydkadri` only if it is missing, and otherwise does nothing. If `claude` is absent, or GitHub cannot be reached, it prints the manual commands and exits 0 so `--all` still finishes.
+
+Manual fallback:
+
+```bash
+claude plugin marketplace add ydkadri/ydkadri
+claude plugin install mine@ydkadri
+```
+
+Update (new versions arrive only when the plugin's `version` in `plugin.json` changes; restart Claude Code afterwards):
+
+```bash
+claude-plugin-update
+# equivalent to:
+claude plugin marketplace update ydkadri && claude plugin update mine@ydkadri
+```
+
+Work machines: `~/.claude/settings.json.bedrock` is swapped in by hand and does not carry the plugin keys, so the plugin disappears after a swap. Re-run `bash ~/Documents/ydkadri/setup/manual/install-claude-plugin.sh` afterwards; it is idempotent. `~/.claude/CLAUDE.md` and `settings.json` are deliberately not managed here.
 
 ### 8. Post-Install Configuration
 
@@ -483,6 +519,8 @@ setup/
 │   ├── install-rustup.sh               # Install Rust via rustup
 │   ├── install-sesh.sh                 # Install sesh (tmux session manager)
 │   ├── install-fonts.sh                # Install Nerd Fonts
+│   ├── install-claude.sh               # Check for the Claude Code CLI
+│   ├── install-claude-plugin.sh        # Install the mine@ydkadri Claude Code plugin
 │   └── install-docker.sh               # Check/install Docker Desktop
 └── docs/
     ├── TOOLS_INVENTORY.md              # Detailed tool descriptions
