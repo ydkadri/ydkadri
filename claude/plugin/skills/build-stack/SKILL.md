@@ -9,7 +9,7 @@ Build the approved stack to ready-for-review. The user has approved the plan, so
 
 ## Before starting
 
-Read `${CLAUDE_PLUGIN_ROOT}/conventions/digests/` for the project language. Load the full conventions only when a digest line is unclear.
+Read `${CLAUDE_PLUGIN_ROOT}/conventions/digests/<language>.md` for the project language (`python` or `rust`). Load the full conventions only when a digest line is unclear.
 
 ## For each PR, bottom to top
 
