@@ -13,6 +13,7 @@
 #   bash install.sh --docker           Check Docker only
 #   bash install.sh --fonts            Install fonts only
 #   bash install.sh --claude           Check for the Claude Code CLI only
+#   bash install.sh --claude-plugin    Install the Claude Code plugin only
 #   bash install.sh --rustup --sesh    Install multiple
 #   bash install.sh --help             Show help
 #
@@ -35,6 +36,7 @@ INSTALL_SESH=false
 INSTALL_DOCKER=false
 INSTALL_FONTS=false
 INSTALL_CLAUDE=false
+INSTALL_CLAUDE_PLUGIN=false
 INSTALL_ALL=false
 
 # ============================================================================
@@ -51,18 +53,20 @@ Installs tools that cannot be managed by home-manager:
   - Docker Desktop: Container platform (macOS check)
   - Nerd Fonts: Terminal icons
   - Claude Code: CLI (checked; printed instructions if missing)
+  - Claude Code plugin: mine@ydkadri (needs the CLI)
 
 Usage:
   bash install.sh [OPTIONS]
 
 Options:
-  --all        Install everything (recommended for first-time setup)
-  --rustup     Install Rustup (Rust toolchain manager)
-  --sesh       Install Sesh (tmux session manager)
-  --docker     Check/install Docker Desktop
-  --fonts      Install Nerd Fonts for terminal
-  --claude     Check for the Claude Code CLI
-  --help       Show this help message
+  --all             Install everything (recommended for first-time setup)
+  --rustup          Install Rustup (Rust toolchain manager)
+  --sesh            Install Sesh (tmux session manager)
+  --docker          Check/install Docker Desktop
+  --fonts           Install Nerd Fonts for terminal
+  --claude          Check for the Claude Code CLI
+  --claude-plugin   Install the Claude Code plugin (mine@ydkadri)
+  --help            Show this help message
 
 Examples:
   bash install.sh --all              # Install everything
@@ -75,6 +79,7 @@ Individual scripts can also be run directly:
   bash install-docker.sh
   bash install-fonts.sh
   bash install-claude.sh
+  bash install-claude-plugin.sh
 
 EOF
 }
@@ -100,6 +105,7 @@ parse_args() {
                 INSTALL_DOCKER=true
                 INSTALL_FONTS=true
                 INSTALL_CLAUDE=true
+                INSTALL_CLAUDE_PLUGIN=true
                 shift
                 ;;
             --rustup)
@@ -120,6 +126,10 @@ parse_args() {
                 ;;
             --claude)
                 INSTALL_CLAUDE=true
+                shift
+                ;;
+            --claude-plugin)
+                INSTALL_CLAUDE_PLUGIN=true
                 shift
                 ;;
             --help|-h)
@@ -221,6 +231,14 @@ run_installations() {
     if [ "$INSTALL_CLAUDE" = true ]; then
         echo ""
         if ! bash "$SCRIPT_DIR/install-claude.sh"; then
+            failed=true
+        fi
+    fi
+
+    # Claude Code plugin (after the CLI)
+    if [ "$INSTALL_CLAUDE_PLUGIN" = true ]; then
+        echo ""
+        if ! bash "$SCRIPT_DIR/install-claude-plugin.sh"; then
             failed=true
         fi
     fi
