@@ -14,7 +14,7 @@ just install
 cargo run -- Ada
 ```
 
-Logging is controlled with `RUST_LOG` (default `debug`), see `.env.example`.
+Logging is controlled with `RUST_LOG` (default `info`), see `.env.example`.
 
 ## Development
 
