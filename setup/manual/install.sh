@@ -12,6 +12,7 @@
 #   bash install.sh --sesh             Install Sesh only
 #   bash install.sh --docker           Check Docker only
 #   bash install.sh --fonts            Install fonts only
+#   bash install.sh --claude           Check for the Claude Code CLI only
 #   bash install.sh --rustup --sesh    Install multiple
 #   bash install.sh --help             Show help
 #
@@ -33,6 +34,7 @@ INSTALL_RUSTUP=false
 INSTALL_SESH=false
 INSTALL_DOCKER=false
 INSTALL_FONTS=false
+INSTALL_CLAUDE=false
 INSTALL_ALL=false
 
 # ============================================================================
@@ -48,6 +50,7 @@ Installs tools that cannot be managed by home-manager:
   - Sesh: Tmux session manager
   - Docker Desktop: Container platform (macOS check)
   - Nerd Fonts: Terminal icons
+  - Claude Code: CLI (checked; printed instructions if missing)
 
 Usage:
   bash install.sh [OPTIONS]
@@ -58,6 +61,7 @@ Options:
   --sesh       Install Sesh (tmux session manager)
   --docker     Check/install Docker Desktop
   --fonts      Install Nerd Fonts for terminal
+  --claude     Check for the Claude Code CLI
   --help       Show this help message
 
 Examples:
@@ -70,6 +74,7 @@ Individual scripts can also be run directly:
   bash install-sesh.sh
   bash install-docker.sh
   bash install-fonts.sh
+  bash install-claude.sh
 
 EOF
 }
@@ -94,6 +99,7 @@ parse_args() {
                 INSTALL_SESH=true
                 INSTALL_DOCKER=true
                 INSTALL_FONTS=true
+                INSTALL_CLAUDE=true
                 shift
                 ;;
             --rustup)
@@ -110,6 +116,10 @@ parse_args() {
                 ;;
             --fonts)
                 INSTALL_FONTS=true
+                shift
+                ;;
+            --claude)
+                INSTALL_CLAUDE=true
                 shift
                 ;;
             --help|-h)
@@ -203,6 +213,14 @@ run_installations() {
     if [ "$INSTALL_FONTS" = true ]; then
         echo ""
         if ! bash "$SCRIPT_DIR/install-fonts.sh"; then
+            failed=true
+        fi
+    fi
+
+    # Claude Code CLI
+    if [ "$INSTALL_CLAUDE" = true ]; then
+        echo ""
+        if ! bash "$SCRIPT_DIR/install-claude.sh"; then
             failed=true
         fi
     fi
