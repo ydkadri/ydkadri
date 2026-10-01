@@ -42,8 +42,8 @@ subprocess.run(f"ls -l {user_directory}", shell=True)
 
 ```python
 # ✅ CORRECT - Use templating engine with auto-escaping
-from jinja2 import Template
-template = Template("<p>{{ user_input }}</p>")
+import jinja2
+template = jinja2.Template("<p>{{ user_input }}</p>")
 output = template.render(user_input=user_data)
 
 # ❌ INCORRECT - Raw HTML construction
@@ -189,13 +189,13 @@ Prefer well-maintained, popular packages.
 ### Validation with attrs (Python)
 
 ```python
-from attrs import define, validators
+import attrs
 
-@define
+@attrs.define
 class UserInput:
-    email: str = validators.matches_re(r"^[^@]+@[^@]+\.[^@]+$")
-    age: int = validators.and_(validators.ge(0), validators.le(150))
-    username: str = validators.matches_re(r"^[a-zA-Z0-9_-]{3,20}$")
+    email: str = attrs.field(validator=attrs.validators.matches_re(r"^[^@]+@[^@]+\.[^@]+$"))
+    age: int = attrs.field(validator=[attrs.validators.ge(0), attrs.validators.le(150)])
+    username: str = attrs.field(validator=attrs.validators.matches_re(r"^[a-zA-Z0-9_-]{3,20}$"))
 ```
 
 ## Sensitive Data Handling

@@ -4,16 +4,7 @@ Testing approach and requirements.
 
 ## When to Write Tests
 
-**Write tests alongside implementation**, not strictly before or after.
-
-### Approach
-
-1. **Write interface/API first** - Design how code will be used
-2. **Implement core logic** - Get basic functionality working
-3. **Write tests** - Cover happy paths, edge cases, errors
-4. **Refine** - Adjust implementation and tests together
-
-Not strict TDD, but tests are expected for all new functionality.
+Tests ship with the feature. A feature arrives for review complete, with tests covering happy paths, edge cases and errors. There is no required order (tests first or alongside), but design the interface before the internals.
 
 ## Test Types
 
@@ -141,16 +132,13 @@ mod tests {
 
 ### Fixtures and Test Data
 
-**Python - Use pytest fixtures:**
+Data goes inline in the test. Fixtures are for resources that need setup or teardown (database connections, temp directories, mocked clients). Use the narrowest scope that works: function scope by default, class, module or session scope only for something expensive to build and safe to share.
+
+**Python - Use pytest fixtures for resources:**
 
 ```python
 # tests/conftest.py - Shared fixtures
 import pytest
-
-@pytest.fixture
-def sample_user():
-    """Provide sample user data."""
-    return User(email="test@example.com", name="Test User")
 
 @pytest.fixture
 def temp_file(tmp_path):
@@ -343,9 +331,9 @@ def db_connection():
 
 ## Coverage Requirements
 
-- **Target**: 80% coverage (unless explicitly specified otherwise)
+- **Gate**: 80% coverage, enforced (`--cov-fail-under=80`). A project may set a different threshold in its CLAUDE.md, and that threshold is enforced too.
 - Required in pre-push hooks
-- CI enforces coverage requirements
+- CI enforces the same gate
 
 ### What to Exclude
 
@@ -372,11 +360,11 @@ exclude_lines = [
 
 ### Focus on Meaningful Coverage
 
-**80% coverage target is a guideline, not absolute rule:**
+The gate is a floor, not the goal:
 - Cover happy paths
 - Cover error cases
 - Cover edge cases
-- Don't write tests just to hit percentage
+- Don't write tests just to hit the percentage
 
 ## Property-Based Testing
 

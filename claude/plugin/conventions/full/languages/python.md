@@ -36,7 +36,8 @@ from json import loads
 ```
 
 **Exceptions for typing and common third-party patterns:**
-- `from typing import Protocol, Optional` - typing imports are fine
+- `from typing import Protocol` - typing imports are fine (use `X | None`, never `Optional`)
+- Re-exports in `__init__.py` (see below)
 - Third-party frameworks may have idiomatic patterns (e.g., `from typer import Typer`)
 
 ## Protocol Naming
@@ -177,10 +178,11 @@ pyproject_s3.toml           # S3 plugin package
 ```python
 # src/my_io_core/discovery.py
 import importlib.metadata
-import logging
 from typing import Protocol
 
-log = logging.getLogger(__name__)
+import structlog
+
+log = structlog.get_logger()
 
 class Backend(Protocol):
     """Protocol that all backends must implement."""
@@ -197,8 +199,8 @@ def discover_backends() -> None:
         try:
             backend_class = ep.load()
             _BACKENDS[ep.name] = backend_class
-            log.info(f"Registered backend: {ep.name}")
-        except Exception as e:
+            log.info("backend_registered", name=ep.name)
+        except (ImportError, AttributeError) as e:
             # Fail loudly - don't silently ignore broken plugins
             raise RuntimeError(
                 f"Failed to load backend plugin '{ep.name}': {e}"
@@ -236,9 +238,9 @@ s3 = "my_io_core_s3.backend:S3Backend"
 ```python
 # src/my_io_core_s3/backend.py
 import boto3
-from my_io_core.backends.base import Backend
+from my_io_core.backends import base
 
-class S3Backend(Backend):
+class S3Backend(base.Backend):
     """S3 backend for my-io-core."""
     
     def __init__(self, bucket: str):
@@ -837,16 +839,16 @@ def parse_value(raw: str) -> int | float | str:
 Use `Protocol` for structural typing and ABC for concrete base classes:
 
 ```python
+import abc
 from typing import Protocol
-from abc import ABC, abstractmethod
 
 # Protocol - structural typing (duck typing with types)
 class SupportsRead(Protocol):
     def read(self, n: int) -> bytes: ...
 
 # ABC - concrete base class with inheritance
-class DataProcessor(ABC):
-    @abstractmethod
+class DataProcessor(abc.ABC):
+    @abc.abstractmethod
     def process(self, data: str) -> Result:
         """Process data."""
         ...
@@ -1507,10 +1509,12 @@ def test_parse_user():
 
 ### Fixture Scope
 
-Scope fixtures minimally:
-- **Class scope**: If needed by all tests in a class
-- **Module/session scope**: If expensive to create and safe to share
-- **Avoid function scope**: Define data inline in the function instead
+Data goes inline in the test. Fixtures are for resources that need setup or teardown (database connections, temp directories, mocked clients).
+
+Use the narrowest scope that works:
+- **Function scope** (default): anything a test could modify
+- **Class scope**: needed by all tests in a class and safe to share
+- **Module/session scope**: expensive to create and safe to share (a database container)
 
 ## Async/Await
 
@@ -1520,15 +1524,15 @@ Scope fixtures minimally:
 
 ### Before Every Commit
 
-- Format code first (use ruff format or black)
-- Linting must pass (use ruff)
-- Type checking must pass (use mypy or pyright)
+- Format code first (`ruff format`)
+- Linting must pass (`ruff check`)
+- Type checking must pass (`mypy --strict`)
 - Never commit code that fails linting or type checking
 
 ### Testing Requirements
 
 - Write tests for all new functionality
-- Aim for 80%+ test coverage
+- Coverage is enforced at 80% minimum (`--cov-fail-under=80`) in pre-push and CI
 - Test happy paths, edge cases, and error handling
 
 ## Package Management
@@ -1541,8 +1545,8 @@ Scope fixtures minimally:
 
 - **Package Manager**: uv
 - **Linting**: ruff (fast, comprehensive)
-- **Type Checking**: mypy or pyright
-- **Formatting**: ruff format or black
+- **Type Checking**: mypy (strict)
+- **Formatting**: ruff format
 - **Testing**: pytest, pytest-asyncio, pytest-mock
 - **Task Runner**: just (for complex commands)
 
