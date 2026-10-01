@@ -8,7 +8,7 @@ Git branching, commits, and quality gates.
 
 **The default branch is `main`** (or `master` in older repositories).
 
-**All new branches should be based on the latest version of main** unless otherwise specified:
+**All new branches should be based on the latest version of main** unless otherwise specified. Branches in a stacked PR series (`gh stack`) each build on the branch below:
 
 ```bash
 # Start new work - always from latest main
@@ -220,15 +220,12 @@ Fixes #123
 
 ## PR Workflow
 
-1. Create **draft PR** for the tutorial or reference documentation first
-2. After approval, implement changes
-3. Create PR with:
-   - Clear title (under 70 characters)
-   - Summary of changes
-   - Test plan
-4. Wait for review feedback
-5. Rebase to incorporate feedback (don't add fixup commits) and provide concise summary of changes when feedback has been received
-6. Mark PR as ready for review
+1. Agree ADRs in chat, then open a stack of draft PRs: the ADRs plus the stack plan
+2. After approval, build the stack to ready-for-review
+3. Run the adversarial reviewer on each PR before submitting it
+4. Each PR has a clear title (under 70 characters), a terse summary and a test plan
+5. Address review feedback with `--fixup` commits and summarise what changed
+6. Once accepted, autosquash (`gh stack rebase`, then `git rebase -i --autosquash` per branch) and mark ready
 
 ---
 

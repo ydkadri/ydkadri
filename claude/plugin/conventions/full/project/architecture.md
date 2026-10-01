@@ -15,7 +15,7 @@ The default shape for anything with real external boundaries (storage, external 
 ### The Mental Model
 
 - **Core** - your data (value objects) plus pure decision functions. No I/O, no third-party types.
-- **Ports** - interfaces the core defines, in the core's own language, describing either what it needs from outside (**driven ports** - the core calls *out* through these) or how something else invokes it (**driving ports** - something calls *in* through these). Ports live in core, not next to whichever adapter happens to implement them.
+- **Ports** - interfaces the core defines, named with verbs (`ExtractsData`, not `Extractor`), in the core's own language, describing either what it needs from outside (**driven ports** - the core calls *out* through these) or how something else invokes it (**driving ports** - something calls *in* through these). Ports live in core, not next to whichever adapter happens to implement them.
 - **Adapters** - concrete implementations of ports. One per real external system (`S3Extractor`, `DeltaTableLoader`), plus a trivial fake per port for tests - no mocking library required.
 - **Composition root** - the only place allowed to import both core and adapters. Wires concrete adapters into orchestrators. This is also where an "API request -> which job" mapping belongs, if you have one.
 - **Orchestrator** - sequences port calls and core calls. Contains no decisions itself: *fetch, decide, fetch, decide, act.*
@@ -26,15 +26,15 @@ The default shape for anything with real external boundaries (storage, external 
 
 Ports point in two directions:
 
-- **Driven** - the core calls out (`Extractor`, `Loader`, `SchemaProvider`). The adapter is called *by* the core.
-- **Driving** - something calls in (`JobRunner`). A CLI or HTTP router is the *driving adapter*; it calls the driving port to start a use case. Don't confuse a driving port's `Runner.run(job, params)` with a *driven* adapter that happens to also be called `Runner` internally (e.g. an execution engine) - they operate at completely different levels.
+- **Driven** - the core calls out (`ExtractsData`, `LoadsData`, `ProvidesSchema`). The adapter is called *by* the core.
+- **Driving** - something calls in (`RunsJobs`). A CLI or HTTP router is the *driving adapter*; it calls the driving port to start a use case. Don't confuse a driving port's `RunsJobs.run(job, params)` with a *driven* adapter that happens to also be called `Runner` internally (e.g. an execution engine) - they operate at completely different levels.
 
 ## Worked Example: an ELT Tool
 
 A tool built from three component families:
 
-- **Extractors** (S3, Kafka, Postgres -> DataFrame) - **driven adapters**, implementing one `Extractor` port.
-- **Loaders** (-> a table, -> object storage) - **driven adapters**, implementing one `Loader` port, symmetric to Extractor.
+- **Extractors** (S3, Kafka, Postgres -> DataFrame) - **driven adapters**, implementing one `ExtractsData` port.
+- **Loaders** (-> a table, -> object storage) - **driven adapters**, implementing one `LoadsData` port, symmetric to `ExtractsData`.
 - **Transformers** (DataFrame -> DataFrame, atomic or business logic) - **core**, not adapters. They never leave the process, so they need no port of their own - unless a transformer itself calls out (e.g. an ML classifier API), in which case *that* becomes its own port one level down.
 
 A named business process ("load CDC logs to a Delta table", "load Kafka JSON to a Delta table") is not a bespoke class - it's a **composition-root factory** that chooses a specific extractor, transformer chain, and loader, and hands them to one generic orchestrator:
@@ -42,7 +42,7 @@ A named business process ("load CDC logs to a Delta table", "load Kafka JSON to 
 ```python
 # core/pipeline.py
 class Pipeline:
-    def __init__(self, extractor: Extractor, transformers: list[Transformer], loader: Loader):
+    def __init__(self, extractor: ExtractsData, transformers: list[TransformsData], loader: LoadsData):
         self._extractor, self._transformers, self._loader = extractor, transformers, loader
 
     def run(self) -> WriteResult:
@@ -76,7 +76,7 @@ REGISTRY = {
 A driving adapter (HTTP router or CLI) never sees any of the above directly - it only calls the driving port:
 
 ```python
-class JobRunner:
+class JobRunner:  # implements the RunsJobs driving port
     def __init__(self, registry: dict[str, Callable[..., Pipeline]]):
         self._registry = registry
 
@@ -95,7 +95,7 @@ src/
     │                                 # passes concrete values into adapter constructors
     ├── core/
     │   ├── domain.py                # value objects - no dependencies
-    │   ├── ports.py                 # driven ports (Extractor, Loader) + driving ports (JobRunner)
+    │   ├── ports.py                 # driven ports (ExtractsData, LoadsData) + driving ports (RunsJobs)
     │   ├── transformers/
     │   │   ├── generic.py           # atomic, reusable
     │   │   └── business.py          # domain-specific
