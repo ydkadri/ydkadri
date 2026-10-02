@@ -28,6 +28,7 @@ Every item has a stable ID (for example `PY-03`). Report each finding with that 
 
 - [ ] **COM-10** **R** The PR is one reviewable unit. Commits are logical. No unrelated changes.
 - [ ] **COM-11** **R** Deferred work has a GitHub issue. The PR description links the issues it closes.
+- [ ] **COM-15** **R** No PR defers the fix for a defect raised against its own diff to a later PR in the stack. A later PR may add new scope (COM-11), but not carry a fix for something this PR's own review already found wrong in this PR.
 - [ ] **COM-12** **R** British English in docs, comments and messages.
 
 ### Security
