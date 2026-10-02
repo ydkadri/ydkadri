@@ -227,6 +227,10 @@ Fixes #123
 5. Review comments are discussed in the dialogue, never replied to on GitHub. Agreed changes are pushed as `--fixup` commits.
 6. Once every PR is approved and the user says to merge, autosquash from the bottom up (`git rebase -i --autosquash --no-keep-empty --keep-base <base>`, then `gh stack rebase --no-trunk`, then the next branch), check each squash changed no content, and merge the stack with `gh stack merge --rebase`.
 
+### Deferring work in a stack
+
+A later PR in the stack may add scope that was never in an earlier PR. It must not carry the fix for a defect the review already found in an earlier PR's own diff — that fix belongs in the PR it was found in, as a `--fixup` commit, even if a later PR happens to touch the same code. Shipping a known-wrong design in PR N and fixing it in PR N+1 leaves a point in the merged history where the project was knowingly broken.
+
 ---
 
-**Last Updated**: 2026-07-28
+**Last Updated**: 2026-10-02
