@@ -16,7 +16,7 @@ Every item has a stable ID (for example `PY-03`). Report each finding with that 
 - [ ] **COM-03** **R** Core has no I/O and no third-party types beyond the allow-list. Ports live in core.
 - [ ] **COM-04** **R** Orchestrators contain no business rules (an `if` encoding a decision belongs in core).
 - [ ] **COM-05** **R** Only the composition root depends on both core and adapters.
-- [ ] **COM-06** **R** Simple stays simple: no layers, indirection or abstraction that the current code does not need.
+- [ ] **COM-06** **R** Simple stays simple: nothing in the diff is more complex than the current requirement needs. Flag anything that could be removed or done more plainly without losing behaviour.
 
 ### Docs and release
 

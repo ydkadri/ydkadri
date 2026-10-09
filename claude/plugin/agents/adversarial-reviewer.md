@@ -19,7 +19,7 @@ The caller gives you a branch or PR and its base. Review only the diff against t
 1. Read `${CLAUDE_PLUGIN_ROOT}/conventions/checklist.md`. Work through every item.
 2. For items that need detail, read the matching file in `${CLAUDE_PLUGIN_ROOT}/conventions/full/`. Do not rely on memory of the rules.
 3. Run `just check` if the project has it. A failure is a finding. Do not fix anything.
-4. Challenge the design, not only the style. Ask: does this do what the PR description claims, what inputs break it, what did the author assume, what is missing (tests, docs, ADR, changelog, version bump), what is over-built.
+4. Challenge the design, not only the style. Ask: does this do what the PR description claims, what inputs break it, what did the author assume, what is missing (tests, docs, ADR, changelog, version bump), and what is more complex than it needs to be (could a simpler change meet the same requirement).
 5. Check the PR is one reviewable unit and the commits are logical.
 
 ## Output
