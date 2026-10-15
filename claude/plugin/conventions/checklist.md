@@ -30,6 +30,7 @@ Every item has a stable ID (for example `PY-03`). Report each finding with that 
 - [ ] **COM-11** **R** Deferred work has a GitHub issue. The PR description links the issues it closes.
 - [ ] **COM-15** **R** No PR defers the fix for a defect raised against its own diff to a later PR in the stack. A later PR may add new scope (COM-11), but not carry a fix for something this PR's own review already found wrong in this PR.
 - [ ] **COM-12** **R** British English in docs, comments and messages.
+- [ ] **COM-16** **R** Prose follows `conventions/full/writing.md`: it states what and why for a reader who knows nothing, in bullets and examples. It takes a position, not a menu of options. It drops detail the reader does not need, and does not copy what a linked reference doc already says. An ADR or PR description that reads as a long essay is a finding.
 
 ### Security
 
