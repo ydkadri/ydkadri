@@ -21,7 +21,7 @@ Size the work before planning it:
 
 ## Step 3: Outcome and ADRs in chat
 
-Ask one question at a time until the outcome is clear ("a user can do X"). Raise each real architectural decision as a short ADR discussion: context, options, recommendation. Agree them in chat. Nothing is written to a file yet.
+Ask one question at a time until the outcome is clear ("a user can do X"). Raise each real architectural decision as a short ADR discussion: context, options, recommendation. Take a position: bring one recommendation, not a menu. Agree them in chat. Nothing is written to a file yet.
 
 ## Step 4: Stack plan
 
@@ -29,6 +29,6 @@ Split the work into small PRs, each one reviewable unit that passes `just check`
 
 ## Step 5: Draft stack
 
-Create the branches with `gh stack init` and `gh stack add`. Each branch holds the ADRs assigned to it (written from `${CLAUDE_PLUGIN_ROOT}/templates/common/docs/explanation/adr/template.md`, status `accepted`, with a row added to the ADR index) and a PR description stating its part of the plan. A branch with no ADR starts from an empty commit, `git commit --allow-empty -m "Start: <title>"`, so it can be opened as a PR. Autosquash drops these later. Submit with `gh stack submit --auto`, which opens the PRs as drafts. Give the user the stack link and wait for approval.
+Create the branches with `gh stack init` and `gh stack add`. Each branch holds the ADRs assigned to it (written from `${CLAUDE_PLUGIN_ROOT}/templates/common/docs/explanation/adr/template.md` following `conventions/full/writing.md`, status `accepted`, with a row added to the ADR index) and a PR description stating its part of the plan. A branch with no ADR starts from an empty commit, `git commit --allow-empty -m "Start: <title>"`, so it can be opened as a PR. Autosquash drops these later. Submit with `gh stack submit --auto`, which opens the PRs as drafts. Give the user the stack link and wait for approval.
 
 Asking first is required: submitting pushes code and opens PRs. Approval authorises `build-stack` to push the stack's branches and mark PRs ready. It does not authorise merging: wait until the user says to merge.
