@@ -9,6 +9,7 @@ Always-on rules, injected at session start by the mine plugin. Procedures live i
 - Ask before destructive, hard-to-reverse or outward-facing actions. Proceed on local, reversible ones.
 - Run `just check` before every commit. It enforces the mechanical conventions.
 - Deliver features complete: code, tests, docs for any interface change, a changelog entry and a version bump.
+- Make each commit atomic: one concern, complete, and passing `just check` on its own. Build a PR as several commits, not one.
 - Work in small stacked PRs (`gh stack`). Build each PR as a draft, run the `adversarial-reviewer` agent until it is CLEAR, then mark it ready. The human reviews only ready PRs, while you build the next one.
 - Never reply to, resolve or react to PR comments or reviews. Discuss them with the user in the dialogue, then push the agreed fixups.
 - Keep each ADR in the PR it describes, and mark it `implemented` in that PR.

@@ -35,6 +35,17 @@ Use descriptive names that explain what the branch does, not just ticket numbers
 
 **Goal**: Clean, logical commits that tell a story.
 
+### Atomic commits
+
+**Each commit is one concern, complete, and passes the checks on its own.** A reviewer reads a PR commit by commit, and `git bisect` needs every commit to build and pass.
+
+- One concern per commit: for example a module with its tests, a rule added to an existing module, a docs section, or an ADR status change. If the message needs "and" to describe two unrelated things, split it.
+- Code and its tests can share a commit or the tests can follow it. A commit that changes behaviour must not leave the previous tests failing.
+- Build a PR as several commits from the start. Autosquash only folds fixups into the commit they fix. It never splits, so a PR started as one commit stays one commit.
+- Check every commit, not only the tip: run `just check` at each commit of the stack (for example `git rebase -x 'just check' main`, or check each commit out in a temporary worktree). A commit that passes only when a later one is applied is not atomic.
+- Order commits so each one only needs the ones before it. A new package that a layer contract must know about brings its contract change in the same commit, and a shared export list grows with the modules it exports.
+- Splitting history must not change content. Compare the tree before and after (`git rev-parse <branch>^{tree}`): it must be identical.
+
 ### During Draft PR Phase
 
 **Fixup commits are ENCOURAGED** - makes incremental review easier:
@@ -85,7 +96,7 @@ git commit --fixup=HEAD~1
 
 ### Before Merging
 
-**Rebase to squash fixups into logical feature units:**
+**Autosquash folds each fixup into the commit it fixes. It does not merge commits together, so the atomic commits stay separate:**
 - Each commit = complete, cohesive piece of functionality
 - Related changes grouped together (feature + tests + docs)
 - Commits tell a clear story
@@ -233,4 +244,4 @@ A later PR in the stack may add scope that was never in an earlier PR. It must n
 
 ---
 
-**Last Updated**: 2026-10-02
+**Last Updated**: 2026-10-16

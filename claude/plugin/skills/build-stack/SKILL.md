@@ -15,8 +15,8 @@ Read `${CLAUDE_PLUGIN_ROOT}/conventions/digests/<language>.md` for the project l
 
 The stack starts as draft PRs. For each PR, bottom to top:
 
-1. Switch to its branch (`gh stack switch`). Write the tests, the code and the docs for its unit, mark its ADRs `implemented` (and its index row), add the changelog entry and bump the version one step from the PR below it.
-2. Run `just check` until it passes.
+1. Switch to its branch (`gh stack switch`). Write the tests, the code and the docs for its unit as several atomic commits (see `conventions/full/git.md`), not one, mark its ADRs `implemented` (and its index row), add the changelog entry and bump the version one step from the PR below it.
+2. Run `just check` until it passes, then run it at every commit of the PR (`git rebase -x 'just check' <base>`), not only the tip. A commit that fails alone is not atomic, so split or reorder it.
 3. Run `pr-prep`. The reviewer reviews the draft until it returns `CLEAR`.
 4. Mark the PR ready (`gh pr ready`). Ready means the agent has cleared it and the user may review. A ready PR is never returned to draft.
 5. Start the next PR straight away. While the user reviews PR N, you build PR N+1 and the reviewer reviews it. Do not wait on the user.
@@ -30,7 +30,7 @@ Comments arrive in the dialogue, not as PR replies. Never reply to, resolve or r
 
 ## Finishing
 
-Once every PR is approved and the user says to merge, autosquash from the bottom up, restacking after each branch:
+Once every PR is approved and the user says to merge, autosquash from the bottom up, restacking after each branch. This folds fixups into the commits they fix and leaves the atomic commits as they are:
 
 ```bash
 git switch <lowest-branch>
