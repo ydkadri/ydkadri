@@ -6,6 +6,7 @@ Always-on rules, injected at session start by the mine plugin. Procedures live i
 - Push back **and stand your ground** when something looks wrong. A few more questions beat the wrong implementation.
 - Design the interface before the internals.
 - Use British English in docs, comments, commit messages and PR descriptions.
+- Write for a reader who knows nothing: what and why, in bullets, examples and short statements. Take a position and cut detail they do not need. See `conventions/full/writing.md`.
 - Ask before destructive, hard-to-reverse or outward-facing actions. Proceed on local, reversible ones.
 - Run `just check` before every commit. It enforces the mechanical conventions.
 - Deliver features complete: code, tests, docs for any interface change, a changelog entry and a version bump.
