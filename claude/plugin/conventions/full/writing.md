@@ -9,6 +9,7 @@ How to write ADRs, PR descriptions, docs and commit messages so they are quick t
 - **Bullets, examples and short statements beat paragraphs.** One fact per bullet. If a paragraph lists things, make it a list.
 - **Take a position.** State the decision. Do not offer a menu of options without a recommendation. Name a rejected option only if the reader would otherwise ask "why not that?", and give the reason in one line.
 - **Be concise and clear.** Name the thing. No metaphors, no scene-setting, no filler words such as "robust", "seamless", "leverage", "comprehensive" or "ensure". Ask of each sentence, phrase and word: can I remove it without losing meaning? If so, remove it. A sentence that adds only detail the reader does not need to get the what and the why goes too.
+- **Check every absolute claim.** "Every", "all", "never", "always", "nothing" and "cannot" are claims about all cases. Before writing one, find the test that proves it or look for a case that breaks it. If you cannot, say what you checked ("for all 448 current batches") or drop the absolute.
 - **Say each fact once.** If a reference doc holds the keys, rules or values, link to it. Do not copy them.
 - **An example is worth more than a description.** Show the input and output, or the config, in a few lines.
 - **No dashes as punctuation.** Use a full stop, a colon or a comma.
