@@ -22,7 +22,7 @@ Every item has a stable ID (for example `PY-03`). Report each finding with that 
 
 - [ ] **COM-07** **R** Any interface change updates the reference and tutorial docs. Decisions have an ADR.
 - [ ] **COM-08** **M** CHANGELOG has an entry for the change. The version is bumped as semver in line with the project's version rule.
-- [ ] **COM-09** **R** README and docs still match the behaviour. Examples run.
+- [ ] **COM-09** **R** README and docs still match the behaviour. Examples run. For each absolute claim ("every", "all", "never", "always", "nothing", "cannot"), find the test that proves it or a counterexample in the code. Check a reference doc's list of rules against the code in both directions: a rule documented but not enforced, and one enforced but not documented.
 
 ### PR hygiene
 
