@@ -53,6 +53,7 @@ Every item has a stable ID (for example `PY-03`). Report each finding with that 
 - [ ] **PY-12** **R** Test data is inline. Fixtures are for resources, with the narrowest scope that works.
 - [ ] **PY-13** **R** Parametrize only where the logic is identical. Test names say what is tested and the expected result.
 - [ ] **PY-14** **R** New behaviour, error paths and edge cases are covered, not only the happy path.
+- [ ] **PY-15** **R** Each new test can fail. For each, name the change to the code that would make it fail (a swapped enum value, a removed check, a reversed sort). A test that still passes with the code under test removed or broken is a finding. Enum tests pin name to value, not the set of values.
 
 ## Rust
 

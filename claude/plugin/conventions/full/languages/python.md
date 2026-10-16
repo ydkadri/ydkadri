@@ -1212,6 +1212,29 @@ print(f"Running in {env}")  # "Running in production"
 assert env == "production"  # True
 ```
 
+### Testing Enums
+
+**Pin each member's name to its value.** Compare a dict of name to value against a literal. Do not compare the set of values.
+
+```python
+# ❌ WRONG - passes when two values are swapped
+def test_write_modes():
+    assert {m.value for m in WriteMode} == {"append", "overwrite"}
+
+# ✅ CORRECT - fails when two values are swapped
+def test_write_modes():
+    assert {m.name: m.value for m in WriteMode} == {
+        "APPEND": "append",
+        "OVERWRITE": "overwrite",
+    }
+```
+
+Code often turns text into a member (`WriteMode("append")`). If the values are swapped, that returns the wrong member and nothing else fails: an append batch overwrites its table. The set version cannot see it because it ignores which name has which value.
+
+- Write the expected pairs by hand in the test, so a change to the enum is a change to the test in the same commit.
+- If a copy of an enum must match another (for example one a layer cannot import), compare name to value pairs for both.
+- A `StrEnum` member equals its text (`WriteMode.APPEND == "append"`). A YAML or JSON dumper still cannot write the member, so convert it with `str()` first. Test both.
+
 ### Enums with Associated Data
 
 Use attrs with enums for complex states:
