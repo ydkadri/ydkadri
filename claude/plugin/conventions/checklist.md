@@ -22,12 +22,12 @@ Every item has a stable ID (for example `PY-03`). Report each finding with that 
 
 - [ ] **COM-07** **R** Any interface change updates the reference and tutorial docs. Decisions have an ADR.
 - [ ] **COM-08** **M** CHANGELOG has an entry for the change. The version is bumped as semver in line with the project's version rule.
-- [ ] **COM-09** **R** README and docs still match the behaviour. Examples run. For each absolute claim ("every", "all", "never", "always", "nothing", "cannot"), find the test that proves it or a counterexample in the code. Check a reference doc's list of rules against the code in both directions: a rule documented but not enforced, and one enforced but not documented.
+- [ ] **COM-09** **R** README and docs match the behaviour at this commit, not the design. Every default, refusal, name and limit a doc states has a code path and a test. After a rename or a rule change, the old wording is gone from the docs. Examples run. For each absolute claim ("every", "all", "never", "always", "nothing", "cannot"), find the test that proves it or a counterexample in the code. Check a reference doc's list of rules against the code in both directions: a rule documented but not enforced, and one enforced but not documented.
 
 ### PR hygiene
 
 - [ ] **COM-10** **R** The PR is one reviewable unit. Commits are atomic: each is one concern, complete, and passes the checks on its own (check out a few and run them). A large PR squashed into one commit, or a commit that mixes unrelated concerns, is a finding. No unrelated changes.
-- [ ] **COM-11** **R** Deferred work has a GitHub issue. The PR description links the issues it closes.
+- [ ] **COM-11** **R** Deferred work has a tracked item: a GitHub issue, a task link or similar. Tracked items are granular enough to be closed by a single PR. If work spans several repos or projects, each has its own item for the work it needs. A follow-up the user has not agreed to is not recorded as a deferral. The PR description links the issues it closes, and this PR meets each one's acceptance.
 - [ ] **COM-15** **R** No PR defers the fix for a defect raised against its own diff to a later PR in the stack. A later PR may add new scope (COM-11), but not carry a fix for something this PR's own review already found wrong in this PR.
 - [ ] **COM-12** **R** British English in docs, comments and messages.
 - [ ] **COM-16** **R** Prose follows `conventions/full/writing.md`: it states what and why for a reader who knows nothing, in bullets and examples. It takes a position, not a menu of options. It drops detail the reader does not need, and does not copy what a linked reference doc already says. An ADR or PR description that reads as a long essay is a finding.
@@ -53,7 +53,7 @@ Every item has a stable ID (for example `PY-03`). Report each finding with that 
 - [ ] **PY-12** **R** Test data is inline. Fixtures are for resources, with the narrowest scope that works.
 - [ ] **PY-13** **R** Parametrize only where the logic is identical. Test names say what is tested and the expected result.
 - [ ] **PY-14** **R** New behaviour, error paths and edge cases are covered, not only the happy path.
-- [ ] **PY-15** **R** Each new test can fail. For each, name the change to the code that would make it fail (a swapped enum value, a removed check, a reversed sort). A test that still passes with the code under test removed or broken is a finding. Enum tests pin name to value, not the set of values.
+- [ ] **PY-15** **R** Each new test can fail. For each, name the change to the code that would make it fail (a swapped enum value, a removed check, a reversed sort). A test that still passes with the code under test removed or broken is a finding. Enum tests pin name to value, not the set of values. An error test asserts the key or the whole message, not a prefix of it.
 
 ## Rust
 
@@ -72,6 +72,7 @@ Every item has a stable ID (for example `PY-03`). Report each finding with that 
 - [ ] **RS-13** **R** Table-driven tests only where the logic is identical. Test names say what is tested, with no `test_` prefix.
 - [ ] **RS-14** **R** New behaviour, error paths and edge cases are covered, not only the happy path.
 - [ ] **RS-15** **R** Benchmarks exist for performance-critical paths.
+- [ ] **RS-16** **R** Each new test can fail. For each, name the change to the code that would make it fail (a swapped variant, a removed check, a reversed sort). A test that still passes with the code under test removed or broken is a finding. An error test asserts the variant or the whole message, not a prefix of it.
 
 ## Growing this list
 
