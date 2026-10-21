@@ -28,6 +28,8 @@ Fixes and rebases: use `git commit --fixup=<sha>` for changes to an earlier comm
 
 Comments arrive in the dialogue, not as PR replies. Never reply to, resolve or react to PR comments or reviews. Discuss each with the user, then push the agreed fixups. If a comment needs a major rework of the PR, run `pr-prep` again. Otherwise there is no further agent review.
 
+When the user edits a PR description before marking it ready, compare the edit with your draft. A pattern in what they cut or rewrote is feedback for `writing.md`: raise it at the retro.
+
 ## Finishing
 
 Once every PR is approved and the user says to merge, autosquash from the bottom up, restacking after each branch. This folds fixups into the commits they fix and leaves the atomic commits as they are:
