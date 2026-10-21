@@ -9,7 +9,7 @@ Close each feature by improving the workflow. The output is edits to the plugin,
 
 ## Gather
 
-- The review log, `.claude/review-log.md`. Tally findings by checklist ID. An ID flagged in two or more PRs belongs in the executor digest, and in a lint rule if a tool can check it. An ID that is mostly `false-positive`, or never flagged, is a candidate to reword or drop.
+- The review log, `.claude/review-log.md`, and the saved round reports in `.claude/reviews/` (or wherever the reports were saved). If there is no log, tally the reports. Tally findings by checklist ID. An ID flagged in two or more PRs belongs in the executor digest, and in a lint rule if a tool can check it. An ID that is mostly `false-positive`, or never flagged, is a candidate to reword or drop.
 - `dissent` lines in the log: where the builder and reviewer disagreed. Decide who was right and change the checklist or the behaviour.
 - Round counts and reviewer timings per PR: which PRs needed more than two rounds, and why.
 - The user's PR comments (`gh pr view --comments`, `gh api` for review threads). These are read, not replied to.
