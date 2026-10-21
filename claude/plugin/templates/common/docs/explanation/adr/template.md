@@ -1,7 +1,7 @@
 # NNNN. Title
 
-**Status:** proposed
-**Proposed:** YYYY-MM-DD by Name
+- **Status:** proposed
+- **Proposed:** YYYY-MM-DD by Name
 
 ## Context
 
