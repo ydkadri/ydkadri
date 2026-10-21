@@ -14,7 +14,7 @@ An ADR is in exactly one of five states, and each move has a date line in the he
 | `rejected` | Not adopted | (terminal) |
 | `superseded` | Replaced by a later ADR | (terminal) |
 
-"Accepted" means agreed, not built. Add a header line for each move (`**Accepted:** YYYY-MM-DD by Name`, `**Implemented:** YYYY-MM-DD (#PR)`). An ADR agreed in chat before it is written is created as `accepted`: set the status, and add both the `Proposed` and `Accepted` lines with the same date. A rejected ADR records why under `## Rejection`. A superseded ADR gets `**Superseded by:** NNNN`.
+"Accepted" means agreed, not built. Write the header as a bullet list, one field per bullet, because consecutive lines of plain text render as one paragraph. Add a bullet for each move (`- **Accepted:** YYYY-MM-DD by Name`, `- **Implemented:** YYYY-MM-DD (#PR)`). An ADR agreed in chat before it is written is created as `accepted`: set the status, and add both the `Proposed` and `Accepted` lines with the same date. A rejected ADR records why under `## Rejection`. A superseded ADR gets `- **Superseded by:** NNNN`.
 
 ## Rules
 
