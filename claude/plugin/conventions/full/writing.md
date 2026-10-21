@@ -22,6 +22,19 @@ Context says why a decision was needed. It is the problem and the forces, not a 
 - List only the facts that make the decision necessary. Each is a bullet.
 - Leave out how the system works today unless the decision depends on it.
 
+## PR descriptions
+
+A reviewer reads the diff. The description tells them what to look for.
+
+- **Open with one sentence: the old thing and the new thing.** "Update X to read `new` instead of `old`." Do not give PR history ("replaces #123") or say what the PR stops doing.
+- **One fact per bullet, with no reason attached.** The ADR and the diff hold the why. Split a bullet that joins two facts.
+- **Do not narrate how the PR was built.** "Two commits", "one reader, no parallel load" and "both pass on their own" describe the author's work, not the change.
+- **Keep "Design choices to review" for choices a reviewer could disagree with**, such as what is kept or removed.
+- **Use a list for three or more parallel items.** Names, batches and rollout steps are bullets. Number steps that happen in order, and mark each done or `TODO`, so the PR tracks the rollout.
+- **Fill a template section with the minimum.** "Plugin change?" gets "Yes. It needs a rollout restart.", with no reassurance.
+- **Put a risk the reviewer cannot fix in a sentence, or tell the user in chat.** Do not write a paragraph.
+- **Check names against the code.** A flag, key or file is spelled as it is in the source.
+
 ## Examples
 
 ```
@@ -50,7 +63,9 @@ Context says why a decision was needed. It is the problem and the forces, not a 
 - [ ] Is there a decision, not a menu?
 - [ ] Is anything here already said in a linked doc?
 - [ ] Can any sentence, phrase or word go without losing meaning? Any filler word or dash?
+- [ ] Does a PR description open with old to new in one sentence, and give each fact a bullet with no reason?
+- [ ] Is every name, flag and path spelled as in the code?
 
 ---
 
-**Last Updated**: 2026-10-16
+**Last Updated**: 2026-10-22
