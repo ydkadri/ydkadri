@@ -25,7 +25,7 @@ Ask one question at a time until the outcome is clear ("a user can do X"). Raise
 
 ## Step 4: Stack plan
 
-Split the work into small PRs, each one reviewable unit that passes `just check` by itself. For each give a title, what it adds, its ADRs, and its semver bump (patch by default, minor for a new capability, major for breaking changes). For each PR, list the new public names (classes, functions, modules) with a one-line purpose, and say which layer each belongs in. Assign every ADR to the PR that completes the work it describes: the last PR, for a decision that spans several. An ADR never sits in a plan PR of its own. The first PR that changes an interface also carries the reference and tutorial docs. List the issues each PR closes.
+Split the work into small PRs, each one reviewable unit that passes `just check` by itself. For each give a title, what it adds, its ADRs, and its semver bump (patch by default, minor for a new capability, major for breaking changes). For each PR, list its commits, one line each and one concern per commit (see `conventions/full/git.md`), then the new public names (classes, functions, modules) with a one-line purpose, and say which layer each belongs in. Assign every ADR to the PR that completes the work it describes: the last PR, for a decision that spans several. An ADR never sits in a plan PR of its own. The first PR that changes an interface also carries the reference and tutorial docs. List the issues each PR closes.
 
 ## Step 5: Draft stack
 
