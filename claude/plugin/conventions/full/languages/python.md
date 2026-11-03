@@ -894,6 +894,8 @@ Configure structural rules in `pyproject.toml`:
 strict = true
 warn_return_any = true
 warn_unused_configs = true
+# --strict does not include this. It flags a name a `match` or `if` leaves unbound.
+enable_error_code = ["possibly-undefined"]
 
 [[tool.mypy.overrides]]
 module = "tests.*"
@@ -1194,9 +1196,29 @@ def handle_job(status: JobStatus) -> str:
             return "Job finished successfully"
         case JobStatus.FAILED:
             return "Job failed, check logs"
-        case _:  # Exhaustiveness check - IDE warns if cases missing
-            raise ValueError(f"Unknown status: {status}")
+        case _:
+            assert_never(status)  # mypy reports a missing case here
 ```
+
+**End every `match` on an enum or a union of types with `case _: assert_never(x)`.** Without it, a new member or type is silently unhandled. When the arms assign a variable, it is also left unbound, and the code fails later with `UnboundLocalError`. `--strict` does not catch that, but `possibly-undefined` (see mypy below) does.
+
+**Dispatch on a type with `match`, not an `isinstance` chain.** The class patterns name every type, and `assert_never` makes mypy check that none is missing:
+
+```python
+from typing import assert_never
+
+Batch = FilesBatch | S3TableBatch
+
+match batch:
+    case S3TableBatch():
+        failures = run_s3_table_batch(batch)
+    case FilesBatch():
+        failures = run_files_batch(batch, ...)
+    case _:
+        assert_never(batch)
+```
+
+An input guard that returns or raises early stays an `if`.
 
 ### String-Backed Enums
 

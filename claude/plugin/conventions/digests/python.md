@@ -6,7 +6,8 @@ For the executor. Mechanical rules are enforced by `just check`, so run it befor
 - Protocols are verbs: `ExtractsData`, `LoadsData`. Ports live in core.
 - Member order in a class: private helpers, property builders, `__init__`, public methods. Define before use.
 - Data classes: frozen `attrs`, data only. Change with `attrs.evolve`.
-- Enums, not string literals, for states, types and formats. Use `match` with `typing.assert_never`.
+- Enums, not string literals, for states, types and formats.
+- Dispatch on an enum or a union of types with `match`, not an `isinstance` chain, and end it with `case _: assert_never(x)`. Without it a new member is silently unhandled, and a variable the arms assign can be left unbound. An input guard stays an `if`.
 - Test an enum by pinning each name to its value (`{m.name: m.value for m in E} == {...}`), not the set of values. A set passes when two values are swapped.
 - Fail fast. Never catch `Exception` or `BaseException`, or use a bare `except:`. Name the classes (see the `Raises:` of what the `try` calls), so an unexpected error fails the run. A handler that always re-raises is fine, and so is `raise NewError(...) from e`. Specific exceptions from the package's `exceptions.py`, with context. Log `event_name` plus key-value pairs once, then re-raise.
 - Log levels: DEBUG flow, INFO milestones, WARNING handled, ERROR task failed, CRITICAL cannot continue.
