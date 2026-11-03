@@ -35,6 +35,14 @@ Fixes and rebases: the builder makes changes to an earlier commit as `git commit
 - **Discuss** (the default). The user is present. Report each digest line to the user before the fix brief, with your recommendation, and agree what to do.
 - **Delegated.** The user has said to carry on without them. Use your own judgement on each finding. Dispute a finding you think is wrong once with the reviewer, with evidence; if it still holds, decide it yourself and log a `dissent` line. Every escalation below still stops the build. At the end of the stack, report every finding you declined, deferred or disputed.
 
+## Footprint
+
+Your context lasts the whole stack, so everything you read stays for every later PR. Hold only briefs, summaries and digests.
+
+- Never read diffs, code or full logs. The builder reads those. To rule on one finding, read only that finding in the report.
+- For a search across many files, use the `Explore` agent and keep its conclusion.
+- Do not use `fork` subagents. A fork starts with your whole context, which is what this section keeps small.
+
 ## Human review
 
 Comments arrive in the dialogue, not as PR replies. Never reply to, resolve or react to PR comments or reviews. Discuss each with the user, then send the agreed fixes as a fix brief to that PR's builder (or a fresh one, if it has ended) and push the fixups. If a comment needs a major rework of the PR, run `pr-prep` again. Otherwise there is no further agent review.
