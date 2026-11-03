@@ -174,6 +174,14 @@ git log --oneline
 **Note:** If you have `rebase.autosquash = true` in your gitconfig (recommended), 
 you can use `git rebase -i main` and autosquash happens automatically.
 
+### Force-pushing
+
+Use `--force-with-lease=<branch>:<sha>`, with the SHA read from the remote just before (`git ls-remote origin refs/heads/<branch>`). Never type or guess it. A wrong SHA is rejected, and a lease taken from your own stale `origin/<branch>` overwrites work you have not seen.
+
+### Merging a branch
+
+A clean three-way merge can drop a line without a conflict, when the other side deleted a line this branch still uses. After a merge, grep the file for each name the branch's change uses, and run the type checker.
+
 ## Pre-Commit and Pre-Push Hooks
 
 **Quality checks are determined during project setup** (see the `project-init` skill). The checks below are standard patterns used across projects - customize based on project needs.

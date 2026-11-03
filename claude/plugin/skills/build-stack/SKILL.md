@@ -43,6 +43,23 @@ gh stack rebase --no-trunk
 
 Check each squash changed no content (`git diff <sha-before> <sha-after>` is empty), then `gh stack push` and `gh stack merge --rebase`. Run the `retro` skill after the last merge.
 
+## After the user merges
+
+A rebase-merge on GitHub gives the merged commits new SHAs. A PR still open above them keeps the old ones, shows conflicts, and may have been added after the stack was planned. Restack each remaining branch onto the trunk:
+
+```bash
+git fetch origin
+git rebase --onto origin/<trunk> <old parent tip> <branch>
+git diff <old tip> <new tip> -- <package>   # empty: only the base changed
+git ls-remote origin refs/heads/<branch>    # the lease SHA, read here and never typed
+git push --force-with-lease=<branch>:<that sha> origin <branch>
+```
+
+Run `just check` on the new tip, and remove "Stacked on #N" from the PR description.
+
+- **Lockfile.** Regenerate it on the new base (`uv lock`) and check it only adds packages and changes no version. A text merge of a lockfile can be clean and still undo someone's bump.
+- **Approvals.** Before the first force-push in a repo you have not pushed to, read its reviews and branch protection. Some repos dismiss approvals on a push (`dismiss_stale_reviews`), and some do not.
+
 ## When to stop and ask
 
 Bring the user in, with the options and a recommendation, when:
