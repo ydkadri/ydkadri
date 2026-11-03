@@ -2,6 +2,8 @@
 
 Personal build workflow as a Claude Code plugin: Q&A project setup, stacked PRs via `gh stack`, an adversarial reviewer before every PR, and a retro that feeds back into the conventions.
 
+It has two agents. The `builder` (Sonnet) builds each PR and runs the mechanical checks. The `adversarial-reviewer` (Opus) reviews each PR before it is marked ready.
+
 ## Install
 
 ```bash

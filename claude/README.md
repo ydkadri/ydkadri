@@ -17,7 +17,7 @@ See [plugin/README.md](plugin/README.md) for updating and changing it.
 |---|---|
 | Always-on rules, injected at session start | `plugin/rules.md`, `plugin/hooks/` |
 | Lifecycle skills | `plugin/skills/`: `project-init`, `plan-stack`, `build-stack`, `pr-prep`, `retro` |
-| Adversarial reviewer | `plugin/agents/adversarial-reviewer.md` |
+| Agents: the builder, which builds each PR, and the adversarial reviewer | `plugin/agents/`: `builder.md`, `adversarial-reviewer.md` |
 | Conventions (full, executor digests, reviewer checklist) | `plugin/conventions/` |
 | Python project template | `plugin/templates/python/` |
 
