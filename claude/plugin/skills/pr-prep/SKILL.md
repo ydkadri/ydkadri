@@ -24,7 +24,7 @@ A PR is not marked ready until this passes.
 
 ## Review log
 
-The reviewer writes the log: it appends one block per round in the format below, with every outcome `open`. You only set each finding's outcome once it is agreed, editing that line in place. Run the reviewer through this skill, not by calling the agent directly, or no outcome is set and the `retro` tallies open findings.
+The reviewer writes the log: it appends one block per round in the format below, with every outcome `open`. You set each finding's outcome once it is agreed, editing its line, and add a `dissent` line when one is ruled. Run the reviewer through this skill, not by calling the agent directly, or no outcome is set and the `retro` tallies open findings.
 
 `.claude/review-log.md` and `.claude/reviews/` are untracked. Make sure both are in `.gitignore`, and never commit them or quote them in a PR. The `retro` skill reads them. `.claude/adrs/` is untracked too: an ADR enters git only when it is copied to `docs/explanation/adr/NNNN-<slug>.md` in the PR that completes its work.
 

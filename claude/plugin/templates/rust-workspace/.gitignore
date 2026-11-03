@@ -4,5 +4,6 @@ target/
 *.profraw
 lcov.info
 .claude/review-log.md
+.claude/reviews/
 .claude/adrs/
 !Cargo.lock

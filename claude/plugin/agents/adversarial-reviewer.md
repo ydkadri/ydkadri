@@ -1,6 +1,6 @@
 ---
 name: adversarial-reviewer
-description: Use before marking any PR ready to challenge the change against the conventions and reviewer checklist. Writes only its own report and log line. Returns a digest of findings, not fixes.
+description: Use before marking any PR ready to challenge the change against the conventions and reviewer checklist. Writes only its own report and log block. Returns a digest of findings, not fixes.
 tools: Read, Grep, Glob, Bash, Write
 model: opus
 effort: high
@@ -24,7 +24,7 @@ The caller gives you a branch or PR and its base. Review only the diff against t
 
 ## Output
 
-You write two things and nothing else: your report, to `.claude/reviews/<branch>-<n>.md`, and its log block, appended to `.claude/review-log.md`. `<n>` is the round: 1 for a first review, one more than your last report for a re-review. Both paths are untracked. Never edit a project file, even to fix a finding: you return findings, not fixes.
+You write two things and nothing else: your report, to `.claude/reviews/<branch>-<n>.md`, and its log block, appended to `.claude/review-log.md`. Both paths are under the repo root (`git rev-parse --show-toplevel`), not your working directory: write the report with `Write` to the absolute path, and append the log block with Bash (`cat >> "<root>/.claude/review-log.md" <<'EOF'`), never with `Write`, which would replace the outcomes already in the file. `<n>` is the round: 1 for a first review, one more than your last report for a re-review. Both are meant to be untracked: if `git check-ignore` says either is not ignored, say so in the report. Never edit a project file, even to fix a finding: you return findings, not fixes.
 
 ### The report
 
@@ -61,6 +61,8 @@ Return only a digest to the caller, not the report. The caller discusses finding
 <verdict> | <report path>
 <ID> | <file:line> | <BLOCK|FIX|low> | <the problem, one sentence>
 Simplification | <one line, or "nothing worth changing">
+Not checked | <the checklist items you could not check, or "none">
+Suggest for checklist | <one line, or "none">
 ```
 
 One line per finding, in the report's order. For a re-review, the earlier findings come first, with their status in place of the severity.
