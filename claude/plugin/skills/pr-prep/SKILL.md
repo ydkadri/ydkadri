@@ -7,7 +7,7 @@ description: Use this skill before marking ready any PR, or when a PR needs a ma
 
 A PR is not marked ready until this passes.
 
-1. Run `just check`. Fix failures.
+1. Run `just check`. Fix failures. Then break each guarantee the PR claims, one at a time (remove a check, swap an argument, hard-code a default), and confirm one of this PR's own tests fails. A guarantee tested only in a later PR is a finding here. Check the commits match the plan's commit list, or that the description says why they differ.
 2. Docs check. If the diff changes an interface, the reference and tutorial docs change in the same PR. If it completes the work of a decision, that ADR is in this PR, marked `implemented`, with true dates from its local draft. An ADR for work a later PR still builds stays in `.claude/adrs/`. The changelog has an entry and the version is bumped (patch by default, minor when the PR adds a capability, major if it breaks compatibility).
 3. **First review.** Run the `adversarial-reviewer` agent on the branch against its base (the branch below it in the stack, or `main`). Right away, save its full report to `.claude/reviews/<branch>-<n>.md` and append its `## Log` block to `.claude/review-log.md` (both untracked, see below). Do this before fixing anything.
 4. **Fix.** Fix every `BLOCK` and `FIX` finding as `--fixup` commits. Then update each finding's `outcome` in the log: `fixed`, `false-positive`, `dissent` or `deferred #issue`. If you think a finding is wrong, say why with evidence and do not silently skip it. Dispute it once. If it still stands, the user decides, and only then do you log a `dissent` line saying who was right.

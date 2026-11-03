@@ -15,7 +15,7 @@ Read `${CLAUDE_PLUGIN_ROOT}/conventions/digests/<language>.md` for the project l
 
 The stack starts as draft PRs. For each PR, bottom to top:
 
-1. Switch to its branch (`gh stack switch`). Write the tests, the code and the docs for its unit as several atomic commits (see `conventions/full/git.md`), not one. If it completes an ADR's work, commit that ADR from `.claude/adrs/` as `implemented`, with its next free number, the `Implemented` date and its index row. Add the changelog entry and bump the version one step from the PR below it.
+1. Switch to its branch (`gh stack switch`). Write the tests, the code and the docs for its unit as the several atomic commits the plan lists (see `conventions/full/git.md`), not one. If the list changes, change it in the PR description. If it completes an ADR's work, commit that ADR from `.claude/adrs/` as `implemented`, with its next free number, the `Implemented` date and its index row. Add the changelog entry and bump the version one step from the PR below it.
 2. Run `just check` until it passes, then run it at every commit of the PR (`git rebase -x 'just check' <base>`), not only the tip. A commit that fails alone is not atomic, so split or reorder it.
 3. Run `pr-prep`. The reviewer reviews the draft until it returns `CLEAR`.
 4. Mark the PR ready (`gh pr ready`). Ready means the agent has cleared it and the user may review. A ready PR is never returned to draft.
