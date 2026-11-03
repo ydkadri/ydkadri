@@ -36,6 +36,7 @@ Every item has a stable ID (for example `PY-03`). Report each finding with that 
 
 - [ ] **COM-13** **M** No secrets, no `.env` committed, no sensitive data in logs.
 - [ ] **COM-14** **R** External input is validated at boundaries. Queries are parameterised. No shell command built from input.
+- [ ] **COM-17** **R** No real identifiers in the diff: account ids, bucket names, fabric or table names, personal emails. Grep the added lines for 12-digit numbers, `arn:aws` and non-example emails. Test data uses made-up names from the first commit, because autosquash cannot remove a name from a commit that is already pushed.
 
 ## Python
 

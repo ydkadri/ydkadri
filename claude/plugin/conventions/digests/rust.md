@@ -17,3 +17,4 @@ For the executor. Lints, rustfmt, rustdoc, coverage and `scripts/check-deps.sh` 
 - Each `unsafe` block carries a `// SAFETY:` reason.
 - Any interface change updates reference and tutorial docs. They describe the code at this commit: every default, refusal and name they state has a code path and a test, and after a rename or a rule change the old wording is searched for and removed. Decisions get an ADR.
 - Deferred work gets a tracked item (an issue, or a task link), small enough for one PR to close. Work across repos gets one item per repo. Record no follow-up the user has not agreed to.
+- Use made-up names in code, tests, comments and docs from the first commit: no real account ids, bucket names, fabric or table names, or personal emails. Autosquash cannot remove them from a commit already pushed.
