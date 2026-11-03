@@ -44,7 +44,7 @@ Every item has a stable ID (for example `PY-03`). Report each finding with that 
 - [ ] **PY-03** **R** Class members ordered: private helpers, property builders, `__init__`, public methods. Functions defined before use.
 - [ ] **PY-04** **R** Data classes are frozen `attrs`, data only. Behaviour lives in regular classes.
 - [ ] **PY-05** **R** Enums, not string literals, for states, types and formats.
-- [ ] **PY-06** **R** Errors fail fast. Specific exceptions, raised with context. Logged once, as `event_name` plus key-value pairs.
+- [ ] **PY-06** **R** Errors fail fast. Never catch `Exception` or `BaseException`, and never use a bare `except:`: name the classes, so an unexpected error fails the run instead of being handled as an expected one. Check each `except` against the `Raises:` of what its `try` calls. A handler that always re-raises (to log or close down) is fine, and so is `raise NewError(...) from e`. Specific exceptions, raised with context. Logged once, as `event_name` plus key-value pairs.
 - [ ] **PY-07** **R** Log levels match the convention (DEBUG flow, INFO milestones, WARNING handled, ERROR task failed).
 - [ ] **PY-08** **R** Decorators are rare, use `functools.wraps`, and are function-based.
 - [ ] **PY-09** **R** Docstrings explain purpose and behaviour, with no usage examples.
