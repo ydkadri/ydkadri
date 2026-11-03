@@ -8,7 +8,7 @@ Every item has a stable ID (for example `PY-03`). Report each finding with that 
 
 ### Conventions are enforced
 
-- [ ] **COM-01** **M** `just check` passes. No lint suppression without a reason, and no weakened lint rule, coverage threshold or dependency contract.
+- [ ] **COM-01** **M** `just check` passes. No lint suppression without a reason, and no weakened lint rule, coverage threshold or dependency contract. A file-wide mypy or lint suppression added to make a type pass is a finding: narrow the type instead.
 - [ ] **COM-02** **R** Every rule in `conventions/full/` that no tool checks is followed in the diff. Check the language sections below.
 
 ### Architecture
@@ -22,7 +22,7 @@ Every item has a stable ID (for example `PY-03`). Report each finding with that 
 
 - [ ] **COM-07** **R** Any interface change updates the reference and tutorial docs. Decisions have an ADR.
 - [ ] **COM-08** **M** CHANGELOG has an entry for the change. The version is bumped as semver in line with the project's version rule.
-- [ ] **COM-09** **R** README and docs match the behaviour at this commit, not the design. Every default, refusal, name and limit a doc states has a code path and a test. After a rename or a rule change, the old wording is gone from the docs. Examples run. For each absolute claim ("every", "all", "never", "always", "nothing", "cannot"), find the test that proves it or a counterexample in the code. Check a reference doc's list of rules against the code in both directions: a rule documented but not enforced, and one enforced but not documented.
+- [ ] **COM-09** **R** README and docs match the behaviour at this commit, not the design. Every default, refusal, name and limit a doc states has a code path and a test. After a rename or a rule change, the old wording is gone from the docs. Examples run. For each absolute claim ("every", "all", "never", "always", "nothing", "cannot"), find the test that proves it or a counterexample in the code. Check a reference doc's list of rules against the code in both directions: a rule documented but not enforced, and one enforced but not documented. When a CLI gains a second kind of input, the command docstring, `--help` and the list of options that apply to each kind are updated. A reason a doc gives for a dependency is checked against its real code path (for example with `POLARS_VERBOSE=1` or a trace), not against its README.
 
 ### PR hygiene
 
