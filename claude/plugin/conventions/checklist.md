@@ -52,8 +52,8 @@ Every item has a stable ID (for example `PY-03`). Report each finding with that 
 - [ ] **PY-11** **R** Tests are grouped in classes, mirror the `src` tree, and separate unit from integration.
 - [ ] **PY-12** **R** Test data is inline. Fixtures are for resources, with the narrowest scope that works.
 - [ ] **PY-13** **R** Parametrize only where the logic is identical. Test names say what is tested and the expected result.
-- [ ] **PY-14** **R** New behaviour, error paths and edge cases are covered, not only the happy path.
-- [ ] **PY-15** **R** Each new test can fail. For each, name the change to the code that would make it fail (a swapped enum value, a removed check, a reversed sort). A test that still passes with the code under test removed or broken is a finding. Enum tests pin name to value, not the set of values. An error test asserts the key or the whole message, not a prefix of it.
+- [ ] **PY-14** **R** New behaviour, error paths and edge cases are covered, not only the happy path. Where an input can fail in two ways, a test gives it both faults at once, so which error is reported is pinned. When tests move down a layer, one stays in the upper layer and proves an error from below is not swallowed.
+- [ ] **PY-15** **R** Each new test can fail. For each, name the change to the code that would make it fail (a swapped enum value, a removed check, a reversed sort). A test that still passes with the code under test removed or broken is a finding. Enum tests pin name to value, not the set of values. An error test asserts the key or the whole message, not a prefix of it. Options and flags get values that differ from each other and from the defaults, so a swapped or hard-coded argument fails a test; with two booleans, run one case with each set alone. A concurrency or conflict claim is tested on the record that ends in its final state (closed, deleted, committed), not only on one left open.
 
 ## Rust
 
@@ -70,9 +70,9 @@ Every item has a stable ID (for example `PY-03`). Report each finding with that 
 - [ ] **RS-11** **R** Workspace layering holds: `scripts/check-deps.sh` passes and its allow-list changes are justified.
 - [ ] **RS-12** **R** Unit tests are inline in `#[cfg(test)] mod tests`. Integration tests are in `tests/integration/`. Test data is inline. Fakes implement the real trait, with no mocking crate.
 - [ ] **RS-13** **R** Table-driven tests only where the logic is identical. Test names say what is tested, with no `test_` prefix.
-- [ ] **RS-14** **R** New behaviour, error paths and edge cases are covered, not only the happy path.
+- [ ] **RS-14** **R** New behaviour, error paths and edge cases are covered, not only the happy path. Where an input can fail in two ways, a test gives it both faults at once, so which error is reported is pinned. When tests move down a layer, one stays in the upper layer and proves an error from below is not swallowed.
 - [ ] **RS-15** **R** Benchmarks exist for performance-critical paths.
-- [ ] **RS-16** **R** Each new test can fail. For each, name the change to the code that would make it fail (a swapped variant, a removed check, a reversed sort). A test that still passes with the code under test removed or broken is a finding. An error test asserts the variant or the whole message, not a prefix of it.
+- [ ] **RS-16** **R** Each new test can fail. For each, name the change to the code that would make it fail (a swapped variant, a removed check, a reversed sort). A test that still passes with the code under test removed or broken is a finding. An error test asserts the variant or the whole message, not a prefix of it. Options and flags get values that differ from each other and from the defaults, so a swapped or hard-coded argument fails a test; with two booleans, run one case with each set alone. A concurrency or conflict claim is tested on the record that ends in its final state (closed, deleted, committed), not only on one left open.
 
 ## Growing this list
 

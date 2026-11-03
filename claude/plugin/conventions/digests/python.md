@@ -15,6 +15,7 @@ For the executor. Mechanical rules are enforced by `just check`, so run it befor
 - Only the composition root imports both core and adapters.
 - Tests: classes, mirror `src`, unit and integration apart. Data inline. Fixtures only for resources, narrowest scope. Parametrize only when logic is identical.
 - Before committing a new rule, break it once and see a test fail, then check the break applied. Assert an error's key or whole message, not a prefix.
+- Give options and flags values that differ from each other and from the defaults, so a swapped or hard-coded argument fails a test (two booleans: one case with each set alone). Test an input that can fail two ways with both faults at once. When tests move down a layer, keep one in the upper layer that proves an error from below is not swallowed.
 - No `utils.py` or `helpers.py`. Docstrings explain purpose, with no usage examples.
 - Any interface change updates reference and tutorial docs. They describe the code at this commit: every default, refusal and name they state has a code path and a test, and after a rename or a rule change the old wording is searched for and removed. Decisions get an ADR.
 - Deferred work gets a tracked item (an issue, or a task link), small enough for one PR to close. Work across repos gets one item per repo. Record no follow-up the user has not agreed to.

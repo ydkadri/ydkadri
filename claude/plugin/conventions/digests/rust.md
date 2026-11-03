@@ -12,6 +12,7 @@ For the executor. Lints, rustfmt, rustdoc, coverage and `scripts/check-deps.sh` 
 - Logging is `tracing` with key-value fields, once per event. Use `#[instrument(skip_all, fields(...))]`. DEBUG flow, INFO milestones, WARN handled, ERROR task failed. Never log secrets.
 - Tests: unit inline, integration in `tests/integration/`. Data inline. Fakes implement the real trait, with no mocking crates. Table tests only when the logic is identical. Cover error paths. No `test_` prefix.
 - Before committing a new rule, break it once and see a test fail, then check the break applied. Assert an error's key or whole message, not a prefix.
+- Give options and flags values that differ from each other and from the defaults, so a swapped or hard-coded argument fails a test (two booleans: one case with each set alone). Test an input that can fail two ways with both faults at once. When tests move down a layer, keep one in the upper layer that proves an error from below is not swallowed.
 - Write `# Errors`, `# Panics` and `# Safety` sections. Examples must compile.
 - Each `unsafe` block carries a `// SAFETY:` reason.
 - Any interface change updates reference and tutorial docs. They describe the code at this commit: every default, refusal and name they state has a code path and a test, and after a rename or a rule change the old wording is searched for and removed. Decisions get an ADR.
