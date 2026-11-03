@@ -7,26 +7,37 @@ description: Use this skill whenever asked to build an approved stack of PRs or 
 
 Build the approved stack one PR at a time. The user has approved the plan, so do not stop to ask between PRs. Stop only for an escalation (below).
 
-## Before starting
+## Who does what
 
-Read `${CLAUDE_PLUGIN_ROOT}/conventions/digests/<language>.md` for the project language (`python` or `rust`). Load the full conventions only when a digest line is unclear.
+- **You, the main session**, orchestrate. You write briefs, run the review, discuss findings with the user and rule on disputes. You are the neutral party between the builder and the reviewer.
+- **The `builder` agent** writes the commits and runs every mechanical check. It returns a summary.
+- **The `adversarial-reviewer` agent** reviews the draft. It saves its report and returns a digest.
 
 ## The loop
 
 The stack starts as draft PRs. For each PR, bottom to top:
 
-1. Switch to its branch (`gh stack switch`). Write the tests, the code and the docs for its unit as the several atomic commits the plan lists (see `conventions/full/git.md`), not one. If the list changes, change it in the PR description. If it completes an ADR's work, commit that ADR from `.claude/adrs/` as `implemented`, with its next free number, the `Implemented` date and its index row. Add the changelog entry and bump the version one step from the PR below it.
-2. Run `just check` until it passes, then run it at every commit of the PR (`git rebase -x 'just check' <base>`), not only the tip. A commit that fails alone is not atomic, so split or reorder it.
-3. Run `pr-prep`. The reviewer reviews the draft until it returns `CLEAR`.
-4. Mark the PR ready (`gh pr ready`). Ready means the agent has cleared it and the user may review. A ready PR is never returned to draft.
-5. Start the next PR straight away. While the user reviews PR N, you build PR N+1 and the reviewer reviews it. Do not wait on the user.
-6. Repeat until every PR is ready, reviewed and approved.
+1. **Brief.** Start a fresh `builder` for the PR with a brief: the branch and its base, the PR number, the plan's commit list, the ADRs it completes, the issues it closes and their acceptance, and anything a lower PR decided that this one depends on.
+2. **Build.** The builder writes the commits, runs the checks and returns its summary. If the commit list changed, update the PR description.
+3. **Review.** Run `pr-prep`. The reviewer returns a digest.
+4. **Discuss.** Settle each finding, in the mode for the session (below): fix it, decline it with a reason, or defer it as a GitHub issue. Set its outcome in the log.
+5. **Fix brief.** Send the fixes to the same builder: the report path, the findings to fix, the findings declined and why, and any ruling the user made. It pushes nothing and returns a new summary.
+6. **Re-review.** `pr-prep` runs a targeted re-review of the fixups. Repeat from step 4 until the reviewer returns `CLEAR`. Three rounds is a cap, not a target: if the third is not `CLEAR`, stop and bring the user in.
+7. **Ready.** Mark the PR ready (`gh pr ready`). Ready means the agent has cleared it and the user may review. A ready PR is never returned to draft.
+8. **Next.** Start the next PR straight away, with a fresh builder. While the user reviews PR N, you build PR N+1. Do not wait on the user.
 
-Fixes and rebases: use `git commit --fixup=<sha>` for changes to an earlier commit, push the fixups as they are (do not autosquash yet), and run `gh stack rebase` so upper branches carry lower changes.
+Repeat until every PR is ready, reviewed and approved.
+
+Fixes and rebases: the builder makes changes to an earlier commit as `git commit --fixup=<sha>` and restacks with `gh stack rebase`, so upper branches carry lower changes. Push the fixups as they are (do not autosquash yet).
+
+### Modes
+
+- **Discuss** (the default). The user is present. Report each digest line to the user before the fix brief, with your recommendation, and agree what to do.
+- **Delegated.** The user has said to carry on without them. Use your own judgement on each finding. Dispute a finding you think is wrong once with the reviewer, with evidence; if it still holds, decide it yourself and log a `dissent` line. Every escalation below still stops the build. At the end of the stack, report every finding you declined, deferred or disputed.
 
 ## Human review
 
-Comments arrive in the dialogue, not as PR replies. Never reply to, resolve or react to PR comments or reviews. Discuss each with the user, then push the agreed fixups. If a comment needs a major rework of the PR, run `pr-prep` again. Otherwise there is no further agent review.
+Comments arrive in the dialogue, not as PR replies. Never reply to, resolve or react to PR comments or reviews. Discuss each with the user, then send the agreed fixes as a fix brief to that PR's builder (or a fresh one, if it has ended) and push the fixups. If a comment needs a major rework of the PR, run `pr-prep` again. Otherwise there is no further agent review.
 
 When the user edits a PR description before marking it ready, compare the edit with your draft. A pattern in what they cut or rewrote is feedback for `writing.md`: raise it at the retro.
 
@@ -65,10 +76,10 @@ Run `just check` on the new tip, and remove "Stacked on #N" from the PR descript
 Bring the user in, with the options and a recommendation, when:
 
 - **A decision is irreversible or outward-facing**: pushing, opening or merging PRs, deleting, publishing. Ask first, unless the plan already authorised it.
-- **The builder disagrees with the reviewer**: dispute it once, with evidence (run something where you can). If the reviewer still holds, the user decides. Once they have ruled, log a `dissent` line saying who was right.
+- **The builder or you disagree with the reviewer**: dispute it once, with evidence (have the builder run something where it can). If the reviewer still holds, the user decides (in delegated mode, you decide and report it at the end). Once it is ruled, log a `dissent` line saying who was right.
 - **The plan or an ADR no longer holds**: stop that PR and bring the options. Do not quietly change the design.
 - **Conventions conflict** with each other, or with the tooling.
-- **Spiral**: the same failure after three attempts, or a third review round on one PR.
+- **Spiral**: the builder reports the same failure after three attempts, or a third review round on one PR is not `CLEAR`.
 - **User-visible behaviour is ambiguous** and the plan does not say.
 
 Do not stop for anything the checklist already settles. When blocked on one PR, stop it, note it, and carry on with work that does not depend on it. Speed to the retro matters more than a perfect stack: defer non-blocking problems as GitHub issues and raise them there.
