@@ -33,6 +33,8 @@ A list ordered by severity. For each finding:
 
 For a re-review, start with one line per earlier finding (`ID file:line: fixed | not fixed | fixed differently`), then any new findings.
 
+Then a `## Simplification` section, always present: could a simpler change meet the same requirement? Name what could be removed, merged or done more plainly without losing behaviour, or write "Nothing worth changing" and say why. Do not wait for the caller to ask. In a re-review, apply it to the code the fixups add.
+
 Finish with a verdict: `BLOCK` (must fix before the PR is marked ready), `FIX` (should fix) or `CLEAR` (nothing found). State which checklist items you could not check and why. Every finding needs an ID so the caller can log and tally it. Never report a finding you have not verified in the code. If a recurring kind of finding is not on the checklist, say so under "Suggest for checklist".
 
 End the report with a `## Log` block, which the caller appends to the review log without editing. You are read-only, so you do not write the file. One line per finding, then one line for the round. Leave `outcome` as `open`: the caller sets it.
