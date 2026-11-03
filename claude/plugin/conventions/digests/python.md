@@ -8,7 +8,7 @@ For the executor. Mechanical rules are enforced by `just check`, so run it befor
 - Data classes: frozen `attrs`, data only. Change with `attrs.evolve`.
 - Enums, not string literals, for states, types and formats. Use `match` with `typing.assert_never`.
 - Test an enum by pinning each name to its value (`{m.name: m.value for m in E} == {...}`), not the set of values. A set passes when two values are swapped.
-- Fail fast. Specific exceptions from the package's `exceptions.py`, with context. Log `event_name` plus key-value pairs once, then re-raise.
+- Fail fast. Never catch `Exception` or `BaseException`, or use a bare `except:`. Name the classes (see the `Raises:` of what the `try` calls), so an unexpected error fails the run. A handler that always re-raises is fine, and so is `raise NewError(...) from e`. Specific exceptions from the package's `exceptions.py`, with context. Log `event_name` plus key-value pairs once, then re-raise.
 - Log levels: DEBUG flow, INFO milestones, WARNING handled, ERROR task failed, CRITICAL cannot continue.
 - Orchestrators sequence calls and contain no business `if`. Decisions live in core.
 - Only the composition root imports both core and adapters.

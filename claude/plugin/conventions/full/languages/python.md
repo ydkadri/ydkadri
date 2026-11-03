@@ -739,12 +739,14 @@ raise ParseError("Missing header")
 
 ### Catching Specific Exceptions
 
-**Always catch specific exceptions, never use bare `except Exception`.**
+**Never catch `Exception` or `BaseException`, and never use a bare `except:`. Name the classes you expect.**
 
-Catching `Exception` is too broad and hides bugs by catching everything including `KeyboardInterrupt` and `SystemExit`.
+Catching `Exception` handles an unexpected error as if it were an expected one. A typo, an `AttributeError` or a bug in a dependency becomes a "failed item" or a log line, and the run goes on. Naming the classes means everything else fails the run.
+
+Take the names from the `Raises:` of what the `try` calls. If a callee does not document what it raises, fix the docstring first.
 
 ```python
-# ✅ CORRECT - Catch specific exceptions
+# ✅ CORRECT - Name the classes
 try:
     data = parse_file(path)
 except FileNotFoundError:
@@ -753,45 +755,54 @@ except FileNotFoundError:
 except ParseError as e:
     log.error("parsing_failed", path=str(path), error=str(e))
     raise
-except PermissionError:
-    log.error("permission_denied", path=str(path))
-    raise
 
-# ✅ CORRECT - Multiple specific exceptions
-try:
-    result = process_data(data)
-except (ValidationError, ParseError) as e:
-    log.error("data_processing_failed", error=str(e))
-    raise
+# ✅ CORRECT - A group of expected failures, so one item fails and the others still run
+ITEM_FAILURES = (ParseError, ValidationError, CommitConflictError)
 
-# ❌ INCORRECT - Too broad
-try:
-    result = process_data(data)
-except Exception as e:  # Catches everything
-    log.error("something_failed", error=str(e))
-    raise
+for item in items:
+    try:
+        process(item)
+    except ITEM_FAILURES:
+        log.exception("item_failed", item=item.name)
+        failures.append(item.name)
+
+# ❌ INCORRECT - A bug in process() is logged as a failed item and the run goes on
+for item in items:
+    try:
+        process(item)
+    except Exception:
+        log.exception("item_failed", item=item.name)
+        failures.append(item.name)
 ```
 
-**When you must catch broadly** (e.g., top-level error handler), catch specific groups:
+**A handler that always re-raises may be broad.** It swallows nothing, so it may log or close down first:
 
 ```python
-# At application boundary only
+# ✅ CORRECT - Closes down, then lets the error through
 try:
     run_application()
-except MyPackageError as e:
-    # Catch only our application errors
-    log.exception("application_error")
-    sys.exit(1)
-except KeyboardInterrupt:
-    # Handle Ctrl+C gracefully
-    log.info("interrupted_by_user")
-    sys.exit(130)
+except Exception:
+    log.exception("application_failed")
+    shutdown_workers()
+    raise
 ```
+
+**Wrap with `from`.** A bare `raise` re-raises the same exception with its traceback. `raise NewError(...) from e` raises a different exception and keeps the original as its cause, so the traceback shows both. Use it to turn a library error into one of the package's own:
+
+```python
+# ✅ CORRECT - The caller gets our error, and the original is the cause
+try:
+    table.update_schema().commit()
+except ValidationError as e:
+    raise TableError(f"table {name!r}: cannot change the schema") from e
+```
+
+Without `from`, Python still chains the two, but the traceback says "During handling of the above exception, another exception occurred", which reads as a second failure.
 
 **Why this matters:**
 - Specific exceptions document what can go wrong
+- An unexpected error fails the run, so a bug is seen the first time it happens
 - Forces you to think about error cases
-- Prevents hiding bugs (typos, attribute errors, etc.)
 - Makes debugging easier
 
 ## Type Hints
