@@ -9,7 +9,7 @@ Turn a user outcome into a stack of draft PRs the user can approve before any co
 
 ## Step 1: Orient
 
-Before asking anything, read what exists: `CLAUDE.md`, `ROADMAP.md`, the ADR index and open issues. Check `main` passes `just check`. If there is no justfile, or `just check` fails on `main`, stop and say so: the first stack is bringing the project up to standard by hand against the template in `${CLAUDE_PLUGIN_ROOT}/templates/`, or a fix for `main`. Automated adoption is not available yet.
+Before asking anything, have the `Explore` agent read what exists (`CLAUDE.md`, `ROADMAP.md`, the ADR index, open issues and the code the outcome touches) and return a summary. Keep its conclusion, not the files: this session will build the stack too, and everything it reads stays in its context. Check `main` passes `just check`. If there is no justfile, or `just check` fails on `main`, stop and say so: the first stack is bringing the project up to standard by hand against the template in `${CLAUDE_PLUGIN_ROOT}/templates/`, or a fix for `main`. Automated adoption is not available yet.
 
 ## Step 2: Triage
 
@@ -32,3 +32,5 @@ Split the work into small PRs, each one reviewable unit that passes `just check`
 Create the branches with `gh stack init` and `gh stack add`. Each PR description states its part of the plan, and the design choices to review. The ADR drafts stay local until `build-stack` commits each one in the PR that completes its work. A branch with no ADR starts from an empty commit, `git commit --allow-empty -m "Start: <title>"`, so it can be opened as a PR. Autosquash drops these later. Submit with `gh stack submit --auto`, which opens the PRs as drafts. Give the user the stack link and wait for approval.
 
 Asking first is required: submitting pushes code and opens PRs. Approval authorises `build-stack` to push the stack's branches and mark PRs ready. It does not authorise merging: wait until the user says to merge.
+
+Once the user approves, ask them to check the context size with `/context`. Over 100k tokens, have them `/clear` before `build-stack`. The plan survives a clear, because it is in the PR descriptions and the ADR drafts, and the approval stands, because the PRs are open. In the new session the user names the stack and the mode (discuss or delegated).
