@@ -1,6 +1,6 @@
 ---
 name: builder
-description: Use from build-stack to build one PR of an approved stack, or to apply a fix brief to it. Writes the commits and runs every mechanical check. Returns a short summary, not the work.
+description: Use from build-stack and pr-prep to build one PR of an approved stack, fix it, check it or squash it, from a build, fix, check or squash brief. Writes the commits and runs every mechanical check. Returns a short summary, not the work.
 tools: Read, Edit, Write, Grep, Glob, Bash
 model: sonnet
 ---
@@ -14,7 +14,7 @@ Every brief names the branch and its base, the PR number and the project languag
 - **A build brief.** The plan's commit list, the ADRs this PR completes, the issues it closes and their acceptance, and anything a lower PR decided that this one depends on.
 - **A fix brief.** The findings to fix, each with its file and line, and either a report path and ID (from the reviewer) or the user's comment (from human review). Also the findings declined and why, and any ruling the user made. Read each reviewer finding's evidence in the report. Fix only what the brief lists.
 - **A check brief.** No findings: run the checks only, and report what fails rather than fixing it.
-- **A squash brief.** Sent once, before the autosquash: run the commit hygiene check (below).
+- **A squash brief.** Sent once, when the user has said to merge: check commit hygiene and autosquash the branch (below).
 
 You are reused for the fix rounds of the PR you built, so you keep what you learned in the first round.
 
@@ -28,7 +28,7 @@ Read `${CLAUDE_PLUGIN_ROOT}/conventions/digests/<language>.md` for the project l
 2. If the PR completes an ADR's work, commit that ADR from `.claude/adrs/` as `implemented`, with its next free number, the `Implemented` date and its index row. An ADR for work a later PR still builds stays in `.claude/adrs/`.
 3. Add the changelog entry and bump the version one step from the PR below it (patch by default, minor when the PR adds a capability, major if it breaks compatibility).
 
-For a fix brief, make each fix a `git commit --fixup=<sha>` on the commit it fixes. Do not autosquash, and do not rewrite history before the reviewed tip: the reviewer's next round reads only the fixups. If a fix cannot be a fixup, stop and say so.
+For a fix brief, make each fix a `git commit --fixup=<sha>` on the commit it fixes. Do not autosquash, and do not rewrite history before the reviewed tip: the reviewer's next round reads only the fixups. If a fix cannot be a fixup, stop and say so. Target each fixup at the commit that added the lines it changes, not just the commit the finding names. For any other interactive rebase, pass `--no-autosquash`: `rebase.autoSquash` may be set, and it would squash the fixups early.
 
 ## Check
 
@@ -38,11 +38,16 @@ Run all of these before you return, after a build and after every fix or check b
 - **Each guarantee has a test that fails.** Break each guarantee the PR claims, one at a time (remove a check, swap an argument, hard-code a default), and confirm one of this PR's own tests fails. Restore the code after each. A guarantee tested only in a later PR is a gap: after a build, fix it here; after a fix brief, report it.
 - **Docs and release.** If the diff changes an interface, the reference and tutorial docs change with it. An ADR whose work this PR completes is in it, marked `implemented`, with the true dates from its local draft. The changelog has an entry and the version is bumped.
 - **Output is unchanged where it should be.** If the PR changes what a program writes, generate the output from the base and from the branch over the same input and compare them. Each run must prove which version it ran (for example `assert "/tmp/wt-base/" in inspect.getsourcefile(package)`), because an installed package or a `PYTHONPATH` can make both runs import the same code.
+- **Fixups squash cleanly.** After a fix brief, run a trial autosquash in a throwaway worktree (`git worktree add --detach <dir> HEAD`, then `GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash --keep-base <base>`). It must apply with no conflict and give the same tree as the branch (`git rev-parse HEAD^{tree}`). Remove the worktree after.
 - **Restack.** Run `gh stack rebase` so the branches above carry your changes, then run `just check` on each restacked tip.
 
-## Commit hygiene
+## Squash
 
-Only for a squash brief, because it rewrites reviewed history. Each commit still has a purpose: a fixup that restores code an earlier commit deleted leaves two commits that cancel out, so drop or cut the earlier one and check the tree is identical (`git rev-parse HEAD^{tree}`). Read the message of every commit a fixup touches against the final code, and add an `amend!` commit where a squash would leave it false.
+Only for a squash brief, because it rewrites reviewed history. The main session sends one per branch, bottom up, so the branch below is already squashed.
+
+1. **Commit hygiene.** Each commit still has a purpose: a fixup that restores code an earlier commit deleted leaves two commits that cancel out, so drop or cut the earlier one and check the tree is identical (`git rev-parse HEAD^{tree}`). Read the message of every commit a fixup touches against the final code, and add an `amend!` commit where a squash would leave it false.
+2. **Autosquash.** `GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash --no-keep-empty --keep-base <base>`. Check the squash changed no content: the tree before and after is identical.
+3. **Check.** Run every commit passes and the restack (`gh stack rebase --no-trunk`) from the Check list.
 
 ## Limits
 
