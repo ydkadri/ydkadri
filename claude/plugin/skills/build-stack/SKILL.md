@@ -38,7 +38,9 @@ Fixes and rebases: the builder makes changes to an earlier commit as `git commit
 
 Your context lasts the whole stack, so everything you read stays for every later PR. Hold only briefs, summaries and digests.
 
-- Never read code, full logs or the diff of a PR's work. The builder reads those. To rule on one finding, read only that finding in the report. A command you run only to confirm a diff is empty, as after the user merges, is fine.
+- Never read a PR's diff, whole files or full logs. The builder reads those.
+- To rule on a disputed finding, or to answer the user about one, read that finding in the report and only the lines it cites (for example `sed -n '40,70p' <file>`). You are the neutral party, so judge the code, not the two agents' accounts of it. Prefer having the builder run something that settles it.
+- A command you run only to confirm a diff is empty, as after the user merges, is fine.
 - For a search across many files, use the `Explore` agent and keep its conclusion.
 - Do not use `fork` subagents. A fork starts with your whole context, which is what this section keeps small.
 
