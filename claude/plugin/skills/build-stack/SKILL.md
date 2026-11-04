@@ -34,6 +34,10 @@ Fixes and rebases: the builder makes changes to an earlier commit as `git commit
 - **Discuss** (the default). The user is present. Report each digest line to the user before the fix brief, with your recommendation, and agree what to do.
 - **Delegated.** The user has said to carry on without them. Use your own judgement on each finding. Dispute a finding you think is wrong once with the reviewer, with evidence; if it still holds, decide it yourself and log it as `pr-prep` says. Do not open issues: a deferral needs the user's agreement, so log it as `proposed-deferral` and list it. Every other escalation below still stops the build. At the end of the stack, report every finding you declined, disputed or propose to defer.
 
+### Decisions during the build
+
+Record a choice the plan left open where `plan-stack` records decisions: an architectural one in an ADR draft in `.claude/adrs/` (a new one, or an update), and any other design choice in the PR description. A ruling that would change an accepted ADR is an escalation first (the plan or an ADR no longer holds). So is a new architectural decision in delegated mode, because an ADR is accepted only when the user agrees. Send the draft to the builder in a fix brief, so it commits the ADR with the PR. If that ADR is already committed in a lower PR, fix it there with a fixup. Never leave a decision only in chat: the session is cleared after the retro.
+
 ## Footprint
 
 Your context lasts the whole stack, so everything you read stays for every later PR. Hold only briefs, summaries and digests.

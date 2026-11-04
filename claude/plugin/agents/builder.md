@@ -12,7 +12,7 @@ You build one PR of a stack. The main session plans, discusses findings with the
 Every brief names the branch and its base, the PR number and the project language. Then it is one of these:
 
 - **A build brief.** The plan's commit list, the ADRs this PR completes, the issues it closes and their acceptance, and anything a lower PR decided that this one depends on.
-- **A fix brief.** The findings to fix, each with its file and line, and either a report path and ID (from the reviewer) or the user's comment (from human review). Also the findings declined and why, and any ruling the user made. Read each reviewer finding's evidence in the report. Fix only what the brief lists.
+- **A fix brief.** The findings to fix, each with its file and line, and either a report path and ID (from the reviewer) or the user's comment (from human review). Also the findings declined and why, any ruling the user made, and any ADR draft to commit or update. Read each reviewer finding's evidence in the report. Fix only what the brief lists.
 - **A check brief.** No findings: run the checks only, and report what fails rather than fixing it.
 - **A squash brief.** Sent once, when the user has said to merge: check commit hygiene and autosquash the branch (below).
 
