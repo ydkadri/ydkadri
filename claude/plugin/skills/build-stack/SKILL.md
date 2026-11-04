@@ -23,7 +23,7 @@ The stack starts as draft PRs. For each PR, bottom to top:
 4. **Ready.** Mark the PR ready (`gh pr ready`). Ready means the agent has cleared it and the user may review. A ready PR is never returned to draft.
 5. **Next.** Start the next PR straight away, with a fresh builder. While the user reviews PR N, you build PR N+1. Do not wait on the user.
 
-Run one builder at a time, and wait for its summary before starting another: builders share the checkout, and each switches branches and restacks.
+Run one agent that uses the checkout at a time, a builder or the reviewer, and wait for it to return before starting another: builders switch branches and restack, and the reviewer reads `HEAD`.
 
 Repeat until every PR is ready, reviewed and approved.
 
@@ -50,16 +50,9 @@ When the user edits a PR description before marking it ready, compare the edit w
 
 ## Finishing
 
-Once every PR is approved and the user says to merge, send each PR's builder (or a fresh one) a squash brief, so it checks commit hygiene. Then autosquash from the bottom up, restacking after each branch. This folds fixups into the commits they fix and leaves the atomic commits as they are:
+Once every PR is approved and the user says to merge, squash from the bottom up. For each branch in turn, send its builder (or a fresh one) a squash brief and wait for its summary. The builder checks commit hygiene, autosquashes (which folds fixups into the commits they fix and leaves the atomic commits as they are), confirms no content changed, and restacks the branches above.
 
-```bash
-git switch <lowest-branch>
-GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash --no-keep-empty --keep-base <trunk>
-gh stack rebase --no-trunk
-# then the next branch, using the branch below it as the base
-```
-
-Check each squash changed no content (`git diff <sha-before> <sha-after>` is empty), then `gh stack push` and `gh stack merge --rebase`. Run the `retro` skill after the last merge.
+Then `gh stack push` and `gh stack merge --rebase`. Run the `retro` skill after the last merge.
 
 ## After the user merges
 
@@ -82,11 +75,11 @@ Run `just check` on the new tip, and remove "Stacked on #N" from the PR descript
 
 Bring the user in, with the options and a recommendation, when:
 
-- **A decision is irreversible or outward-facing**: pushing, opening or merging PRs, deleting, publishing. Ask first, unless the plan already authorised it.
+- **A decision is irreversible or outward-facing**: pushing, opening or merging PRs, deleting, publishing. Ask first, unless the plan already authorised it. An approved stack authorises pushing its branches and marking its PRs ready (see `plan-stack`), not merging.
 - **The builder or you disagree with the reviewer**: dispute it once, with evidence (have the builder run something where it can). If the reviewer still holds, the user decides. Once it is ruled, log a `dissent` line saying who was right. In delegated mode this one does not stop the build: see Modes.
 - **The plan or an ADR no longer holds**: stop that PR and bring the options. Do not quietly change the design.
 - **Conventions conflict** with each other, or with the tooling.
 - **Spiral**: the builder reports the same failure after three attempts, or a third review round on one PR is not `CLEAR`.
 - **User-visible behaviour is ambiguous** and the plan does not say.
 
-Do not stop for anything the checklist already settles. When blocked on one PR, stop it, note it, and carry on with work that does not depend on it. Speed to the retro matters more than a perfect stack: defer non-blocking problems as GitHub issues and raise them there.
+Do not stop for anything the checklist already settles. When blocked on one PR, stop it, note it, and carry on with work that does not depend on it. Speed to the retro matters more than a perfect stack: defer non-blocking problems as GitHub issues and raise them there. In delegated mode, propose them instead (see Modes).
