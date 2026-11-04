@@ -38,11 +38,11 @@ Open a PR for the change through the normal workflow. Prefer a quick fix now, or
 
 ## Close the feature
 
-Each feature runs in its own session, and the user clears it after the retro. Anything that lives only in this session is lost, and review history does not carry over: only a one-line tally does. The retro PR belongs to the feature: build it with the `build-stack` loop, with no retro of its own. Its reviews are written to the plugin repo's `.claude/`, because that is where the retro PR lives. When the feature is in another repo, step 3 deletes them there too.
+A session holds at most one feature, and the user clears it after the retro. Anything that lives only in this session is lost, and review history does not carry over: only a one-line tally does. The retro PR belongs to the feature: build it with the `build-stack` loop, with no retro of its own. Its reviews are written to the plugin repo's `.claude/`, because that is where the retro PR lives. When the feature is in another repo, step 3 deletes them there too.
 
 In this order:
 
-1. **Pre-clear check.** Read the log and the session, and check nothing lives only here:
+1. **Pre-clear check.** Read the log (and, for a feature in another repo, the retro PR's lines in the plugin repo's log) and the session, and check nothing lives only here:
    - **Decisions.** Every architectural decision is in an ADR, and every other design choice is in its PR's description, not only in chat.
    - **Deferred work.** Every `deferred` and `proposed-deferral` outcome has a GitHub issue the user agreed to. Every finding still `open` is given an outcome, or an issue if the user wants one.
    - **Lessons.** Every correction the user made is in a convention, the checklist or memory.
@@ -50,6 +50,6 @@ In this order:
    - **Work.** No branch or worktree has unpushed commits, and no PR of this feature, the retro PR included, is still open.
 
    Fix what is missing. Merge any open PR once the user says to, as in `build-stack` Finishing.
-2. **Tally.** Append one line to `.claude/review-tally.md` (untracked): `<date> | <feature> | <PRs> | <rounds> | <ID>x<count>, ...`. Count only findings whose outcome is not `false-positive`. For example `2026-11-04 | token efficiency | #70-#72 | 5 | COM-09x3, COM-16x1`.
+2. **Tally.** Append one line to `.claude/review-tally.md` (untracked): `<date> | <feature> | <PRs> | <rounds> | <ID>x<count>, ...`. Count only findings whose outcome is not `false-positive`, from both logs. For example `2026-11-04 | token efficiency | #70-#72 | 5 | COM-09x3, COM-16x1`.
 3. **Delete, once the user agrees.** Deleted untracked files cannot be recovered, so ask first. Then delete the feature's reports and log (`.claude/reviews/` and `.claude/review-log.md`), in the feature's repo and, for the retro PR, in the plugin repo, and the drafts in `.claude/adrs/` that are now committed.
 4. **Clear.** Tell the user the feature is closed and to run `/clear`, so the next feature starts in a fresh session.
