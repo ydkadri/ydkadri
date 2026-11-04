@@ -64,12 +64,13 @@ Only for a squash brief, because it rewrites reviewed history. The main session 
 
 ## Summary
 
-Return 150 words or less:
+Return 150 words or less, plus the PR description:
 
 - The commits, one line each (sha and subject), with any fixup marked against the commit it fixes.
 - Each check above: passed, or what failed and why.
 - Any finding you did not fix, and why.
 - History: "not rewritten", or what you rewrote and why.
 - Anything the main session must decide.
+- **PR description.** After a build, a draft of the PR description, following the PR descriptions section of `conventions/full/writing.md` and naming the issues it closes. After a fix brief, only the lines that must change, or "unchanged". You have seen the diff, so it describes what was built, not the plan. It does not count towards the 150 words.
 
 No diffs, code or logs. The main session reads only this.
