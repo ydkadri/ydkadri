@@ -84,6 +84,7 @@ Bring the user in, with the options and a recommendation, when:
 - **A decision is irreversible or outward-facing**: pushing, opening or merging PRs, deleting, publishing. Ask first, unless the plan already authorised it. An approved stack authorises pushing its branches and marking its PRs ready (see `plan-stack`), not merging.
 - **The builder or you disagree with the reviewer**: dispute it once, with evidence (have the builder run something where it can). If the reviewer still holds, the user decides. Once it is ruled, log a `dissent` line saying who was right. In delegated mode this one does not stop the build: see Modes.
 - **The plan or an ADR no longer holds**: stop that PR and bring the options. Do not quietly change the design.
+- **A new architectural decision** the plan left open: the user accepts every ADR, so bring the draft to them. In discuss mode, agree it in the dialogue; in delegated mode, stop that PR.
 - **Conventions conflict** with each other, or with the tooling.
 - **Spiral**: the builder reports the same failure after three attempts, or a third review round on one PR is not `CLEAR`.
 - **User-visible behaviour is ambiguous** and the plan does not say.
