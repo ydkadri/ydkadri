@@ -54,7 +54,7 @@ When the user edits a PR description before marking it ready, compare the edit w
 
 Once every PR is approved and the user says to merge, squash from the bottom up. For each branch in turn, send its builder (or a fresh one) a squash brief and wait for its summary. The builder checks commit hygiene, autosquashes (which folds fixups into the commits they fix and leaves the atomic commits as they are), confirms no content changed, and restacks the branches above.
 
-Then `gh stack push` and `gh stack merge --rebase`. Run the `retro` skill after the last merge.
+Then `gh stack push` and `gh stack merge --rebase`. After the last merge, run the `retro` skill. It ends by telling the user to `/clear`, so the next feature starts in a fresh session.
 
 ## After the user merges
 

@@ -18,6 +18,6 @@ Always-on rules, injected at session start by the mine plugin. Procedures live i
 - Stop and ask for irreversible or outward-facing actions, after one dispute with the reviewer, when the plan or an ADR no longer holds, and on a third failure or a third review round that is not CLEAR. The full list is in `build-stack`. Otherwise keep moving.
 - Record architectural decisions as ADRs.
 - Defer nothing silently. Open a GitHub issue for deferred work.
-- At the end of a feature, run the `retro` skill.
+- Work on at most one feature per session. At a feature's end, run the `retro` skill: it checks nothing lives only in the session, then the user runs `/clear`.
 
 Skills: `project-init`, `plan-stack`, `build-stack`, `pr-prep`, `retro`.
