@@ -17,7 +17,7 @@ A PR is not marked ready until this passes. This is the main session's part. The
    - **Scope.** Findings must be caused by the fixups, but they may be anywhere. The reviewer reads whatever it needs to check that unchanged code is not broken (callers, tests that pass for the wrong reason, docs that are now false).
 
    Each round's report and log block are saved the same way. Repeat until `CLEAR`. Three rounds is a cap, not a target: if the third is not `CLEAR`, stop and bring the user in (see `build-stack`). When the user is present, report the reviewer's findings to them before sending the fix brief.
-5. PR description: follow the PR descriptions section of `conventions/full/writing.md`. Name the issues it closes.
+5. PR description: use the builder's draft. Check it against the plan and the findings settled, follow the PR descriptions section of `conventions/full/writing.md`, and name the issues it closes.
 
 ## Review log
 
