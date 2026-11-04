@@ -32,7 +32,7 @@ Fixes and rebases: the builder makes changes to an earlier commit as `git commit
 ### Modes
 
 - **Discuss** (the default). The user is present. Report each digest line to the user before the fix brief, with your recommendation, and agree what to do.
-- **Delegated.** The user has said to carry on without them. Use your own judgement on each finding. Dispute a finding you think is wrong once with the reviewer, with evidence; if it still holds, decide it yourself and log a `dissent` line marked `decided by main session`, so the retro checks your ruling. Do not open issues: a deferral needs the user's agreement, so list each one you propose. Every other escalation below still stops the build. At the end of the stack, report every finding you declined, disputed or propose to defer.
+- **Delegated.** The user has said to carry on without them. Use your own judgement on each finding. Dispute a finding you think is wrong once with the reviewer, with evidence; if it still holds, decide it yourself and log it as `pr-prep` says. Do not open issues: a deferral needs the user's agreement, so log it as `proposed-deferral` and list it. Every other escalation below still stops the build. At the end of the stack, report every finding you declined, disputed or propose to defer.
 
 ## Footprint
 
