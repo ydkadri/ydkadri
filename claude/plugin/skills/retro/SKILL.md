@@ -9,7 +9,8 @@ Close each feature by improving the workflow. The output is edits to the plugin,
 
 ## Gather
 
-- The review log, `.claude/review-log.md`, and the saved round reports in `.claude/reviews/` (or wherever the reports were saved). If there is no log, tally the reports. Tally findings by checklist ID. An ID flagged in two or more PRs belongs in the executor digest, and in a lint rule if a tool can check it. An ID that is mostly `false-positive`, or never flagged, is a candidate to reword or drop.
+- The review log, `.claude/review-log.md`, and the saved round reports in `.claude/reviews/`. If there is no log, tally the reports. Tally findings by checklist ID. An ID flagged in two or more PRs belongs in the executor digest, and in a lint rule if a tool can check it. An ID that is mostly `false-positive`, or never flagged, is a candidate to reword or drop.
+- The tally of earlier features, `.claude/review-tally.md`. An ID in this feature's log that also appears in an earlier line is a repeat: flag it. Either the last change for it did not hold, or it was judged a one-off then and is worth another look.
 - `dissent` lines in the log: where the main session or the builder disputed the reviewer. A line marked `decided by main session` was ruled without the user: check it first. Decide who was right and change the checklist or the behaviour.
 - Round counts and reviewer timings per PR: which PRs needed more than two rounds, and why.
 - The user's PR comments (`gh pr view --comments`, `gh api` for review threads). These are read, not replied to.
@@ -34,3 +35,10 @@ Edit the plugin source in this repo, never the installed copy:
 - Then `claude plugin update mine@ydkadri` on each machine.
 
 Open a PR for the change through the normal workflow. Prefer a quick fix now, or a GitHub issue for later, over holding the retro open until everything is settled.
+
+## Close the feature
+
+Review history is per feature. Only a one-line tally carries forward, so the next retro can spot IDs that keep coming back.
+
+1. Append one line to `.claude/review-tally.md` (untracked): `<date> | <feature> | <PRs> | <rounds> | <ID>x<count>, ...`. Count only findings whose outcome is not `false-positive`. For example `2026-11-04 | token efficiency | #70-#72 | 5 | COM-09x3, COM-16x1`.
+2. Ask the user, because deleted untracked files cannot be recovered. Then delete this feature's reports and log (`.claude/reviews/` and `.claude/review-log.md`), and the drafts in `.claude/adrs/` that are now committed.

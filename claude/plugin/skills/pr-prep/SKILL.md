@@ -23,7 +23,7 @@ A PR is not marked ready until this passes. This is the main session's part. The
 
 The reviewer writes the log: it appends one block per round in the format below, with every outcome `open`. You set each finding's outcome once it is agreed, editing its line, and add a `dissent` line when one is ruled. Run the reviewer through this skill, not by calling the agent directly, or no outcome is set and the `retro` tallies open findings.
 
-`.claude/review-log.md` and `.claude/reviews/` are untracked. Make sure both are in `.gitignore`, and never commit them or quote them in a PR. The `retro` skill reads them. `.claude/adrs/` is untracked too: an ADR enters git only when it is copied to `docs/explanation/adr/NNNN-<slug>.md` in the PR that completes its work.
+`.claude/review-log.md`, `.claude/reviews/` and `.claude/review-tally.md` are untracked. Make sure all three are in `.gitignore`, and never commit them or quote them in a PR. The `retro` skill reads them, then deletes the log and reports at the end of the feature. `.claude/adrs/` is untracked too: an ADR enters git only when it is copied to `docs/explanation/adr/NNNN-<slug>.md` in the PR that completes its work.
 
 - Per finding, real or not: `date | branch | round | ID | file:line | severity | outcome` (`open`, then `fixed`, `false-positive`, `dissent`, `deferred #issue` or `proposed-deferral`).
 - Per round: `date | branch | round | round | base sha | reviewed sha | verdict`. The next round's `git range-diff` uses the shas.
