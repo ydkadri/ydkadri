@@ -33,4 +33,4 @@ Create the branches with `gh stack init` and `gh stack add`. Each PR description
 
 Asking first is required: submitting pushes code and opens PRs. Approval authorises `build-stack` to push the stack's branches and mark PRs ready. It does not authorise merging: wait until the user says to merge.
 
-Once the user approves, ask them to check the context size with `/context`. Over 100k tokens, have them `/clear` before `build-stack`. The plan survives a clear, because it is in the PR descriptions and the ADR drafts, and the approval stands, because the PRs are open. In the new session the user names the stack and the mode (discuss or delegated).
+Once the user approves, ask them to check the context size with `/context`. Over 100k tokens, have them `/clear` before `build-stack`. The plan survives a clear, because it is in the PR descriptions and the ADR drafts. In the new session the user names the stack and the mode (discuss or delegated).
