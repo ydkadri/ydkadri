@@ -38,7 +38,7 @@ Run all of these before you return, after a build and after every fix or check b
 - **Each guarantee has a test that fails.** Break each guarantee the PR claims, one at a time (remove a check, swap an argument, hard-code a default), and confirm one of this PR's own tests fails. Restore the code after each. A guarantee tested only in a later PR is a gap: after a build, fix it here; after a fix brief, report it.
 - **Docs and release.** If the diff changes an interface, the reference and tutorial docs change with it. An ADR whose work this PR completes is in it, marked `implemented`, with the true dates from its local draft. The changelog has an entry and the version is bumped.
 - **Output is unchanged where it should be.** If the PR changes what a program writes, generate the output from the base and from the branch over the same input and compare them. Each run must prove which version it ran (for example `assert "/tmp/wt-base/" in inspect.getsourcefile(package)`), because an installed package or a `PYTHONPATH` can make both runs import the same code.
-- **Fixups squash cleanly.** After a fix brief, run a trial autosquash in a throwaway worktree (`git worktree add --detach <dir> HEAD`, then `GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash --keep-base <base>`). It must apply with no conflict and give the same tree as the branch (`git rev-parse HEAD^{tree}`). Remove the worktree after.
+- **Fixups squash cleanly.** After a fix brief, run the squash command (below) in a throwaway worktree (`git worktree add --detach <dir> HEAD`). It must apply with no conflict, give the same tree as the branch (`git rev-parse HEAD^{tree}`), and leave each `amend!` body as the message of the commit it rewords. Remove the worktree after.
 - **Restack.** Run `gh stack rebase` so the branches above carry your changes, then run `just check` on each restacked tip.
 
 ## Squash
@@ -46,8 +46,14 @@ Run all of these before you return, after a build and after every fix or check b
 Only for a squash brief, because it rewrites reviewed history. The main session sends one per branch, bottom up, so the branch below is already squashed.
 
 1. **Commit hygiene.** Each commit still has a purpose: a fixup that restores code an earlier commit deleted leaves two commits that cancel out, so drop or cut the earlier one and check the tree is identical (`git rev-parse HEAD^{tree}`). Read the message of every commit a fixup touches against the final code, and add an `amend!` commit where a squash would leave it false.
-2. **Autosquash.** `GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash --no-keep-empty --keep-base <base>`. Check the squash changed no content: the tree before and after is identical.
-3. **Check.** Run every commit passes and the restack (`gh stack rebase --no-trunk`) from the Check list.
+2. **Autosquash.** Run the squash command:
+
+   ```bash
+   GIT_SEQUENCE_EDITOR="sed -i.bak '/ Start: /d'" git rebase -i --autosquash --keep-base <base>
+   ```
+
+   The editor drops the empty `Start:` commits. Do not use `--no-keep-empty` for that: it also drops the empty `amend!` commits, so their rewords are lost without a trace in the tree. Check the tree before and after is identical, and each `amend!` body is now its commit's message.
+3. **Check.** Run the "Every commit passes" check, then restack the branches above onto this one with `gh stack rebase --no-trunk`.
 
 ## Limits
 
