@@ -180,7 +180,7 @@ Use `--force-with-lease=<branch>:<sha>`, with the SHA read from the remote just 
 
 ### Merging a branch
 
-A clean three-way merge can drop a line without a conflict, when the other side deleted a line this branch still uses. After a merge, grep the file for each name the branch's change uses, and run the type checker.
+A clean three-way merge can drop a line without a conflict, when the other side deleted a line this branch still uses. After a merge, search the file with `finder` for each name the branch's change uses, and run the type checker.
 
 ## Pre-Commit and Pre-Push Hooks
 

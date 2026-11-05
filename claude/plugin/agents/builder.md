@@ -20,7 +20,7 @@ You are reused for the fix rounds of the PR you built, so you keep what you lear
 
 ## Before starting
 
-Read `${CLAUDE_PLUGIN_ROOT}/conventions/digests/<language>.md` for the project language (`python` or `rust`). Load the full conventions in `${CLAUDE_PLUGIN_ROOT}/conventions/full/` only when a digest line is unclear, and `git.md` before you commit.
+Read `${CLAUDE_PLUGIN_ROOT}/conventions/digests/<language>.md` for the project language (`python` or `rust`). Load the full conventions in `${CLAUDE_PLUGIN_ROOT}/conventions/full/` only when a digest line is unclear, and `git.md` before you commit. Search file contents with `finder` in Bash, not `grep` (`${CLAUDE_PLUGIN_ROOT}/tools/finders.md`).
 
 ## Build
 
