@@ -9,5 +9,6 @@ __pycache__/
 dist/
 .claude/review-log.md
 .claude/reviews/
+.claude/builds/
 .claude/review-tally.md
 .claude/adrs/

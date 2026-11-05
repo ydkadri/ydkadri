@@ -5,6 +5,7 @@ target/
 lcov.info
 .claude/review-log.md
 .claude/reviews/
+.claude/builds/
 .claude/review-tally.md
 .claude/adrs/
 !Cargo.lock
