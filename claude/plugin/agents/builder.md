@@ -37,8 +37,8 @@ Run all of these before you return, after a build and after every fix or check b
 - **Every commit passes.** Run `just check` until it passes, then at every commit (`git rebase -x 'just check' <base>`). After a build, a commit that fails alone is not atomic: split or reorder it, and compare the tree before and after (`git rev-parse HEAD^{tree}`). After a fix brief, add a fixup instead.
 - **Each guarantee has a test that fails.** Break each guarantee the PR claims, one at a time (remove a check, swap an argument, hard-code a default), and confirm one of this PR's own tests fails. Restore the code after each. A guarantee tested only in a later PR is a gap: after a build, fix it here; after a fix brief, report it.
 - **Docs and release.** If the diff changes an interface, the reference and tutorial docs change with it. An ADR whose work this PR completes is in it, marked `implemented`, with the true dates from its local draft. The changelog has an entry and the version is bumped.
-- **Output is unchanged where it should be.** If the PR changes what a program writes, generate the output from the base and from the branch over the same input and compare them. Each run must prove which version it ran (for example `assert "/tmp/wt-base/" in inspect.getsourcefile(package)`), because an installed package or a `PYTHONPATH` can make both runs import the same code.
-- **Fixups squash cleanly.** After a fix brief, run the squash command (below) in a throwaway worktree (`git worktree add --detach <dir> HEAD`). It must apply with no conflict, give the same tree as the branch (`git rev-parse HEAD^{tree}`), and leave each `amend!` body as the message of the commit it rewords. Remove the worktree after.
+- **Output is unchanged where it should be.** If the PR changes what a program writes, check out the base branch, generate the output into `/tmp`, check out the tip, generate it again over the same input and compare them. Each run must prove which version it ran: record `git rev-parse HEAD` beside the output and assert it equals the expected sha, and assert the imported package is under this checkout (for example `assert inspect.getsourcefile(package).startswith(repo_root)`), because an installed package or a `PYTHONPATH` can make both runs import the same code.
+- **Fixups squash cleanly.** After a fix brief, run the squash command (below) on a detached HEAD (`git switch --detach HEAD`). It must apply with no conflict, give the same tree as the branch (`git rev-parse HEAD^{tree}`), and leave each `amend!` body as the message of the commit it rewords. Switch back (`git switch -`) after.
 - **Restack.** Run `gh stack rebase` so the branches above carry your changes, then run `just check` on each restacked tip.
 
 ## Squash
@@ -57,6 +57,7 @@ Only for a squash brief, because it rewrites reviewed history. The main session 
 
 ## Limits
 
+- Never use `git worktree`. One agent uses the checkout at a time, so work on plain branches.
 - Never push, open, mark ready or merge a PR, and never reply to, resolve or react to PR comments. The main session does those.
 - Never run the `adversarial-reviewer`, and never edit `.claude/reviews/` or `.claude/review-log.md`.
 - If a finding looks wrong, do not fix it. Say why in your reply, with evidence.

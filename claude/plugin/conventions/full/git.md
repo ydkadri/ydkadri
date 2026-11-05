@@ -42,7 +42,7 @@ Use descriptive names that explain what the branch does, not just ticket numbers
 - One concern per commit: for example a module with its tests, a rule added to an existing module, a docs section, or an ADR status change. If the message needs "and" to describe two unrelated things, split it.
 - Code and its tests can share a commit or the tests can follow it. A commit that changes behaviour must not leave the previous tests failing.
 - Build a PR as several commits from the start. Autosquash only folds fixups into the commit they fix. It never splits, so a PR started as one commit stays one commit.
-- Check every commit, not only the tip: run `just check` at each commit of the stack (for example `git rebase -x 'just check' main`, or check each commit out in a temporary worktree). A commit that passes only when a later one is applied is not atomic.
+- Check every commit, not only the tip: run `just check` at each commit of the stack (for example `git rebase -x 'just check' main`, or check each commit out in turn with `git switch --detach <sha>`). A commit that passes only when a later one is applied is not atomic.
 - Order commits so each one only needs the ones before it. A new package that a layer contract must know about brings its contract change in the same commit, and a shared export list grows with the modules it exports.
 - Splitting history must not change content. Compare the tree before and after (`git rev-parse <branch>^{tree}`): it must be identical.
 
