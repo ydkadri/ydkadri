@@ -85,6 +85,7 @@ Run `just check` on the new tip, and remove "Stacked on #N" from the PR descript
 Bring the user in, with the options and a recommendation, when:
 
 - **A decision is irreversible or outward-facing**: pushing, opening or merging PRs, deleting, publishing. Ask first, unless the plan already authorised it. An approved stack authorises pushing its branches and marking its PRs ready (see `plan-stack`), not merging.
+- **A rewrite of commits the user has already seen**, such as a split or reorder of a PR they are reviewing: it changes the SHAs and outdates their comments. Say what will change and ask first. Routine pushes of fixups and restacks (`gh stack push`, `--force-with-lease`), the restack after a merge and the squash at Finishing are not covered.
 - **The builder or you disagree with the reviewer**: dispute it once, with evidence (have the builder run something where it can). If the reviewer still holds, the user decides. Once it is ruled, log a `dissent` line saying who was right. In delegated mode this one does not stop the build: see Modes.
 - **The plan or an ADR no longer holds**: stop that PR and bring the options. Do not quietly change the design.
 - **A new architectural decision** the plan left open: the user accepts every ADR, so bring the draft to them. In discuss mode, agree it in the dialogue; in delegated mode, stop that PR.
