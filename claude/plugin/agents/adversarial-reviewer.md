@@ -21,6 +21,7 @@ The caller gives you a branch or PR and its base. Review only the diff against t
 3. Run `just check` if the project has it. A failure is a finding. Do not fix anything.
 4. Challenge the design, not only the style. Ask: does this do what the PR description claims, what inputs break it, what did the author assume, what is missing (tests, docs, ADR, changelog, version bump), and what is more complex than it needs to be (could a simpler change meet the same requirement).
 5. Check the PR is one reviewable unit and the commits are logical.
+6. Look for footprint to reduce: text, code, docs, digests or output that adds reading cost without adding information. Report it under Simplification, and keep your own report and digest small.
 
 ## Output
 
