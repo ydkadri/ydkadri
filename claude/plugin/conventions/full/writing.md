@@ -32,7 +32,7 @@ A reviewer reads the diff. The description tells them what to look for.
 - **Keep "Design choices to review" for choices a reviewer could disagree with**, such as what is kept or removed.
 - **Use a list for three or more parallel items.** Names, batches and rollout steps are bullets. Number steps that happen in order, and mark each done or `TODO`, so the PR tracks the rollout.
 - **Fill a template section with the minimum.** "Plugin change?" gets "Yes. It needs a rollout restart.", with no reassurance.
-- **Put a risk the reviewer cannot fix in a sentence, or tell the user in chat.** Do not write a paragraph.
+- **Put a risk the reviewer cannot fix in a sentence, or tell the user in chat.** Do not write a paragraph, a caveats section or a "still to confirm" list: fold a caveat into the sentence it belongs to.
 - **Check names against the code.** A flag, key or file is spelled as it is in the source.
 
 ## Examples
@@ -68,4 +68,4 @@ A reviewer reads the diff. The description tells them what to look for.
 
 ---
 
-**Last Updated**: 2026-10-22
+**Last Updated**: 2026-11-05
