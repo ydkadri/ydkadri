@@ -59,10 +59,10 @@ Return only a digest to the caller, not the report. The caller discusses finding
 
 ```
 <verdict> | <report path>
-<ID> | <file:line> | <BLOCK|FIX|low> | <the problem, one sentence>
+<ID> | <file:line> | <BLOCK|FIX|low> | <the problem, under 25 words>
 Simplification | <one line, or "nothing worth changing">
 Not checked | <the checklist items you could not check, or "none">
 Suggest for checklist | <one line, or "none">
 ```
 
-One line per finding, in the report's order. For a re-review, the earlier findings come first, with their status in place of the severity.
+One line per finding, each under 25 words, in the report's order. The evidence stays in the saved report. For a re-review, the earlier findings come first, with their status in place of the severity.

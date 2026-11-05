@@ -10,7 +10,7 @@ Build the approved stack one PR at a time. The user has approved the plan, so do
 ## Who does what
 
 - **You, the main session**, orchestrate. You write briefs, run the review, discuss findings with the user and rule on disputes. You are the neutral party between the builder and the reviewer.
-- **The `builder` agent** writes the commits and runs every mechanical check. It returns a summary.
+- **The `builder` agent** writes the commits and runs every mechanical check. It returns a short reply and saves the rest (the commit list, check output, PR description draft) to `.claude/builds/`.
 - **The `adversarial-reviewer` agent** reviews the draft. It saves its report and returns a digest.
 
 ## The loop
@@ -18,7 +18,7 @@ Build the approved stack one PR at a time. The user has approved the plan, so do
 The stack starts as draft PRs. For each PR, bottom to top:
 
 1. **Brief.** Start a fresh `builder` for the PR with a build brief (see `agents/builder.md`): the branch and its base, the PR number, the project language, the plan's commit list, the ADRs it completes, the issues it closes and their acceptance, and anything a lower PR decided that this one depends on.
-2. **Build.** The builder writes the commits, runs the checks and returns its summary. Push the branch (`gh stack push`). If the commit list changed, update the PR description.
+2. **Build.** The builder writes the commits, runs the checks and returns a short reply that names its file in `.claude/builds/`. Push the branch (`gh stack push`). If the commit list changed, update the PR description.
 3. **Review.** Run `pr-prep`. It runs the reviewer, settles the findings in the session's mode (below), sends fix briefs to this PR's builder, pushes the fixups and re-reviews until the reviewer returns `CLEAR`.
 4. **Ready.** Mark the PR ready (`gh pr ready`). Ready means the agent has cleared it and the user may review. A ready PR is never returned to draft.
 5. **Next.** Start the next PR straight away, with a fresh builder. While the user reviews PR N, you build PR N+1. Do not wait on the user.
@@ -40,7 +40,7 @@ Record a choice the plan left open where `plan-stack` records decisions: an arch
 
 ## Footprint
 
-Your context lasts the whole stack, so everything you read stays for every later PR. Hold only briefs, summaries and digests.
+Your context lasts the whole stack, so everything you read stays for every later PR. Hold only briefs, replies and digests.
 
 - Never read a PR's diff, whole files or full logs. The builder reads those.
 - To rule on a disputed finding, or to answer the user about one, read that finding in the report and only the lines it cites (for example `sed -n '40,70p' <file>`). You are the neutral party, so judge the code, not the two agents' accounts of it. Prefer having the builder run something that settles it.
@@ -56,7 +56,7 @@ When the user edits a PR description before marking it ready, compare the edit w
 
 ## Finishing
 
-Once every PR is approved and the user says to merge, squash from the bottom up. For each branch in turn, send its builder (or a fresh one) a squash brief and wait for its summary. The builder checks commit hygiene, autosquashes (which folds fixups into the commits they fix and leaves the atomic commits as they are), confirms no content changed, and restacks the branches above.
+Once every PR is approved and the user says to merge, squash from the bottom up. For each branch in turn, send its builder (or a fresh one) a squash brief and wait for its reply. The builder checks commit hygiene, autosquashes (which folds fixups into the commits they fix and leaves the atomic commits as they are), confirms no content changed, and restacks the branches above.
 
 Then `gh stack push` and `gh stack merge --rebase`. After the last merge, run the `retro` skill. It ends by telling the user to `/clear`, so the next feature starts in a fresh session.
 
