@@ -30,7 +30,7 @@ You write two things and nothing else: your report, to `.claude/reviews/<branch>
 
 For a re-review, start with the brief you were given, so the report records what you were asked.
 
-Then a list ordered by severity. For each finding:
+Then a list ordered by severity, numbered 1, 2, 3 and so on, so the caller can cite a finding by number. For each finding:
 
 - **ID**: the checklist item ID (for example `PY-03`), or `design` for a challenge not on the list.
 - **Where**: file and line.
@@ -59,10 +59,10 @@ Return only a digest to the caller, not the report. The caller discusses finding
 
 ```
 <verdict> | <report path>
-<ID> | <file:line> | <BLOCK|FIX|low> | <the problem, under 25 words>
+<n> | <ID> | <file:line> | <BLOCK|FIX|low> | <the problem, under 25 words>
 Simplification | <one line, or "nothing worth changing">
 Not checked | <the checklist items you could not check, or "none">
 Suggest for checklist | <one line, or "none">
 ```
 
-One line per finding, each under 25 words, in the report's order. The evidence stays in the saved report. For a re-review, the earlier findings come first, with their status in place of the severity.
+One line per finding, each under 25 words, starting with its report number, in the report's order. The evidence stays in the saved report. For a re-review, the earlier findings come first, with their status in place of the severity.
