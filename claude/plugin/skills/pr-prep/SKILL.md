@@ -5,7 +5,7 @@ description: Use this skill before marking ready any PR, or when a PR needs a ma
 
 # pr-prep
 
-A PR is not marked ready until this passes. This is the main session's part. The `builder` agent runs the mechanical checks (`just check` at every commit, mutation checks, docs and version, output comparison, commit hygiene): see `agents/builder.md`. Run on its own, outside `build-stack`, start a `builder` with a check brief (the branch, its base, the PR and the language), so the checks still run.
+A PR is not marked ready until this passes, or the user skips the next review after a lows-only round (step 4). This is the main session's part. The `builder` agent runs the mechanical checks (`just check` at every commit, mutation checks, docs and version, output comparison, commit hygiene): see `agents/builder.md`. Run on its own, outside `build-stack`, start a `builder` with a check brief (the branch, its base, the PR and the language), so the checks still run.
 
 1. **Builder checks.** The builder's latest reply says every check passed, and the commits match the plan's commit list or the PR description says why they differ. If not, send it back.
 2. **First review.** Run the `adversarial-reviewer` agent on the branch against its base (the branch below it in the stack, or `main`). It saves its full report to `.claude/reviews/<branch>-<n>.md` and appends its log block to `.claude/review-log.md` (both untracked, see below), then returns a digest: the verdict, the report path and one line per finding. Work from the digest. Read a finding's evidence in the report only when you need it to rule on or dispute that finding.
@@ -16,8 +16,10 @@ A PR is not marked ready until this passes. This is the main session's part. The
    - **What I did not change, and why.** One line per finding that was declined or only partly done, so the reviewer does not raise it again unless the reason is wrong.
    - **Scope.** Findings must be caused by the fixups, but they may be anywhere. The reviewer reads whatever it needs to check that unchanged code is not broken (callers, tests that pass for the wrong reason, docs that are now false).
 
-   Each round's report and log block are saved the same way. Repeat until `CLEAR`. Three rounds is a cap, not a target: if the third is not `CLEAR`, stop and bring the user in (see `build-stack`). When the user is present, report the reviewer's findings to them before sending the fix brief.
-5. PR description: use the draft in the builder's file (`.claude/builds/`). Check it against the plan and the findings settled, follow the PR descriptions section of `conventions/full/writing.md`, and name the issues it closes.
+   Each round's report and log block are saved the same way. Repeat until `CLEAR`, or until the user skips the next review (below). Three rounds is a cap, not a target: if the third is not `CLEAR`, stop and bring the user in (see `build-stack`). When the user is present, report the reviewer's findings to them before sending the fix brief.
+
+   In discuss mode, when every finding of a round is `low`, ask the user once for that PR whether to fix the lows and skip the next review. If they say yes, send the fix brief and push. Once the builder's reply says every check passed, `build-stack` marks the PR ready (this skill does not). Log each outcome as `fixed (re-review skipped at user request)`. This does not apply when any finding is `FIX` or `BLOCK`, and it does not change delegated mode.
+5. PR description: use the draft in the first build's file (`.claude/builds/<branch>-1.md`), with the changed lines from the later files. Check it against the plan and the findings settled, follow the PR descriptions section of `conventions/full/writing.md`, and name the issues it closes.
 
 ## Review log
 
@@ -25,6 +27,6 @@ The reviewer writes the log: it appends one block per round in the format below,
 
 `.claude/review-log.md`, `.claude/reviews/`, `.claude/builds/` (the builder's files) and `.claude/review-tally.md` are untracked. Make sure all four are in `.gitignore`, and never commit them or quote them in a PR. The `retro` skill reads them, then deletes the log, the reports and the builder files at the end of the feature. `.claude/adrs/` is untracked too: an ADR enters git only when it is copied to `docs/explanation/adr/NNNN-<slug>.md` in the PR that completes its work.
 
-- Per finding, real or not: `date | branch | round | ID | file:line | severity | outcome` (`open`, then `fixed`, `false-positive`, `dissent`, `deferred #issue` or `proposed-deferral`).
+- Per finding, real or not: `date | branch | round | ID | file:line | severity | outcome` (`open`, then `fixed`, `fixed (re-review skipped at user request)`, `false-positive`, `dissent`, `deferred #issue` or `proposed-deferral`).
 - Per round: `date | branch | round | round | base sha | reviewed sha | verdict`. The next round's `git range-diff` uses the shas.
 - Add the reviewer's start and end times to the round line if you want the retro to report timings.

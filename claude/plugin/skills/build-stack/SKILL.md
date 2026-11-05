@@ -19,8 +19,8 @@ The stack starts as draft PRs. For each PR, bottom to top:
 
 1. **Brief.** Start a fresh `builder` for the PR with a build brief (see `agents/builder.md`): the branch and its base, the PR number, the project language, the plan's commit list, the ADRs it completes, the issues it closes and their acceptance, and anything a lower PR decided that this one depends on.
 2. **Build.** The builder writes the commits, runs the checks and returns a short reply that names its file in `.claude/builds/`. Push the branch (`gh stack push`). If the commit list changed, update the PR description.
-3. **Review.** Run `pr-prep`. It runs the reviewer, settles the findings in the session's mode (below), sends fix briefs to this PR's builder, pushes the fixups and re-reviews until the reviewer returns `CLEAR`.
-4. **Ready.** Mark the PR ready (`gh pr ready`). Ready means the agent has cleared it and the user may review. A ready PR is never returned to draft.
+3. **Review.** Run `pr-prep`. It runs the reviewer, settles the findings in the session's mode (below), sends fix briefs to this PR's builder, pushes the fixups and re-reviews until the reviewer returns `CLEAR` (or the user skips the next review after a lows-only round).
+4. **Ready.** Mark the PR ready (`gh pr ready`). Ready means the agent has cleared it, or the user skipped the next review after a lows-only round, and the user may review. A ready PR is never returned to draft.
 5. **Next.** Start the next PR straight away, with a fresh builder. While the user reviews PR N, you build PR N+1. Do not wait on the user.
 
 Run one agent that uses the checkout at a time, a builder or the reviewer, and wait for it to return before starting another: builders switch branches and restack, and the reviewer reads `HEAD`.
