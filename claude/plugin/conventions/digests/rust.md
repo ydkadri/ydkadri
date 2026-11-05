@@ -11,7 +11,7 @@ For the executor. Lints, rustfmt, rustdoc, coverage and `scripts/check-deps.sh` 
 - Core has no I/O and no third-party types beyond the allow-list. Orchestrators hold no business `if`. Only the app crate depends on both core and adapters.
 - Logging is `tracing` with key-value fields, once per event. Use `#[instrument(skip_all, fields(...))]`. DEBUG flow, INFO milestones, WARN handled, ERROR task failed. Never log secrets.
 - Tests: unit inline, integration in `tests/integration/`. Data inline. Fakes implement the real trait, with no mocking crates. Table tests only when the logic is identical. Cover error paths. No `test_` prefix.
-- Before committing a new rule, break it once and see a test fail, then check the break applied. Assert an error's key or whole message, not a prefix.
+- Before committing a new rule, break it once and see a test fail, then check the break applied. Assert the whole result in a test (the full message and its structured fields, such as the key, variant or location), not only that something was raised or which item it names.
 - Give options and flags values that differ from each other and from the defaults, so a swapped or hard-coded argument fails a test (two booleans: one case with each set alone). Test an input that can fail two ways with both faults at once. When tests move down a layer, keep one in the upper layer that proves an error from below is not swallowed.
 - Write `# Errors`, `# Panics` and `# Safety` sections. Examples must compile.
 - Each `unsafe` block carries a `// SAFETY:` reason.
