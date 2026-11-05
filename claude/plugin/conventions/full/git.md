@@ -239,7 +239,7 @@ Fixes #123
 ## PR Workflow
 
 1. Agree ADRs in chat and draft them locally in `.claude/adrs/`, then open the stack as draft PRs. Each ADR is committed in the PR that completes its work. The user approves the plan.
-2. Build PR 1 as a draft. The adversarial reviewer reviews it until CLEAR, then it is marked ready.
+2. Build PR 1 as a draft. The adversarial reviewer reviews it until CLEAR (or the user skips the next review after a lows-only round), then it is marked ready.
 3. Build PR 2 while the user reviews PR 1 and the reviewer reviews PR 2. Repeat up the stack.
 4. Each PR has a clear title (under 70 characters), a terse summary and a test plan.
 5. Review comments are discussed in the dialogue, never replied to on GitHub. Agreed changes are pushed as `--fixup` commits.

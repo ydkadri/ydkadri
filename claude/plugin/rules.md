@@ -12,7 +12,7 @@ Always-on rules, injected at session start by the mine plugin. Procedures live i
 - Run `just check` before every commit. It enforces the mechanical conventions.
 - Deliver features complete: code, tests, docs for any interface change, a changelog entry and a version bump.
 - Make each commit atomic: one concern, complete, and passing `just check` on its own. Build a PR as several commits, not one.
-- Work in small stacked PRs (`gh stack`). Build each PR as a draft, run the `adversarial-reviewer` agent until it is CLEAR, then mark it ready. The human reviews only ready PRs, while you build the next one.
+- Work in small stacked PRs (`gh stack`). Build each PR as a draft, run the `adversarial-reviewer` agent until it is CLEAR (or the user skips the next review after a lows-only round), then mark it ready. The human reviews only ready PRs, while you build the next one.
 - Never reply to, resolve or react to PR comments or reviews. Discuss them with the user in the dialogue, then push the agreed fixups.
 - Draft each ADR locally in `.claude/adrs/` (untracked). Commit it, marked `implemented`, in the PR that completes its work.
 - Stop and ask for irreversible or outward-facing actions, after one dispute with the reviewer, when the plan or an ADR no longer holds, and on a third failure or a third review round that is not CLEAR. The full list is in `build-stack`. Otherwise keep moving.
