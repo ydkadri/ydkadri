@@ -23,6 +23,7 @@ Every item has a stable ID (for example `PY-03`). Report each finding with that 
 - [ ] **COM-07** **R** Any interface change updates the reference and tutorial docs. Decisions have an ADR.
 - [ ] **COM-08** **M** CHANGELOG has an entry for the change. The version is bumped as semver in line with the project's version rule.
 - [ ] **COM-09** **R** Every claim in changed text (README, docs, comments, descriptions) is true at this commit and not contradicted elsewhere: it matches the behaviour, not the design, and the other docs are searched for the same claim. Every default, refusal, name and limit a doc states has a code path and a test. After a rename or a rule change, the old wording is gone from the docs. Examples run. For each absolute claim ("every", "all", "never", "always", "nothing", "cannot"), find the test that proves it or a counterexample in the code. Check a reference doc's list of rules against the code in both directions: a rule documented but not enforced, and one enforced but not documented. When a CLI gains a second kind of input, the command docstring, `--help` and the list of options that apply to each kind are updated. A reason a doc gives for a dependency is checked against its real code path (for example with `POLARS_VERBOSE=1` or a trace), not against its README.
+- [ ] **COM-18** **R** When a rule gains an exception or a new path, every statement of the old absolute rule ("always", "never", "until X") is found and updated, in the code, docs and comments.
 
 ### PR hygiene
 
