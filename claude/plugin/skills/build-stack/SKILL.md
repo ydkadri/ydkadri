@@ -42,10 +42,13 @@ Record a choice the plan left open where `plan-stack` records decisions: an arch
 
 Your context lasts the whole stack, so everything you read stays for every later PR. Hold only briefs, replies and digests.
 
-- Never read a PR's diff, whole files or full logs. The builder reads those.
+- Never read a PR's diff, whole files, or a log or report in full, and never `cat` one: use `finder -s` or `tail` for the branch you need. The builder reads those.
 - To rule on a disputed finding, or to answer the user about one, read that finding in the report and only the lines it cites (for example `sed -n '40,70p' <file>`). You are the neutral party, so judge the code, not the two agents' accounts of it. Prefer having the builder run something that settles it.
 - A command you run only to confirm a diff is empty, as after the user merges, is fine.
 - For a search across many files, use the `Explore` agent and keep its conclusion.
+- Digests to the user are the finding line, your recommendation and the report path. Do not restate the reviewer's evidence.
+- A fix brief for reviewer findings cites the report path and the finding numbers (for example "findings 1, 2, 4 of report 2") and does not copy the finding text. A fix brief for human review quotes the user's comment, which is the finding.
+- A brief that removes something says exactly what stays. A brief that said "remove the check for X" led a builder to delete a broader check that covered other cases as well.
 - Do not use `fork` subagents. A fork starts with your whole context, which is what this section keeps small.
 
 ## Human review
