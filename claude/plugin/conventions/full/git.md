@@ -147,7 +147,7 @@ git push
 
 **Before merging (once every PR is approved):**
 - Rebase to incorporate all feedback into logical commits
-- Use `git rebase -i --autosquash` to automatically squash fixup commits
+- Use the autosquash command below to squash fixup commits
 - Verify tests pass after rebase
 - Push cleaned history
 
@@ -161,9 +161,9 @@ git log --oneline
 # jkl012 Add query infrastructure
 
 # Rebase with autosquash
-git rebase -i --autosquash main   # for a stacked branch, use the branch below it as the base
-# Automatically reorders and marks fixups for squashing
-# Just save and exit - no manual work needed
+GIT_SEQUENCE_EDITOR="sed -i.bak '/ Start: /d'" git rebase -i --autosquash --keep-base main   # for a stacked branch, use the branch below it as the base
+# Reorders and squashes the fixups, and drops the empty `Start:` commits
+# No manual work needed
 
 # After: clean history
 git log --oneline
@@ -171,8 +171,7 @@ git log --oneline
 # pqr678 Add query infrastructure
 ```
 
-**Note:** If you have `rebase.autosquash = true` in your gitconfig (recommended), 
-you can use `git rebase -i main` and autosquash happens automatically.
+**Note:** `rebase.autosquash = true` in your gitconfig makes every `git rebase -i` squash fixups, even while they wait for review. Pass `--no-autosquash` to any other interactive rebase until the squash.
 
 ### Force-pushing
 
@@ -244,7 +243,7 @@ Fixes #123
 3. Build PR 2 while the user reviews PR 1 and the reviewer reviews PR 2. Repeat up the stack.
 4. Each PR has a clear title (under 70 characters), a terse summary and a test plan.
 5. Review comments are discussed in the dialogue, never replied to on GitHub. Agreed changes are pushed as `--fixup` commits.
-6. Once every PR is approved and the user says to merge, autosquash from the bottom up (`git rebase -i --autosquash --no-keep-empty --keep-base <base>`, then `gh stack rebase --no-trunk`, then the next branch), check each squash changed no content, and merge the stack with `gh stack merge --rebase`.
+6. Once every PR is approved and the user says to merge, autosquash from the bottom up (`GIT_SEQUENCE_EDITOR="sed -i.bak '/ Start: /d'" git rebase -i --autosquash --keep-base <base>`, which drops the empty `Start:` commits and keeps the empty `amend!` ones, then `gh stack rebase --no-trunk`, then the next branch), check each squash changed no content, and merge the stack with `gh stack merge --rebase`.
 
 ### Deferring work in a stack
 
