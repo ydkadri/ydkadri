@@ -9,4 +9,4 @@ finder -f "*.py" -r "def\s+handle_" -i        # regex inside Python files, ignor
 finder src -f "*.rs" -l -s "unsafe"           # paths only
 ```
 
-`finder --help` lists every option (`--json`, `-c` for counts). `PATH` defaults to the current directory.
+`finder --help` lists every option (`--json`, `-c` for counts). `PATH` defaults to the current directory. It searches files on disk, ignored files and `.git/` included (search a subdirectory to avoid `.git/`), and cannot read a git ref or stdin. For a ref that is not checked out, use `git grep <ref>` or `git show <ref>:<path>`.
