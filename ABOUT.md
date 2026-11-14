@@ -9,9 +9,9 @@
 
 ## What I Do
 
-I lead a team of data platform engineers at Kraken Technologies. We're building systems that help utility companies access and understand their data - think 70+ million customer accounts across 30+ countries. My job is to make data easier to work with, both for analysts inside the company and for clients who need to use it.
+I currently work for a software company in the utilities sector. We're building systems that help companies access and understand their data. Think 100+ million customer accounts across clients around the world. My job is to make data easier to work with, both for consumers inside the company and for client data teams.
 
-I'm particularly focused on reducing friction. Data is only valuable if people can actually get to it and understand what it's telling them.
+I'm particularly focused on reducing friction. Data is only valuable if people can actually get to it, ask questions of it, understand what it is telling them.
 
 ---
 
@@ -21,17 +21,17 @@ I've had a pretty winding career path. Started at Essence Digital working with c
 
 After that I went self-employed for a bit, building tools for marketing tech startups. I made an awesome network graph builder for search marketing, to help small businesses figure out where to spend their ad budget.
 
-Then I moved into consulting. First at Deloitte doing digital forensics on one of the largest investigations in history. I built a file scanner with Elasticsearch that could find documents in seconds instead of months. Then big data consulting at Informatica and Servian.
+Then I moved into consulting. First at Deloitte doing digital forensics on one of the largest investigations in history. I built a file scanner with Elasticsearch that could identify documents relevant to the case in seconds instead of months. Then big data consulting at Informatica and Servian.
 
-I joined Kraken in 2022 as a data engineer. I ended up leading the APAC engineering function, and now I'm the product lead for Kraken Data Sharing. We've grown from 4 engineers (down to 2 after some relocations) to 17 people across five countries. Really proud that we've had zero attrition, people seem to like working with me.
+I joined Kraken in 2022 as a data engineer. I ended up leading the APAC engineering function, was a product lead for the data sharing function, and am currently the staff data engineer. The APAC team has grown from 4 engineers when I joined (down to 2 after some relocations) to 10 people across three countries. Really proud that we've had zero attrition, people seem to like working with me.
 
 ---
 
 ## What I'm Working On
 
-Right now I'm focused on Kraken Data Sharing. We process operational data from the Kraken platform (it's a utilities CRM serving companies like EDF, Tokyo Gas, and Origin Energy) and make it available to both internal analysts and external clients.
+Right now I'm focused on process optimisation. Trying to get more bang for my buck, process data faster and cheaper at scale so we can drop time to serve. Our clients are talking about AI enablement and real-time responses to events. All of this needs data to be current and correct.
 
-The interesting technical challenge is that different clients have different data platforms. Some use Delta Sharing, others prefer Iceberg. We handle both structured data and unstructured stuff like audio files for ML use cases.
+Beyond that I am pushing to expand the internal user base of the data platform. Working with software engineers, customer success, and delivery managers to make, and support their clients with making the best decisions with data. 
 
 I've also built a bunch of infrastructure over the years:
 - Datalake platforms and configuration tools
@@ -113,4 +113,4 @@ Or just wander around Wellington, you'll probably run into me eventually.
 
 ---
 
-**Last Updated**: 2026-03-22
+**Last Updated**: 2026-11-14
